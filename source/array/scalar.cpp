@@ -1,0 +1,89 @@
+
+#include <quspin/array/details/scalar.hpp>
+#include <quspin/array/scalar.hpp>
+#include <quspin/dtype/details/dtype.hpp>
+#include <quspin/dtype/dtype.hpp>
+
+namespace quspin {
+
+Scalar::Scalar() {
+  internals_ = details::scalars(details::scalar<double>(0));
+  dtype_ = DType(details::dtype<double>());
+}
+
+Scalar::Scalar(const Scalar &scalar) {
+  internals_ = scalar.internals_;
+  dtype_ = scalar.dtype_;
+}
+
+Scalar::Scalar(const details::scalars &scalar) {
+  internals_ = scalar;
+  dtype_ = std::visit(
+      [](const auto &scalar) {
+        using T = typename std::decay_t<decltype(scalar)>::value_type;
+        return DType(details::dtype<T>());
+      },
+      scalar);
+}
+
+template <typename T> Scalar::Scalar(const T &value) {
+  internals_ = details::scalars(details::scalar<T>(value));
+  dtype_ = details::dtypes(details::dtype<T>());
+}
+// explicit template instantiation
+template Scalar::Scalar(const int8_t &);
+template Scalar::Scalar(const uint8_t &);
+template Scalar::Scalar(const int16_t &);
+template Scalar::Scalar(const uint16_t &);
+template Scalar::Scalar(const int32_t &);
+template Scalar::Scalar(const uint32_t &);
+template Scalar::Scalar(const int64_t &);
+template Scalar::Scalar(const uint64_t &);
+template Scalar::Scalar(const float &);
+template Scalar::Scalar(const double &);
+template Scalar::Scalar(const details::cfloat &);
+template Scalar::Scalar(const details::cdouble &);
+
+Scalar &Scalar::operator=(const Scalar &scalar) {
+  internals_ = scalar.internals_;
+  dtype_ = scalar.dtype_;
+  return *this;
+}
+
+Scalar &Scalar::operator=(const details::scalars &scalar) {
+  internals_ = scalar;
+  dtype_ = std::visit(
+      [](const auto &scalar) {
+        using T = typename std::decay_t<decltype(scalar)>::value_type;
+        return DType(details::dtype<T>());
+      },
+      scalar);
+  return *this;
+}
+
+template <typename T> Scalar &Scalar::operator=(const T &value) {
+  internals_ = details::scalars(details::scalar<T>(value));
+  dtype_ = DType(details::dtype<T>());
+  return *this;
+}
+// explicit template instantiation
+template Scalar &Scalar::operator=(const int8_t &);
+template Scalar &Scalar::operator=(const uint8_t &);
+template Scalar &Scalar::operator=(const int16_t &);
+template Scalar &Scalar::operator=(const uint16_t &);
+template Scalar &Scalar::operator=(const int32_t &);
+template Scalar &Scalar::operator=(const uint32_t &);
+template Scalar &Scalar::operator=(const int64_t &);
+template Scalar &Scalar::operator=(const uint64_t &);
+template Scalar &Scalar::operator=(const float &);
+template Scalar &Scalar::operator=(const double &);
+template Scalar &Scalar::operator=(const details::cfloat &);
+template Scalar &Scalar::operator=(const details::cdouble &);
+
+DType Scalar::dtype() const { return dtype_; }
+
+details::scalars get_variant_obj(const Scalar &scalar) {
+  return scalar.internals_;
+}
+
+} // namespace quspin
