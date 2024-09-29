@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cassert>
+
 #include <quspin/details/complex.hpp>
 #include <quspin/details/error.hpp>
 #include <quspin/details/optional.hpp>
@@ -73,6 +75,7 @@ Array dispatch_elementwise(Kernel &&kernel, Optional<Array> out,
   };
 
   auto result_shape = [](const Array &lhs, const Array &rhs) {
+    assert (lhs.shape() == rhs.shape());
     return lhs.shape();
   };
 

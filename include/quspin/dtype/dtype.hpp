@@ -15,7 +15,6 @@ class DType : public details::VariantContainer<details::dtypes> {
 
 public:
   DType();
-  DType(const DType &dtype);
   DType(const details::dtypes &dtype);
   template <typename T> DType(const details::dtype<T> &dtype);
   std::string name() const;

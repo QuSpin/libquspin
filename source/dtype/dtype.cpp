@@ -12,7 +12,6 @@
 namespace quspin {
 
 DType::DType() { internals_ = details::dtype<double>(); }
-DType::DType(const details::dtypes &dtype) { this->internals_ = dtype; }
 
 template <typename T> DType::DType(const details::dtype<T> &dtype) {
   internals_ = dtype;
@@ -29,8 +28,6 @@ template DType::DType(const details::dtype<float> &);
 template DType::DType(const details::dtype<double> &);
 template DType::DType(const details::dtype<details::cfloat> &);
 template DType::DType(const details::dtype<details::cdouble> &);
-
-DType::DType(const DType &dtype) { internals_ = dtype.internals_; }
 
 std::string DType::name() const {
 

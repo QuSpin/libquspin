@@ -61,7 +61,7 @@ Scalar norm(const Array &arr) {
     return details::ErrorOr<Scalar>(result);
   };
 
-  auto static_args_check = [](const auto &arr) { return details::ValidArgs(); };
+  auto static_args_check = [](const auto &) { return details::ValidArgs(); };
 
   auto dynamic_args_check = [](const auto &arr) {
     if (arr.ndim() != 1) {

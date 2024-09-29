@@ -6,20 +6,14 @@
 
 namespace quspin {
 
-class Scalar {
-private:
-  details::scalars internals_;
-  DType dtype_;
-
-  friend details::scalars get_variant_obj(const Scalar &);
+class Scalar : public DTypeObject<details::scalars> {
+  using DTypeObject<details::scalars>::internals_;
 
 public:
   Scalar();
-  Scalar(const Scalar &scalar);
   Scalar(const details::scalars &scalar);
   template <typename T> Scalar(const T &value);
 
-  Scalar &operator=(const Scalar &scalar);
   Scalar &operator=(const details::scalars &scalar);
   template <typename T> Scalar &operator=(const T &value);
 

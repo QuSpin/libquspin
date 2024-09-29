@@ -10,16 +10,11 @@
 
 namespace quspin {
 
-class Reference {
-private:
-  details::references internals_;
-  DType dtype_;
-
-  friend details::references get_variant_obj(const Reference &);
+class Reference : public DTypeObject<details::references> {
+  using DTypeObject<details::references>::internals_;
 
 public:
   Reference();
-  Reference(Reference &reference);
   Reference(details::references &reference);
   template <typename T> Reference(T &ref);
 

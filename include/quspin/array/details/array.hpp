@@ -132,9 +132,6 @@ public:
   array()
       : data_(reference_counted_ptr<T>()), stride_({}), shape_({}), size_(0),
         ndim_(0) {};
-  array(const array<T> &other)
-      : data_(other.data_), stride_(other.stride_), shape_(other.shape_),
-        size_(other.size_), ndim_(other.ndim_) {};
   array(std::initializer_list<ssize_t> shape, T *data = nullptr) {
     init_from_stl_(std::vector<ssize_t>(shape), data);
   }

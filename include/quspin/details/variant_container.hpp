@@ -12,7 +12,6 @@ protected:
 public:
   VariantContainer() = default;
   VariantContainer(const Variant &internals) : internals_(internals) {}
-  VariantContainer(const VariantContainer &obj) : internals_(obj.internals_) {}
 };
 
 } // namespace details

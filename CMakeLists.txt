@@ -4,8 +4,8 @@ cmake_minimum_required(VERSION 3.14...3.22)
 
 # Note: update this to your new project's name and version
 project(
-  QuSpin
-  VERSION 0.1
+  quspin
+  VERSION 0.1.0
   LANGUAGES CXX
 )
 
@@ -53,7 +53,7 @@ target_include_directories(
 
 # the location where the project's version header will be placed should match the project's regular
 # header paths
-string(TOLOWER ${PROJECT_NAME}/version.h VERSION_HEADER_LOCATION)
+string(TOLOWER ${PROJECT_NAME}/version.hpp VERSION_HEADER_LOCATION)
 
 packageProject(
   NAME ${PROJECT_NAME}

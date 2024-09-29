@@ -13,24 +13,12 @@ namespace quspin {
 
 // implementation of Reference
 
-Reference::Reference(Reference &reference) {
-  internals_ = reference.internals_;
-  dtype_ = reference.dtype_;
-}
-
 Reference::Reference(details::references &reference) {
   internals_ = reference;
-  dtype_ = std::visit(
-      [](auto &reference) {
-        using T = typename std::decay_t<decltype(reference)>::value_type;
-        return DType(details::dtype<T>());
-      },
-      reference);
 }
 
 template <typename T> Reference::Reference(T &ref) {
   internals_ = details::references(details::reference<T>(ref));
-  dtype_ = details::dtypes(details::dtype<T>());
 }
 template Reference::Reference(int8_t &);
 template Reference::Reference(uint8_t &);
@@ -57,12 +45,6 @@ Reference &Reference::operator=(const Scalar &scalar) {
       },
       internals_, get_variant_obj(scalar));
   return *this;
-}
-
-DType Reference::dtype() const { return dtype_; }
-
-details::references get_variant_obj(const Reference &reference) {
-  return reference.internals_;
 }
 
 } // namespace quspin

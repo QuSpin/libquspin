@@ -14,7 +14,6 @@ template <typename T> class reference : public typed_object<T> {
 public:
   reference() : ref_(nullptr) {}
   reference(T &ref) : ref_(&ref) {}
-  reference(reference &ref) : ref_(ref.ref_) {}
   operator T &() const { return *ref_; }
   T &operator=(const T &value) {
     *ref_ = value;
