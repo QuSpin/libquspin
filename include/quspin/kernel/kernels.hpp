@@ -5,9 +5,9 @@
 
 namespace quspin {
 
-Array add(const Array &lhs, const Array &rhs,
-          details::Optional<Array> out = details::Optional<Array>());
+  Array add(const Array &lhs, const Array &rhs,
+            details::Optional<Array> out = details::Optional<Array>());
 
-Scalar norm(const Array &array);
+  Scalar norm(const Array &array);
 
-} // namespace quspin
+}  // namespace quspin

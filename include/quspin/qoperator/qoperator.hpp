@@ -5,15 +5,14 @@
 
 namespace quspin {
 
-class Operator : public DTypeObject<details::qoperators> {
-  using DTypeObject<details::qoperators>::internals_;
+  class Operator : public DTypeObject<details::qoperators> {
+    using DTypeObject<details::qoperators>::internals_;
 
-public:
-  Operator(const Operator &op);
-  Operator(const details::qoperators &op);
-  template <typename T, typename I, typename J>
-  Operator(const details::qoperator<T, I, J> &op);
-  Operator(Array, Array, Array, Array);
-};
+  public:
+    Operator(const Operator &op);
+    Operator(const details::qoperators &op);
+    template <typename T, typename I, typename J> Operator(const details::qoperator<T, I, J> &op);
+    Operator(Array, Array, Array, Array);
+  };
 
-} // namespace quspin
+}  // namespace quspin

@@ -1,20 +1,18 @@
 #pragma once
 
 namespace quspin {
-namespace details {
+  namespace details {
 
-template <typename Variant> class VariantContainer {
-protected:
-  Variant internals_;
+    template <typename Variant> class VariantContainer {
+    protected:
+      Variant internals_;
 
-public:
-  VariantContainer() = default;
-  VariantContainer(const Variant &internals) : internals_(internals) {}
-  Variant get_variant_obj() const { return internals_; }
-};
+    public:
+      VariantContainer() = default;
+      VariantContainer(const Variant &internals) : internals_(internals) {}
+      Variant get_variant_obj() const { return internals_; }
+    };
 
-} // namespace details
+  }  // namespace details
 
-
-
-} // namespace quspin
+}  // namespace quspin
