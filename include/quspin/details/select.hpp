@@ -8,28 +8,29 @@
 namespace quspin {
   namespace details {
 
-    template <typename... Types, typename Variant> std::variant<Types...> select(Variant v) {
+    template <typename... Types, typename Variant> std::variant<Types...> select(Variant variant) {
+      using select_variant_t = std::variant<Types...>;
       return visit_or_error<std::variant<Types...>>(
           [](auto &&arg) {
             using arg_t = std::decay_t<decltype(arg)>;
             if constexpr ((std::is_same_v<arg_t, Types> || ...)) {
-              return std::variant<Types...>(arg);
+              return ErrorOr<select_variant_t>(select_variant_t(arg));
             } else {
-              std::stringstream err;
+              std::stringstream error_msg;
 
               DType input_dtype = DType::of<arg_t>();
               auto expected_dtypes = std::vector<DType>{DType::of<Types>()...};
-              err << "Invalid type " << input_dtype.name();
-              err << ", expected one of the specified types: ";
+              error_msg << "Invalid type " << input_dtype.name();
+              error_msg << ", expected one of the specified types: ";
 
               for (auto &dtype : expected_dtypes) {
-                err << dtype.name() << ", ";
+                error_msg << dtype.name() << ", ";
               }
-
-              return Error(ErrorType::ValueError, err.str());
+              Error error = Error(ErrorType::ValueError, error_msg.str());
+              return ErrorOr<select_variant_t>(error);
             }
           },
-          v);
+          variant);
     }
 
   }  // namespace details
