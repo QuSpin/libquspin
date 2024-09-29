@@ -98,7 +98,7 @@ namespace quspin {
         }
         std::size_t offset = 0;
         for (std::size_t i = 0; i < ndim_; i++) {
-          if (input[i] < 0 || input[i] >= shape_[i]) {
+          if (input[i] >= shape_[i]) {
             throw std::runtime_error("Index " + std::to_string(i) + " out of bounds");
           }
           offset += input[i] * stride_[i];
@@ -114,7 +114,7 @@ namespace quspin {
 
         stride_.resize(ndim_);
         stride_[ndim_ - 1] = sizeof(T);
-        for (std::size_t i = ndim_ - 2; i >= 0; i--) {
+        for (int i = ndim_ - 1; i >= 0; i--) {
           stride_[i] = stride_[i + 1] * shape[i + 1] * sizeof(T);
         }
 

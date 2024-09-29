@@ -16,7 +16,7 @@ namespace quspin {
       array<I> indptr_;
       array<I> indices_;
       array<J> cindices_;
-      static constexpr std::size_t max_coeff = std::numeric_limits<J>::max();
+      static constexpr J max_coeff = std::numeric_limits<J>::max();
 
     public:
       qoperator() = default;
