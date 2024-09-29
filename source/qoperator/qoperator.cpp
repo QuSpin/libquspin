@@ -16,9 +16,9 @@ namespace quspin {
     const std::size_t dim = indptr.size() - 1;
 
     auto data_variants = select<array<int8_t>, array<int16_t>, array<float>, array<double>,
-                                array<cfloat>, array<cdouble>>(data.get_variant_obj());
+                                        array<cfloat>, array<cdouble>>(data.get_variant_obj());
     auto indptr_variants = select<array<int32_t>, array<int64_t>>(indptr.get_variant_obj());
-    auto indices_variants = select<array<uint8_t>, array<uint16_t>>(indices.get_variant_obj());
+    auto indices_variants = select<array<int32_t>, array<int64_t>>(indices.get_variant_obj());
     auto cindices_variants = select<array<uint8_t>, array<uint16_t>>(cindices.get_variant_obj());
 
     this->internals_ = visit_or_error<qoperators>(

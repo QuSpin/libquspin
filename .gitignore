@@ -2,6 +2,7 @@
 /.vscode
 /cpm_modules
 .DS_Store
+scratch/
 
 # CMake files
 CMakeLists.txt.user

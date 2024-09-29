@@ -2,6 +2,8 @@
 
 #include <variant>
 
+// TODO: replace this with std::optional
+
 namespace quspin {
   namespace details {
 
