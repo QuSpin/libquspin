@@ -13,7 +13,7 @@ namespace quspin {
   Operator::Operator(Array data, Array indptr, Array indices, Array cindices) {
     using namespace details;
 
-    const ssize_t dim = indptr.size() - 1;
+    const std::size_t dim = indptr.size() - 1;
 
     auto data_variants = select<array<int8_t>, array<int16_t>, array<float>, array<double>,
                                 array<cfloat>, array<cdouble>>(data.get_variant_obj());

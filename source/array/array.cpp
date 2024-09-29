@@ -28,7 +28,7 @@ namespace quspin {
         DType().get_variant_obj());
   }
 
-  Array::Array(std::initializer_list<ssize_t> shape, const DType &dtype) {
+  Array::Array(std::initializer_list<std::size_t> shape, const DType &dtype) {
     internals_ = std::visit(
         [&shape](const auto &dtype) {
           using T = typename std::decay_t<decltype(dtype)>::value_type;
@@ -38,7 +38,7 @@ namespace quspin {
         dtype.get_variant_obj());
   }
 
-  Array::Array(const std::vector<ssize_t> &shape, const DType &dtype) {
+  Array::Array(const std::vector<std::size_t> &shape, const DType &dtype) {
     internals_ = std::visit(
         [&shape](const auto &dtype) {
           using T = typename std::decay_t<decltype(dtype)>::value_type;
@@ -48,7 +48,7 @@ namespace quspin {
         dtype.get_variant_obj());
   }
 
-  Array::Array(const std::vector<ssize_t> &shape, const DType &dtype, void *data) {
+  Array::Array(const std::vector<std::size_t> &shape, const DType &dtype, void *data) {
     internals_ = std::visit(
         [&shape, &data](const auto &dtype) {
           using T = typename std::decay_t<decltype(dtype)>::value_type;
@@ -58,19 +58,19 @@ namespace quspin {
         dtype.get_variant_obj());
   }
 
-  std::vector<ssize_t> Array::shape() const {
+  std::vector<std::size_t> Array::shape() const {
     return std::visit([](const auto &internals) { return internals.shape(); }, internals_);
   }
 
-  ssize_t Array::ndim() const {
+  std::size_t Array::ndim() const {
     return std::visit([](const auto &internals) { return internals.ndim(); }, internals_);
   }
 
-  ssize_t Array::size() const {
+  std::size_t Array::size() const {
     return std::visit([](const auto &internals) { return internals.size(); }, internals_);
   }
 
-  const Scalar Array::operator[](std::vector<ssize_t> &index) const {
+  const Scalar Array::operator[](std::vector<std::size_t> &index) const {
     return std::visit([&index](const auto &internals) { return Scalar(internals.at(index)); },
                       internals_);
   }

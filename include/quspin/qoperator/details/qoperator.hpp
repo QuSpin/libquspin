@@ -11,17 +11,17 @@ namespace quspin {
 
     template <typename T, typename I, typename J> struct qoperator : public typed_object<T> {
     private:
-      ssize_t dim_;
+      std::size_t dim_;
       array<T> data_;
       array<I> indptr_;
       array<I> indices_;
       array<J> cindices_;
-      static constexpr ssize_t max_coeff = std::numeric_limits<J>::max();
+      static constexpr std::size_t max_coeff = std::numeric_limits<J>::max();
 
     public:
       qoperator() = default;
 
-      qoperator(ssize_t dim, array<T> data, array<I> indptr, array<I> indices, array<J> cindices)
+      qoperator(std::size_t dim, array<T> data, array<I> indptr, array<I> indices, array<J> cindices)
           : dim_(dim), data_(data), indptr_(indptr), indices_(indices), cindices_(cindices) {}
 
       T *data() { return data_.mut_data(); }
@@ -36,7 +36,7 @@ namespace quspin {
       J *cindices() { return cindices_.mut_data(); }
       const J *cindices() const { return cindices_.data(); }
 
-      ssize_t dim() const { return dim_; }
+      std::size_t dim() const { return dim_; }
     };
 
     using qoperators

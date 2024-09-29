@@ -18,16 +18,16 @@ namespace quspin {
 
   public:
     Array();
-    Array(std::initializer_list<ssize_t> shape, const DType &dtype);
-    Array(const std::vector<ssize_t> &shape, const DType &dtype);
-    Array(const std::vector<ssize_t> &shape, const DType &dtype, void *data);
+    Array(std::initializer_list<std::size_t> shape, const DType &dtype);
+    Array(const std::vector<std::size_t> &shape, const DType &dtype);
+    Array(const std::vector<std::size_t> &shape, const DType &dtype, void *data);
 
-    std::vector<ssize_t> shape() const;
-    ssize_t ndim() const;
-    ssize_t size() const;
+    std::vector<std::size_t> shape() const;
+    std::size_t ndim() const;
+    std::size_t size() const;
 
-    const Scalar operator[](std::vector<ssize_t> &index) const;
-    Reference operator[](std::vector<ssize_t> &index);
+    const Scalar operator[](std::vector<std::size_t> &index) const;
+    Reference operator[](std::vector<std::size_t> &index);
   };
 
 }  // namespace quspin

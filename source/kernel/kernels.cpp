@@ -35,22 +35,22 @@ namespace quspin {
       using T = typename std::decay_t<decltype(arr)>::value_type;
       using norm_t = std::decay_t<decltype(details::abs_squared(T(0)))>;
 
-      constexpr ssize_t batch = 64 / sizeof(norm_t);
+      constexpr std::size_t batch = 64 / sizeof(norm_t);
 
       std::array<norm_t, batch> norms({norm_t(0)});
 
-      ssize_t niter = arr.size() / norms.size();
-      ssize_t nleft = arr.size() % norms.size();
+      std::size_t niter = arr.size() / norms.size();
+      std::size_t nleft = arr.size() % norms.size();
 
       auto ptr = arr.cbegin();
 
-      for (ssize_t i = 0; i < niter; i++) {
+      for (std::size_t i = 0; i < niter; i++) {
         for (auto &norm : norms) {
           norm += details::abs_squared(*ptr++);
         }
       }
       norm_t extra = norm_t(0);
-      for (ssize_t i = 0; i < nleft; i++) {
+      for (std::size_t i = 0; i < nleft; i++) {
         extra += details::abs_squared(*ptr++);
       }
       Scalar result = std::accumulate(norms.cbegin(), norms.cend(), extra);

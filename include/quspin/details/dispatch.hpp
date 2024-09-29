@@ -44,7 +44,7 @@ namespace quspin {
                            ResultDType &&result_dtype_func, StaticArgsCheck &&static_args_check,
                            DynamicArgsCheck &&dynamic_args_check, Optional<Array> out_option,
                            Args... args) {
-      std::vector<ssize_t> shape = result_shape_func(args...);
+      std::vector<std::size_t> shape = result_shape_func(args...);
       DType output_dtype = result_dtype_func(args...);
 
       auto default_result = [&shape, &output_dtype]() { return Array(shape, output_dtype); };
