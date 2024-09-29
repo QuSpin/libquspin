@@ -1,11 +1,14 @@
 #include <array>
-#include <quspin/array/array.hpp>
+
 #include <quspin/details/broadcast.hpp>
 #include <quspin/details/complex.hpp>
 #include <quspin/details/dispatch.hpp>
 #include <quspin/details/error.hpp>
+#include <quspin/details/cast.hpp>
 #include <quspin/details/math.hpp>
 #include <quspin/details/optional.hpp>
+
+#include <quspin/array/array.hpp>
 #include <quspin/kernel/kernels.hpp>
 
 namespace quspin {
@@ -23,7 +26,7 @@ namespace quspin {
       std::transform(
           lhs.cbegin(), lhs.cend(), rhs.cbegin(), out.begin(),
           [](const auto &lhs, const auto &rhs) {
-            return lhs+rhs;
+            return details::cast<result_t>(lhs+rhs);
           });
       return details::ReturnVoidError();
     };
