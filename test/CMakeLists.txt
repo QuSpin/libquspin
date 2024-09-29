@@ -19,24 +19,24 @@ include(../cmake/CPM.cmake)
 CPMAddPackage("gh:doctest/doctest@2.4.9")
 
 if(TEST_INSTALLED_VERSION)
-  find_package(quspin REQUIRED)
+  find_package(QuSpin REQUIRED)
 else()
-  CPMAddPackage(NAME quspin SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/..)
+  CPMAddPackage(NAME QuSpin SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/..)
 endif()
 
 # ---- Create binary ----
 
 file(GLOB sources CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp)
 add_executable(${PROJECT_NAME} ${sources})
-target_link_libraries(${PROJECT_NAME} doctest::doctest quspin::quspin)
+target_link_libraries(${PROJECT_NAME} doctest::doctest QuSpin::QuSpin)
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 20)
 
 # enable compiler warnings
 if(NOT TEST_INSTALLED_VERSION)
   if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-    target_compile_options(quspin PUBLIC -Wall -Wpedantic -Wextra -Werror)
+    target_compile_options(QuSpin PUBLIC -Wall -Wpedantic -Wextra -Werror)
   elseif(MSVC)
-    target_compile_options(quspin PUBLIC /W4 /WX)
+    target_compile_options(QuSpin PUBLIC /W4 /WX)
     target_compile_definitions(${PROJECT_NAME} PUBLIC DOCTEST_CONFIG_USE_STD_HEADERS)
   endif()
 endif()
