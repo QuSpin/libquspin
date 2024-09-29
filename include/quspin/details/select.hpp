@@ -14,7 +14,8 @@ namespace quspin {
           [](auto &&arg) {
             using arg_t = std::decay_t<decltype(arg)>;
             if constexpr ((std::is_same_v<arg_t, Types> || ...)) {
-              return ErrorOr<select_variant_t>(select_variant_t(arg));
+              select_variant_t select_variant = arg;
+              return ErrorOr<select_variant_t>(select_variant);
             } else {
               std::stringstream error_msg;
 
