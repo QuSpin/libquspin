@@ -109,11 +109,12 @@ namespace quspin {
       void init_from_stl_(const std::vector<std::size_t> &shape, T *data) {
         shape_ = shape;
         ndim_ = shape.size();
-        size_ = (ndim_ > 0 ? std::reduce(shape.begin(), shape.end(), std::size_t(1), std::multiplies<std::size_t>())
+        size_ = (ndim_ > 0 ? std::reduce(shape.begin(), shape.end(), std::size_t(1),
+                                         std::multiplies<std::size_t>())
                            : 0);
 
         stride_.resize(ndim_);
-        if (ndim_ == 1){
+        if (ndim_ == 1) {
           stride_[0] = sizeof(T);
         } else if (ndim_ > 1) {
           stride_[ndim_ - 1] = sizeof(T);
@@ -132,11 +133,13 @@ namespace quspin {
       }
 
     public:
-      array() : data_(reference_counted_ptr<T>()), stride_({}), shape_({}), size_(0), ndim_(0) {};
+      array() : data_(reference_counted_ptr<T>()), stride_({}), shape_({}), size_(0), ndim_(0){};
       array(std::initializer_list<std::size_t> shape, T *data = nullptr) {
         init_from_stl_(std::vector<std::size_t>(shape), data);
       }
-      array(const std::vector<std::size_t> &shape, T *data = nullptr) { init_from_stl_(shape, data); }
+      array(const std::vector<std::size_t> &shape, T *data = nullptr) {
+        init_from_stl_(shape, data);
+      }
 
       const T *data() const { return data_.get(); }
       T *mut_data() { return data_.get(); }
@@ -163,7 +166,9 @@ namespace quspin {
         return at(std::vector<std::size_t>(input));
       }
       T &at(std::vector<std::size_t> &input) { return mut_data()[get_offset(input)]; }
-      T &at(std::initializer_list<std::size_t> &input) { return at(std::vector<std::size_t>(input)); }
+      T &at(std::initializer_list<std::size_t> &input) {
+        return at(std::vector<std::size_t>(input));
+      }
     };
 
     template <typename T> constexpr bool is_integer_array_v

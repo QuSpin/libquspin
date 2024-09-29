@@ -10,8 +10,8 @@ namespace quspin {
     template <typename T> inline constexpr bool is_complex_v = is_complex<T>::value;
 
 #ifdef _MSC_VER
-#pragma warning( push )
-#pragma warning( disable : 4244 )
+#  pragma warning(push)
+#  pragma warning(disable : 4244)
 #endif
 
     template <typename U, typename T> inline U cast(const T &value) {
@@ -22,7 +22,7 @@ namespace quspin {
       }
     }
 #ifdef _MSC_VER
-#pragma warning( pop )
+#  pragma warning(pop)
 #endif
 
   }  // namespace details

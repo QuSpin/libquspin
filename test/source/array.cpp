@@ -1,15 +1,14 @@
 #include <doctest/doctest.h>
+
 #include <quspin/array/array.hpp>
 #include <quspin/dtype/dtype.hpp>
 #include <quspin/version.hpp>
-
 #include <string>
 
 TEST_CASE("Array") {
   using namespace quspin;
 
   Array a({1, 2, 3}, Float);
-
 }
 
 TEST_CASE("QuSpin version") {

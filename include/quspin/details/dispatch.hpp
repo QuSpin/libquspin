@@ -1,7 +1,7 @@
 #pragma once
 #ifdef _MSC_VER
-#pragma warning( push )
-#pragma warning( disable : 4100 )
+#  pragma warning(push)
+#  pragma warning(disable : 4100)
 #endif
 
 #include <cassert>
@@ -129,5 +129,5 @@ namespace quspin {
 }  // namespace quspin
 
 #ifdef _MSC_VER
-#pragma warning( pop )
+#  pragma warning(pop)
 #endif

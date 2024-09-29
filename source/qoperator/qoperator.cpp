@@ -13,10 +13,10 @@ namespace quspin {
   decltype(auto) select_data_variants(const Array &data) {
     using namespace details;
 
-    return select<array<int8_t>, array<int16_t>, array<float>, array<double>,
-                  array<cfloat>, array<cdouble>>(data.get_variant_obj());
+    return select<array<int8_t>, array<int16_t>, array<float>, array<double>, array<cfloat>,
+                  array<cdouble>>(data.get_variant_obj());
   }
-  
+
   decltype(auto) select_index_variants(const Array &indptr) {
     using namespace details;
 
@@ -41,16 +41,16 @@ namespace quspin {
 
     auto constructor = [&dim](auto &&data, auto &&indptr, auto &&indices, auto &&cindices) {
       if constexpr (!std::is_same_v<decltype(indptr), decltype(indices)>) {
-        return ErrorOr<qoperators>(Error(ErrorType::ValueError, "indptr and indices must have the same dtype"));
+        return ErrorOr<qoperators>(
+            Error(ErrorType::ValueError, "indptr and indices must have the same dtype"));
       } else {
         qoperators op = qoperator(dim, data, indptr, indices, cindices);
         return ErrorOr<qoperators>(op);
       }
     };
 
-    this->internals_ = visit_or_error<qoperators>(
-        constructor,
-        data_variants, indptr_variants, indices_variants, cindices_variants);
+    this->internals_ = visit_or_error<qoperators>(constructor, data_variants, indptr_variants,
+                                                  indices_variants, cindices_variants);
   }
 
 }  // namespace quspin
