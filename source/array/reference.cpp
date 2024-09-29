@@ -9,6 +9,8 @@
 #include <quspin/dtype/details/dtype.hpp>
 #include <quspin/dtype/dtype.hpp>
 
+#include <quspin/details/variant_container.hpp>
+
 namespace quspin {
 
 // implementation of Reference
@@ -43,8 +45,9 @@ Reference &Reference::operator=(const Scalar &scalar) {
 
         internals = details::cast<T, S>(scalar_value);
       },
-      internals_, get_variant_obj(scalar));
+      internals_, scalar.get_variant_obj());
   return *this;
 }
+
 
 } // namespace quspin

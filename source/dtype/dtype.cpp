@@ -74,7 +74,7 @@ DType result_dtype(std::vector<DType> &args) {
         [](const auto &dtype1, const auto &dtype2) {
           return DType(details::result_dtype(dtype1, dtype2));
         },
-        get_variant_obj(args[0]), get_variant_obj(args[1]));
+        args[0].get_variant_obj(), args[1].get_variant_obj());
   default:
     auto next_args = std::vector<DType>(args.begin() + 1, args.end());
     DType recurse = result_dtype(next_args);
@@ -90,7 +90,7 @@ bool int_dtype(const DType &dtype) {
         using T = typename std::decay_t<decltype(dtype)>::value_type;
         return std::is_integral_v<T>;
       },
-      get_variant_obj(dtype));
+      dtype.get_variant_obj());
 }
 
 bool float_dtype(const DType &dtype) {
@@ -99,7 +99,7 @@ bool float_dtype(const DType &dtype) {
         using T = typename std::decay_t<decltype(dtype)>::value_type;
         return std::is_floating_point_v<T>;
       },
-      get_variant_obj(dtype));
+      dtype.get_variant_obj());
 }
 
 bool complex_dtype(const DType &dtype) {
@@ -109,7 +109,7 @@ bool complex_dtype(const DType &dtype) {
         return std::is_same_v<T, details::cfloat> ||
                std::is_same_v<T, details::cdouble>;
       },
-      get_variant_obj(dtype));
+      dtype.get_variant_obj());
 }
 
 } // namespace quspin

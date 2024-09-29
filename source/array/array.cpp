@@ -26,7 +26,7 @@ Array::Array() {
         details::array<T> arr;
         return details::arrays(arr);
       },
-      get_variant_obj(DType()));
+      DType().get_variant_obj());
 }
 
 Array::Array(std::initializer_list<ssize_t> shape, const DType &dtype) {
@@ -36,7 +36,7 @@ Array::Array(std::initializer_list<ssize_t> shape, const DType &dtype) {
         details::array<T> arr(shape);
         return details::arrays(arr);
       },
-      get_variant_obj(dtype));
+      dtype.get_variant_obj());
 }
 
 Array::Array(const std::vector<ssize_t> &shape, const DType &dtype) {
@@ -46,7 +46,7 @@ Array::Array(const std::vector<ssize_t> &shape, const DType &dtype) {
         details::array<T> arr(shape);
         return details::arrays(arr);
       },
-      get_variant_obj(dtype));
+      dtype.get_variant_obj());
 }
 
 Array::Array(const std::vector<ssize_t> &shape, const DType &dtype,
@@ -57,7 +57,7 @@ Array::Array(const std::vector<ssize_t> &shape, const DType &dtype,
         details::array<T> arr(shape, static_cast<T *>(data));
         return details::arrays(arr);
       },
-      get_variant_obj(dtype));
+      dtype.get_variant_obj());
 }
 
 std::vector<ssize_t> Array::shape() const {

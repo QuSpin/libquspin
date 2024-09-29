@@ -38,7 +38,7 @@ void dispatch_core(Kernel &&kernel, StaticArgsCheck &&static_args_check,
           return kernel(out, args...);
         }
       },
-      get_variant_obj(out), get_variant_obj(args)...);
+      out.get_variant_obj(), args.get_variant_obj()...);
 }
 
 template <typename Kernel, typename ResultShape, typename ResultDType,
@@ -131,7 +131,7 @@ Scalar dispatch_scalar(Kernel &&kernel, StaticArgsCheck &&static_args_check,
           return kernel(args...);
         }
       },
-      get_variant_obj(args)...);
+      args.get_variant_obj()...);
 }
 
 } // namespace details

@@ -21,10 +21,10 @@ Operator::Operator(Array data, Array indptr, Array indices, Array cindices) {
 
   auto data_variants =
       select<array<int8_t>, array<int16_t>, array<float>, array<double>,
-             array<cfloat>, array<cdouble>>(get_variant_obj(data));
-  auto indptr_variants = select<array<int32_t>, array<int64_t>>(get_variant_obj(indptr));
-  auto indices_variants = select<array<uint8_t>, array<uint16_t>>(get_variant_obj(indices));
-  auto cindices_variants = select<array<uint8_t>, array<uint16_t>>(get_variant_obj(cindices));
+             array<cfloat>, array<cdouble>>(data.get_variant_obj());
+  auto indptr_variants = select<array<int32_t>, array<int64_t>>(indptr.get_variant_obj());
+  auto indices_variants = select<array<uint8_t>, array<uint16_t>>(indices.get_variant_obj());
+  auto cindices_variants = select<array<uint8_t>, array<uint16_t>>(cindices.get_variant_obj());
 
   this->internals_ = visit_or_error<details::qoperators>(
       [&dim](const auto &data, const auto &indptr, const auto &indices,
