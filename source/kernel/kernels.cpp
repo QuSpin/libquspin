@@ -19,14 +19,11 @@ namespace quspin {
             details::Optional<Array> out /* = details::Optional<Array>() */) {
     auto kernel = [](auto &out, const auto &lhs, const auto &rhs) {
       using out_t = typename std::decay_t<decltype(out)>::value_type;
-      using lhs_t = typename std::decay_t<decltype(lhs)>::value_type;
-      using rhs_t = typename std::decay_t<decltype(rhs)>::value_type;
-      using result_t = std::common_type_t<lhs_t, rhs_t>;
 
       std::transform(
           lhs.cbegin(), lhs.cend(), rhs.cbegin(), out.begin(),
           [](const auto &lhs, const auto &rhs) {
-            return details::cast<result_t>(lhs+rhs);
+            return details::cast<out_t>(lhs+rhs);
           });
       return details::ReturnVoidError();
     };

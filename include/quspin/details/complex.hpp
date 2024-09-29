@@ -19,10 +19,14 @@ namespace quspin {
     template<typename T, typename U, typename Op>
     std::common_type_t<T, U> operator_binary(const T &a,const U &b, Op &&op) {{
         using arith_result = std::common_type_t<T, U>;
-    #pragma warning( push ) 
-    #pragma warning( disable : 4244 ) // disable warning for implicit conversion
+#ifdef _MSC_VER
+#pragma warning( push ) 
+#pragma warning( disable : 4244 ) // disable warning for implicit conversion
+#endif
         return op(static_cast<arith_result>(a), static_cast<arith_result>(b));
-    #pragma warning( pop )
+#ifdef _MSC_VER
+#pragma warning( pop )
+#endif
     }}
 
   }  // namespace details

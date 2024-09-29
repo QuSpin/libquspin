@@ -1,6 +1,8 @@
 #pragma once
+#ifdef _MSC_VER
 #pragma warning( push )
 #pragma warning( disable : 4100 )
+#endif
 
 #include <cassert>
 #include <quspin/array/array.hpp>
@@ -126,4 +128,6 @@ namespace quspin {
   }  // namespace details
 }  // namespace quspin
 
+#ifdef _MSC_VER
 #pragma warning( pop )
+#endif
