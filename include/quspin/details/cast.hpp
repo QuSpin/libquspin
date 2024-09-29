@@ -9,18 +9,21 @@ namespace quspin {
 
     template <typename T> inline constexpr bool is_complex_v = is_complex<T>::value;
 
-#pragma warning( push )
-#pragma warning( disable : 4244 )
-
     template <typename U, typename T> inline U cast(const T &value) {
       if constexpr (is_complex_v<T> && !is_complex_v<U>) {
-        return static_cast<U>(value.real());
+        const auto real = value.real();
+        if constexpr (std::is_convertible_v<decltype(real), U>) {
+          return static_cast<U>(real);
+        } else {
+          return U(real);
+        }
       } else {
-        return static_cast<U>(value);
+        if constexpr (std::is_convertible_v<T, U>) {
+          return static_cast<U>(value);
+        } else {
+          return U(value);
+        }
       }
     }
-
-#pragma warning( pop )
-
   }  // namespace details
 }  // namespace quspin

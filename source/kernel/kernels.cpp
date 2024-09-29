@@ -23,7 +23,7 @@ namespace quspin {
       std::transform(
           lhs.cbegin(), lhs.cend(), rhs.cbegin(), out.begin(),
           [](const auto &lhs, const auto &rhs) {
-            return static_cast<out_t>(static_cast<result_t>(lhs) + static_cast<result_t>(rhs));
+            return lhs+rhs;
           });
       return details::ReturnVoidError();
     };

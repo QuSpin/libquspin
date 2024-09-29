@@ -21,12 +21,13 @@ namespace quspin {
     auto indices_variants = select<array<uint8_t>, array<uint16_t>>(indices.get_variant_obj());
     auto cindices_variants = select<array<uint8_t>, array<uint16_t>>(cindices.get_variant_obj());
 
-    this->internals_ = visit_or_error<details::qoperators>(
-        [&dim](const auto &data, const auto &indptr, const auto &indices, const auto &cindices) {
+    this->internals_ = visit_or_error<qoperators>(
+        [&dim](auto &&data, auto &&indptr, auto &&indices, auto &&cindices) {
           if constexpr (!std::is_same_v<decltype(indptr), decltype(indices)>) {
-            return Error(ErrorType::ValueError, "indptr and indices must have the same dtype");
+            return ErrorOr<qoperators>(Error(ErrorType::ValueError, "indptr and indices must have the same dtype"));
           } else {
-            return operators(qoperator{dim, data, indptr, indices, cindices});
+            qoperators op = qoperator(dim, data, indptr, indices, cindices);
+            return ErrorOr<qoperators>(op);
           }
         },
         data_variants, indptr_variants, indices_variants, cindices_variants);

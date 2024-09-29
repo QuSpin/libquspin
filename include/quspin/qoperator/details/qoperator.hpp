@@ -21,7 +21,7 @@ namespace quspin {
     public:
       qoperator() = default;
 
-      qoperator(std::size_t dim, array<T> data, array<I> indptr, array<I> indices, array<J> cindices)
+      qoperator(std::size_t dim,array<T> &data,array<I> &indptr,array<I> &indices,array<J> &cindices)
           : dim_(dim), data_(data), indptr_(indptr), indices_(indices), cindices_(cindices) {}
 
       T *data() { return data_.mut_data(); }

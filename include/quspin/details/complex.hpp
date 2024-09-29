@@ -16,31 +16,37 @@ namespace quspin {
     typedef std::complex<double> cdouble;
     typedef std::complex<long double> cldouble;
 
-    // template<typename T, typename U, typename Op>
-    // std::common_type_t<T, U> operator_binary(const T &a,const U &b, Op &&op) {{
-    //     using arith_result = std::common_type_t<T, U>;
-    //     return op(static_cast<arith_result>(a), static_cast<arith_result>(b));
-    // }}
-
-    // template<typename T, typename U>
-    // std::common_type_t<T, U> operator+(const T &a, const U &b) {{
-    //     return operator_binary(a, b, [](auto a, auto b) {{ return a + b; }});
-    // }}
-
-    // template<typename T, typename U>
-    // std::common_type_t<T, U> operator-(const T &a, const U &b) {{
-    //     return operator_binary(a, b, [](auto a, auto b) {{ return a - b; }});
-    // }}
-
-    // template<typename T, typename U>
-    // std::common_type_t<T, U> operator*(const T &a, const U &b) {{
-    //     return operator_binary(a, b, [](auto a, auto b) {{ return a * b; }});
-    // }}
-
-    // template<typename T, typename U>
-    // std::common_type_t<T, U> operator/(const T &a, const U &b) {{
-    //     return operator_binary(a, b, [](auto a, auto b) {{ return a / b; }});
-    // }}
+    template<typename T, typename U, typename Op>
+    std::common_type_t<T, U> operator_binary(const T &a,const U &b, Op &&op) {{
+        using arith_result = std::common_type_t<T, U>;
+    #pragma warning( push ) 
+    #pragma warning( disable : 4244 ) // disable warning for implicit conversion
+        return op(static_cast<arith_result>(a), static_cast<arith_result>(b));
+    #pragma warning( pop )
+    }}
 
   }  // namespace details
 }  // namespace quspin
+
+
+
+
+template<typename T, typename U>
+std::common_type_t<T, U> operator+(const T &a, const U &b) {{
+    return quspin::details::operator_binary(a, b, [](auto a, auto b) {{ return a + b; }});
+}}
+
+template<typename T, typename U>
+std::common_type_t<T, U> operator-(const T &a, const U &b) {{
+    return quspin::details::operator_binary(a, b, [](auto a, auto b) {{ return a - b; }});
+}}
+
+template<typename T, typename U>
+std::common_type_t<T, U> operator*(const T &a, const U &b) {{
+    return quspin::details::operator_binary(a, b, [](auto a, auto b) {{ return a * b; }});
+}}
+
+template<typename T, typename U>
+std::common_type_t<T, U> operator/(const T &a, const U &b) {{
+    return quspin::details::operator_binary(a, b, [](auto a, auto b) {{ return a / b; }});
+}}
