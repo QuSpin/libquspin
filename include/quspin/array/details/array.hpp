@@ -109,7 +109,7 @@ namespace quspin {
       void init_from_stl_(const std::vector<std::size_t> &shape, T *data) {
         shape_ = shape;
         ndim_ = shape.size();
-        size_ = (ndim_ > 0 ? std::reduce(shape.begin(), shape.end(), 1, std::multiplies<std::size_t>())
+        size_ = (ndim_ > 0 ? std::reduce(shape.begin(), shape.end(), std::size_t(1), std::multiplies<std::size_t>())
                            : 0);
 
         stride_.resize(ndim_);

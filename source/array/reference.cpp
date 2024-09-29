@@ -33,7 +33,7 @@ namespace quspin {
 
   Reference &Reference::operator=(const Scalar &scalar) {
     std::visit(
-        [](auto &internals, const auto &scalar) {
+        [](auto &&internals, auto &&scalar) {
           auto scalar_value = scalar.get();
 
           using T = typename std::decay_t<decltype(internals)>::value_type;
