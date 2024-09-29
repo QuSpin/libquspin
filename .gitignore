@@ -3,6 +3,8 @@
 /cpm_modules
 .DS_Store
 scratch/
+.venv/
+.env/
 
 # CMake files
 CMakeLists.txt.user
