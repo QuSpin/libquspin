@@ -114,10 +114,10 @@ namespace quspin {
 
         stride_.resize(ndim_);
         if (ndim_ == 1){
-          stride_[ndim_ - 1] = sizeof(T);
+          stride_[0] = sizeof(T);
         } else if (ndim_ > 1) {
           stride_[ndim_ - 1] = sizeof(T);
-          for (std::size_t i = ndim_ - 2; i >= 0; i--) {
+          for (int i = static_cast<int>(ndim_) - 2; i >= 0; i--) {
             stride_[i] = stride_[i + 1] * shape[i + 1] * sizeof(T);
           }
         }
