@@ -33,7 +33,7 @@ namespace quspin {
   Scalar norm(const Array &arr) {
     auto kernel = [](const auto &arr) {
       using T = typename std::decay_t<decltype(arr)>::value_type;
-      using norm_t = std::decay_t<decltype(details::abs_squared(T(0)))>;
+      using norm_t = std::decay_t<decltype(details::abs_squared(T()))>;
 
       constexpr std::size_t batch = 64 / sizeof(norm_t);
 

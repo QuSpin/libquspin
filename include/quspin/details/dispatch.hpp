@@ -1,4 +1,6 @@
 #pragma once
+#pragma warning( push )
+#pragma warning( disable : 4100 )
 
 #include <cassert>
 #include <quspin/array/array.hpp>
@@ -123,3 +125,5 @@ namespace quspin {
 
   }  // namespace details
 }  // namespace quspin
+
+#pragma warning( pop )

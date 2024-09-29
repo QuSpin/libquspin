@@ -11,7 +11,7 @@ namespace quspin {
     template <typename... Types, typename Variant> std::variant<Types...> select(Variant v) {
       return visit_or_error<std::variant<Types...>>(
           [](auto &&arg) {
-            using arg_t = std::decay_t<decltype(v)>;
+            using arg_t = std::decay_t<decltype(arg)>;
             if constexpr ((std::is_same_v<arg_t, Types> || ...)) {
               return std::variant<Types...>(arg);
             } else {
