@@ -22,7 +22,7 @@ namespace quspin {
     }
 
     template <typename... Ts> std::common_type<Ts...> object_result_type(typed_object<Ts>...) {
-      return common_type<Ts...>();
+      return std::common_type<Ts...>();
     }
 
     template <typename T> struct is_typed_object : std::false_type {};
