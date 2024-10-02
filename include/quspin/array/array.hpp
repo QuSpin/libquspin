@@ -23,11 +23,14 @@ namespace quspin {
     Array(const std::vector<std::size_t> &shape, const DType &dtype, void *data);
 
     std::vector<std::size_t> shape() const;
+    std::size_t shape(const std::size_t &) const;
     std::size_t ndim() const;
     std::size_t size() const;
 
     const Scalar operator[](std::vector<std::size_t> &index) const;
     Reference operator[](std::vector<std::size_t> &index);
+    const Scalar operator[](std::initializer_list<std::size_t> index) const;
+    Reference operator[](std::initializer_list<std::size_t> index);
   };
 
 }  // namespace quspin

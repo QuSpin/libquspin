@@ -14,11 +14,11 @@ namespace quspin {
 #  pragma warning(disable : 4244)
 #endif
 
-    template <typename U, typename T> inline U cast(const T &value) {
-      if constexpr (is_complex_v<T> && !is_complex_v<U>) {
-        return static_cast<U>(value.real());
+    template <typename To, typename From> inline To cast(const From &value) {
+      if constexpr (is_complex_v<From> && !is_complex_v<To>) {
+        return static_cast<To>(value.real());
       } else {
-        return static_cast<U>(value);
+        return static_cast<To>(value);
       }
     }
 #ifdef _MSC_VER

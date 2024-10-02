@@ -14,17 +14,29 @@ namespace quspin {
   public:
     DType();
     DType(const details::dtypes &dtype);
-    template <typename T> DType(const details::dtype<T> &dtype);
+    template <typename T> DType(const details::dtype<T> &dtype) { internals_ = details::dtypes(dtype); }
     std::string name() const;
 
     template <typename T> static DType of() {
-      if constexpr (details::is_typed_object_v<T>) {
-        return DType(details::dtype<typename T::value_type>());
-      } else {
-        return DType(details::dtype<T>());
-      }
+      using val_t = details::value_type_t<std::decay_t<T>>;
+      return DType(details::dtype<details::value_type_t<val_t>>());
     }
+
+    bool operator==(const DType &dtype) const;
   };
+
+  template DType::DType(const details::dtype<int8_t> &);
+  template DType::DType(const details::dtype<uint8_t> &);
+  template DType::DType(const details::dtype<int16_t> &);
+  template DType::DType(const details::dtype<uint16_t> &);
+  template DType::DType(const details::dtype<int32_t> &);
+  template DType::DType(const details::dtype<uint32_t> &);
+  template DType::DType(const details::dtype<int64_t> &);
+  template DType::DType(const details::dtype<uint64_t> &);
+  template DType::DType(const details::dtype<float> &);
+  template DType::DType(const details::dtype<double> &);
+  template DType::DType(const details::dtype<details::cfloat> &);
+  template DType::DType(const details::dtype<details::cdouble> &);
 
   DType result_dtype(std::vector<DType> &);
   bool int_dtype(const DType &);
@@ -51,7 +63,7 @@ namespace quspin {
   public:
     DType dtype() const {
       return std::visit([](const auto &obj) { return DType::of<decltype(obj)>(); },
-                        get_variant_obj(*this));
+                        internals_);
     }
   };
 

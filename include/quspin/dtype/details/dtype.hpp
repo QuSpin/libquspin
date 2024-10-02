@@ -25,11 +25,16 @@ namespace quspin {
       return std::common_type<Ts...>();
     }
 
-    template <typename T> struct is_typed_object : std::false_type {};
+    template <typename T> struct value_type {
+      using type = T;
+    };
 
-    template <typename T> struct is_typed_object<typed_object<T>> : std::true_type {};
+    template<typename T> struct value_type<dtype<T>> {
+      using type = T;
+    };
 
-    template <typename T> constexpr bool is_typed_object_v = is_typed_object<T>::value;
+    template<typename T> using value_type_t = typename value_type<T>::type;
+
 
     using dtypes = std::variant<dtype<int8_t>, dtype<uint8_t>, dtype<int16_t>, dtype<uint16_t>,
                                 dtype<uint32_t>, dtype<int32_t>, dtype<uint64_t>, dtype<int64_t>,

@@ -21,6 +21,11 @@ namespace quspin {
       const T &get() const { return *ref_; }
     };
 
+    template <typename T>
+    struct value_type<reference<T>> {
+      using type = T;
+    };
+
     using references = std::variant<reference<int8_t>, reference<uint8_t>, reference<int16_t>,
                                     reference<uint16_t>, reference<uint32_t>, reference<int32_t>,
                                     reference<uint64_t>, reference<int64_t>, reference<float>,

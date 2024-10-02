@@ -11,6 +11,7 @@
 #include <stdexcept>
 #include <string>
 #include <type_traits>
+#include <utility>
 #include <variant>
 #include <vector>
 
@@ -62,6 +63,10 @@ namespace quspin {
     return std::visit([](const auto &internals) { return internals.shape(); }, internals_);
   }
 
+  std::size_t Array::shape(const std::size_t &dim) const {
+    return std::visit([dim](const auto &internals) { return internals.shape(dim); }, internals_);
+  }
+
   std::size_t Array::ndim() const {
     return std::visit([](const auto &internals) { return internals.ndim(); }, internals_);
   }
@@ -72,6 +77,23 @@ namespace quspin {
 
   const Scalar Array::operator[](std::vector<std::size_t> &index) const {
     return std::visit([&index](const auto &internals) { return Scalar(internals.at(index)); },
+                      internals_);
+  }
+
+  Reference Array::operator[](std::vector<std::size_t> &index) {
+    return std::visit([&index](auto &&internals) { return Reference(internals.at(index)); },
+                      internals_);
+  }
+
+  const Scalar Array::operator[](std::initializer_list<std::size_t> indices) const {
+    auto index = std::vector<std::size_t>(indices);
+    return std::visit([&index](const auto &internals) { return Scalar(internals.at(index)); },
+                      internals_);
+  }
+
+  Reference Array::operator[](std::initializer_list<std::size_t> indices) {
+    auto index = std::vector<std::size_t>(indices);
+    return std::visit([&index](auto &&internals) { return Reference(internals.at(index)); },
                       internals_);
   }
 

@@ -51,7 +51,9 @@ namespace quspin {
           : ptr(new T[size]),
             ref_count_(new std::size_t(1)),
             owns_pointer(true),  // objects all own the memory, can delete
-            size(size) {}
+            size(size) {
+        std::fill(ptr, ptr + size, T());
+      }
 
       reference_counted_ptr(const reference_counted_ptr &other)
           : ptr(other.ptr),
@@ -99,7 +101,9 @@ namespace quspin {
         std::size_t offset = 0;
         for (std::size_t i = 0; i < ndim_; i++) {
           if (input[i] >= shape_[i]) {
-            throw std::runtime_error("Index " + std::to_string(i) + " out of bounds");
+            throw std::runtime_error("Index " + std::to_string(i)
+                                     + " out of bounds: " + std::to_string(input[i])
+                                     + " >= " + std::to_string(shape_[i]));
           }
           offset += input[i] * stride_[i];
         }
@@ -107,7 +111,7 @@ namespace quspin {
       }
 
       void init_from_stl_(const std::vector<std::size_t> &shape, T *data) {
-        shape_ = shape;
+        std::copy(shape.begin(), shape.end(), std::back_inserter(shape_));
         ndim_ = shape.size();
         size_ = (ndim_ > 0 ? std::reduce(shape.begin(), shape.end(), std::size_t(1),
                                          std::multiplies<std::size_t>())
@@ -119,7 +123,7 @@ namespace quspin {
         } else if (ndim_ > 1) {
           stride_[ndim_ - 1] = sizeof(T);
           for (int i = static_cast<int>(ndim_) - 2; i >= 0; i--) {
-            stride_[i] = stride_[i + 1] * shape[i + 1] * sizeof(T);
+            stride_[i] = shape[i + 1] * sizeof(T);
           }
         }
 
@@ -133,7 +137,7 @@ namespace quspin {
       }
 
     public:
-      array() : data_(reference_counted_ptr<T>()), stride_({}), shape_({}), size_(0), ndim_(0){};
+      array() : data_(reference_counted_ptr<T>()), stride_({}), shape_({}), size_(0), ndim_(0) {};
       array(std::initializer_list<std::size_t> shape, T *data = nullptr) {
         init_from_stl_(std::vector<std::size_t>(shape), data);
       }
@@ -150,10 +154,9 @@ namespace quspin {
       T *begin() { return mut_data(); }
       T *end() { return mut_data() + size(); }
 
-      std::size_t stride(int i) const { return stride_.at(i); }
+      std::size_t stride(const int i) const { return stride_.at(i); }
+      std::size_t shape(const int i) const { return shape_.at(i); }
       std::vector<std::size_t> shape() const { return shape_; }
-
-      std::size_t shape(int i) const { return shape_.at(i); }
       std::vector<std::size_t> stride() const { return stride_; }
 
       std::size_t ndim() const { return ndim_; }
@@ -169,6 +172,11 @@ namespace quspin {
       T &at(std::initializer_list<std::size_t> &input) {
         return at(std::vector<std::size_t>(input));
       }
+    };
+
+    template<typename T>
+    struct value_type<array<T>> {
+      using type = T;
     };
 
     template <typename T> constexpr bool is_integer_array_v

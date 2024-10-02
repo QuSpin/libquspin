@@ -12,19 +12,13 @@ namespace quspin {
 
   DType::DType() { internals_ = details::dtype<double>(); }
 
-  template <typename T> DType::DType(const details::dtype<T> &dtype) { internals_ = dtype; }
-  template DType::DType(const details::dtype<int8_t> &);
-  template DType::DType(const details::dtype<uint8_t> &);
-  template DType::DType(const details::dtype<int16_t> &);
-  template DType::DType(const details::dtype<uint16_t> &);
-  template DType::DType(const details::dtype<int32_t> &);
-  template DType::DType(const details::dtype<uint32_t> &);
-  template DType::DType(const details::dtype<int64_t> &);
-  template DType::DType(const details::dtype<uint64_t> &);
-  template DType::DType(const details::dtype<float> &);
-  template DType::DType(const details::dtype<double> &);
-  template DType::DType(const details::dtype<details::cfloat> &);
-  template DType::DType(const details::dtype<details::cdouble> &);
+  bool DType::operator==(const DType &dtype) const {
+      return std::visit([](auto &&lhs, auto &&rhs) {
+        using lhs_t = typename std::decay_t<decltype(lhs)>::value_type;
+        using rhs_t = typename std::decay_t<decltype(rhs)>::value_type;
+        return std::is_same_v<lhs_t, rhs_t>;
+      }, internals_, dtype.get_variant_obj());
+     }
 
   std::string DType::name() const {
     return std::visit(
