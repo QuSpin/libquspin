@@ -2,7 +2,7 @@
 #include <quspin/array/reference.hpp>
 #include <quspin/array/scalar.hpp>
 #include <quspin/details/cast.hpp>
-#include <quspin/details/complex.hpp>
+#include <quspin/details/operators.hpp>
 #include <quspin/details/variant_container.hpp>
 #include <quspin/dtype/details/dtype.hpp>
 #include <quspin/dtype/dtype.hpp>

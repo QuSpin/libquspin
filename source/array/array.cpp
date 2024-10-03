@@ -5,8 +5,8 @@
 #include <quspin/array/details/array.hpp>
 #include <quspin/array/reference.hpp>
 #include <quspin/array/scalar.hpp>
-#include <quspin/details/complex.hpp>
 #include <quspin/details/error.hpp>
+#include <quspin/details/operators.hpp>
 #include <quspin/dtype/dtype.hpp>
 #include <stdexcept>
 #include <string>

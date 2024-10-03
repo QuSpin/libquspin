@@ -6,11 +6,8 @@
 #include <quspin/version.hpp>
 #include <string>
 
-
 TEST_CASE("Array Set and Get") {
   using namespace quspin;
-
-
 
   Array a({1, 2, 3}, Float);
   CHECK(a.ndim() == 3);
@@ -35,24 +32,23 @@ TEST_CASE("Array Set and Get") {
   }
 }
 
-TEST_CASE("Array Sum"){
+TEST_CASE("Array Sum happy path") {
   using namespace quspin;
 
-  Array a({10}, Int64);
-  Array b({10}, Int32);
-  Array c({10}, Int64);
+  Array a({100}, Int64);
+  Array b({100}, Float);
 
   for (std::size_t i = 0; i < a.shape(0); i++) {
-    a[{i}] = static_cast<int64_t>(i);
-    b[{i}] = static_cast<int32_t>(2*i);
+    a[{i}] = i;
+    b[{i}] = 2 * i;
   }
 
   Array d = add(a, b);
 
-  CHECK(d.dtype() == Int64);
+  CHECK(d.dtype() == Float);
 
   for (std::size_t i = 0; i < a.shape(0); i++) {
-    CHECK(static_cast<int64_t>(d[{i}]) == static_cast<int64_t>(3*i));
+    CHECK(static_cast<float>(d[{i}]) == static_cast<float>(3 * i));
   }
 }
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <quspin/details/complex.hpp>
+#include <quspin/details/operators.hpp>
 #include <quspin/details/variant_container.hpp>
 #include <quspin/dtype/details/dtype.hpp>
 #include <string>
@@ -14,7 +14,9 @@ namespace quspin {
   public:
     DType();
     DType(const details::dtypes &dtype);
-    template <typename T> DType(const details::dtype<T> &dtype) { internals_ = details::dtypes(dtype); }
+    template <typename T> DType(const details::dtype<T> &dtype) {
+      internals_ = details::dtypes(dtype);
+    }
     std::string name() const;
 
     template <typename T> static DType of() {
@@ -62,8 +64,7 @@ namespace quspin {
 
   public:
     DType dtype() const {
-      return std::visit([](const auto &obj) { return DType::of<decltype(obj)>(); },
-                        internals_);
+      return std::visit([](const auto &obj) { return DType::of<decltype(obj)>(); }, internals_);
     }
   };
 

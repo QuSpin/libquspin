@@ -5,7 +5,7 @@
 #include <functional>
 #include <iostream>
 #include <numeric>
-#include <quspin/details/complex.hpp>
+#include <quspin/details/operators.hpp>
 #include <quspin/dtype/details/dtype.hpp>
 #include <stdexcept>
 #include <type_traits>
@@ -174,8 +174,7 @@ namespace quspin {
       }
     };
 
-    template<typename T>
-    struct value_type<array<T>> {
+    template <typename T> struct value_type<array<T>> {
       using type = T;
     };
 

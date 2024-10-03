@@ -1,6 +1,6 @@
 #pragma once
 
-#include <quspin/details/complex.hpp>
+#include <quspin/details/operators.hpp>
 #include <quspin/dtype/details/dtype.hpp>
 #include <variant>
 
@@ -21,8 +21,7 @@ namespace quspin {
       const T &get() const { return *ref_; }
     };
 
-    template <typename T>
-    struct value_type<reference<T>> {
+    template <typename T> struct value_type<reference<T>> {
       using type = T;
     };
 

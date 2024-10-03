@@ -40,6 +40,13 @@ namespace quspin {
       }
       return *this;
     }
+
+    template <typename T> Scalar &operator+(const T &other) const;
+    template <typename T> Scalar &operator-(const T &other) const;
+    template <typename T> Scalar &operator*(const T &other) const;
+    template <typename T> Scalar &operator/(const T &other) const;
+    bool operator==(const Scalar &other) const;
+    bool operator!=(const Scalar &other) const;
   };
 
   template Reference::Reference(int8_t &);

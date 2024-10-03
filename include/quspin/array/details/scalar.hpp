@@ -1,5 +1,6 @@
 #pragma once
-#include <quspin/details/complex.hpp>
+
+#include <quspin/details/operators.hpp>
 #include <quspin/dtype/details/dtype.hpp>
 #include <variant>
 
@@ -20,8 +21,7 @@ namespace quspin {
       T get() const { return value_; }
     };
 
-    template <typename T>
-    struct value_type<scalar<T>> {
+    template <typename T> struct value_type<scalar<T>> {
       using type = T;
     };
 

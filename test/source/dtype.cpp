@@ -1,5 +1,6 @@
-#include <quspin/dtype/dtype.hpp>
 #include <doctest/doctest.h>
+
+#include <quspin/dtype/dtype.hpp>
 
 TEST_CASE("DTYPES") {
   using namespace quspin;
@@ -16,5 +17,4 @@ TEST_CASE("DTYPES") {
   CHECK(Double == DType::of<double>());
   CHECK(CFloat == DType::of<details::cfloat>());
   CHECK(CDouble == DType::of<details::cdouble>());
-  
 }

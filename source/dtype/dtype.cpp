@@ -1,6 +1,6 @@
 
 #include <cstdint>
-#include <quspin/details/complex.hpp>
+#include <quspin/details/operators.hpp>
 #include <quspin/dtype/details/dtype.hpp>
 #include <quspin/dtype/dtype.hpp>
 #include <stdexcept>
@@ -13,12 +13,14 @@ namespace quspin {
   DType::DType() { internals_ = details::dtype<double>(); }
 
   bool DType::operator==(const DType &dtype) const {
-      return std::visit([](auto &&lhs, auto &&rhs) {
-        using lhs_t = typename std::decay_t<decltype(lhs)>::value_type;
-        using rhs_t = typename std::decay_t<decltype(rhs)>::value_type;
-        return std::is_same_v<lhs_t, rhs_t>;
-      }, internals_, dtype.get_variant_obj());
-     }
+    return std::visit(
+        [](auto &&lhs, auto &&rhs) {
+          using lhs_t = typename std::decay_t<decltype(lhs)>::value_type;
+          using rhs_t = typename std::decay_t<decltype(rhs)>::value_type;
+          return std::is_same_v<lhs_t, rhs_t>;
+        },
+        internals_, dtype.get_variant_obj());
+  }
 
   std::string DType::name() const {
     return std::visit(

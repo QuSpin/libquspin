@@ -2,8 +2,7 @@
 
 #include <cmath>
 #include <complex>
-#include <quspin/details/complex.hpp>
-
+#include <quspin/details/operators.hpp>
 namespace quspin {
   namespace details {
 
