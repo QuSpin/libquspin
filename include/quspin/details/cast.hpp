@@ -19,8 +19,9 @@ namespace quspin {
 
     template <typename... Ts> using upcast_t = std::common_type_t<Ts...>;
 
-    template <class from, class to> inline constexpr bool can_cast_v
-        = std::is_convertible_v<from, to>;
+    template <class from, class to> struct can_safe_cast : std::false_type {};
+
+    template <class from, class to> inline constexpr bool can_safe_cast_v = can_safe_cast<from, to>::value;
 
 #ifdef _MSC_VER
 #  pragma warning(push)
@@ -37,6 +38,66 @@ namespace quspin {
 #ifdef _MSC_VER
 #  pragma warning(pop)
 #endif
+
+    template <> struct can_safe_cast<int8_t, int8_t> : std::true_type {};
+    template <> struct can_safe_cast<int8_t, int16_t> : std::true_type {};
+    template <> struct can_safe_cast<int8_t, int32_t> : std::true_type {};
+    template <> struct can_safe_cast<int8_t, int64_t> : std::true_type {};
+    template <> struct can_safe_cast<int8_t, float> : std::true_type {};
+    template <> struct can_safe_cast<int8_t, double> : std::true_type {};
+    template <> struct can_safe_cast<int8_t, cfloat> : std::true_type {};
+    template <> struct can_safe_cast<int8_t, cdouble> : std::true_type {};
+    template <> struct can_safe_cast<uint8_t, uint8_t> : std::true_type {};
+    template <> struct can_safe_cast<uint8_t, int16_t> : std::true_type {};
+    template <> struct can_safe_cast<uint8_t, uint16_t> : std::true_type {};
+    template <> struct can_safe_cast<uint8_t, int32_t> : std::true_type {};
+    template <> struct can_safe_cast<uint8_t, uint32_t> : std::true_type {};
+    template <> struct can_safe_cast<uint8_t, int64_t> : std::true_type {};
+    template <> struct can_safe_cast<uint8_t, uint64_t> : std::true_type {};
+    template <> struct can_safe_cast<uint8_t, float> : std::true_type {};
+    template <> struct can_safe_cast<uint8_t, double> : std::true_type {};
+    template <> struct can_safe_cast<uint8_t, cfloat> : std::true_type {};
+    template <> struct can_safe_cast<uint8_t, cdouble> : std::true_type {};
+    template <> struct can_safe_cast<int16_t, int16_t> : std::true_type {};
+    template <> struct can_safe_cast<int16_t, int32_t> : std::true_type {};
+    template <> struct can_safe_cast<int16_t, int64_t> : std::true_type {};
+    template <> struct can_safe_cast<int16_t, float> : std::true_type {};
+    template <> struct can_safe_cast<int16_t, double> : std::true_type {};
+    template <> struct can_safe_cast<int16_t, cfloat> : std::true_type {};
+    template <> struct can_safe_cast<int16_t, cdouble> : std::true_type {};
+    template <> struct can_safe_cast<uint16_t, uint16_t> : std::true_type {};
+    template <> struct can_safe_cast<uint16_t, int32_t> : std::true_type {};
+    template <> struct can_safe_cast<uint16_t, uint32_t> : std::true_type {};
+    template <> struct can_safe_cast<uint16_t, int64_t> : std::true_type {};
+    template <> struct can_safe_cast<uint16_t, uint64_t> : std::true_type {};
+    template <> struct can_safe_cast<uint16_t, float> : std::true_type {};
+    template <> struct can_safe_cast<uint16_t, double> : std::true_type {};
+    template <> struct can_safe_cast<uint16_t, cfloat> : std::true_type {};
+    template <> struct can_safe_cast<uint16_t, cdouble> : std::true_type {};
+    template <> struct can_safe_cast<int32_t, int32_t> : std::true_type {};
+    template <> struct can_safe_cast<int32_t, int64_t> : std::true_type {};
+    template <> struct can_safe_cast<int32_t, double> : std::true_type {};
+    template <> struct can_safe_cast<int32_t, cdouble> : std::true_type {};
+    template <> struct can_safe_cast<uint32_t, uint32_t> : std::true_type {};
+    template <> struct can_safe_cast<uint32_t, int64_t> : std::true_type {};
+    template <> struct can_safe_cast<uint32_t, uint64_t> : std::true_type {};
+    template <> struct can_safe_cast<uint32_t, double> : std::true_type {};
+    template <> struct can_safe_cast<uint32_t, cdouble> : std::true_type {};
+    template <> struct can_safe_cast<int64_t, int64_t> : std::true_type {};
+    template <> struct can_safe_cast<int64_t, double> : std::true_type {};
+    template <> struct can_safe_cast<int64_t, cdouble> : std::true_type {};
+    template <> struct can_safe_cast<uint64_t, uint64_t> : std::true_type {};
+    template <> struct can_safe_cast<uint64_t, double> : std::true_type {};
+    template <> struct can_safe_cast<uint64_t, cdouble> : std::true_type {};
+    template <> struct can_safe_cast<float, float> : std::true_type {};
+    template <> struct can_safe_cast<float, double> : std::true_type {};
+    template <> struct can_safe_cast<float, cfloat> : std::true_type {};
+    template <> struct can_safe_cast<float, cdouble> : std::true_type {};
+    template <> struct can_safe_cast<double, double> : std::true_type {};
+    template <> struct can_safe_cast<double, cdouble> : std::true_type {};
+    template <> struct can_safe_cast<cfloat, cfloat> : std::true_type {};
+    template <> struct can_safe_cast<cfloat, cdouble> : std::true_type {};
+    template <> struct can_safe_cast<cdouble, cdouble> : std::true_type {};
 
   }  // namespace details
 }  // namespace quspin

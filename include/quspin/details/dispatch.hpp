@@ -4,7 +4,6 @@
 #  pragma warning(disable : 4100)
 #endif
 
-#include <cassert>
 #include <quspin/array/array.hpp>
 #include <quspin/array/details/array.hpp>
 #include <quspin/array/scalar.hpp>
@@ -68,10 +67,7 @@ namespace quspin {
         static Error get_error() { return Error(ErrorType::ValueError, "Incompatible out type"); }
       };
 
-      auto result_shape = [](const Array &lhs, const Array &rhs) {
-        assert(lhs.shape() == rhs.shape());
-        return lhs.shape();
-      };
+      auto result_shape = [](const Array &lhs, const Array &) { return lhs.shape(); };
 
       auto result_dtype_func = [](const Array &lhs, const Array &rhs) {
         std::vector<DType> dtypes = {lhs.dtype(), rhs.dtype()};
@@ -84,7 +80,7 @@ namespace quspin {
         using out_t = typename std::decay_t<decltype(out)>::value_type;
         using result_t = std::common_type_t<lhs_t, rhs_t>;
 
-        if constexpr (std::is_convertible_v<result_t, out_t>) {
+        if constexpr (can_safe_cast_v<result_t, out_t>) {
           return ValidArgs();
         } else {
           return InvalidDtype();

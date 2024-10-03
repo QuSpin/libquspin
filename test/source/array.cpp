@@ -1,5 +1,6 @@
 #include <doctest/doctest.h>
 
+#include <exception>
 #include <quspin/array/array.hpp>
 #include <quspin/array/kernel/kernels.hpp>
 #include <quspin/dtype/dtype.hpp>
@@ -50,6 +51,18 @@ TEST_CASE("Array Sum happy path") {
   for (std::size_t i = 0; i < a.shape(0); i++) {
     CHECK(static_cast<float>(d[{i}]) == static_cast<float>(3 * i));
   }
+}
+
+TEST_CASE("Array Sum error path") {
+  using namespace quspin;
+
+  Array a({10}, Int64);
+  Array b({9}, Float);
+  Array c({10}, Int64);
+  Array out({10}, Int8);
+
+  CHECK_THROWS_AS(add(a, b), std::invalid_argument);
+  CHECK_THROWS_AS(add(a, c, out), std::invalid_argument);
 }
 
 TEST_CASE("QuSpin version") {
