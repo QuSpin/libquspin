@@ -3,8 +3,8 @@
 #include <quspin/array/array.hpp>
 #include <quspin/array/details/array.hpp>
 #include <quspin/details/select.hpp>
-#include <quspin/qoperator/details/qoperator.hpp>
-#include <quspin/qoperator/qoperator.hpp>
+#include <quspin/quantum_operator/details/quantum_operator.hpp>
+#include <quspin/quantum_operator/quantum_operator.hpp>
 #include <type_traits>
 #include <variant>
 
@@ -29,7 +29,7 @@ namespace quspin {
     return select<array<uint8_t>, array<uint16_t>>(cindices.get_variant_obj());
   }
 
-  Operator::Operator(Array data, Array indptr, Array indices, Array cindices) {
+  QuantumOperator::QuantumOperator(Array data, Array indptr, Array indices, Array cindices) {
     using namespace details;
 
     const std::size_t dim = indptr.size() - 1;
@@ -41,15 +41,15 @@ namespace quspin {
 
     auto constructor = [&dim](auto &&data, auto &&indptr, auto &&indices, auto &&cindices) {
       if constexpr (!std::is_same_v<decltype(indptr), decltype(indices)>) {
-        return ErrorOr<qoperators>(
+        return ErrorOr<quantum_operators>(
             Error(ErrorType::ValueError, "indptr and indices must have the same dtype"));
       } else {
-        qoperators op = qoperator(dim, data, indptr, indices, cindices);
-        return ErrorOr<qoperators>(op);
+        quantum_operators op = quantum_operator(dim, data, indptr, indices, cindices);
+        return ErrorOr<quantum_operators>(op);
       }
     };
 
-    this->internals_ = visit_or_error<qoperators>(constructor, data_variants, indptr_variants,
+    this->internals_ = visit_or_error<quantum_operators>(constructor, data_variants, indptr_variants,
                                                   indices_variants, cindices_variants);
   }
 
