@@ -21,7 +21,8 @@ namespace quspin {
 
     template <class from, class to> struct can_safe_cast : std::false_type {};
 
-    template <class from, class to> inline constexpr bool can_safe_cast_v = can_safe_cast<from, to>::value;
+    template <class from, class to> inline constexpr bool can_safe_cast_v
+        = can_safe_cast<from, to>::value;
 
 #ifdef _MSC_VER
 #  pragma warning(push)

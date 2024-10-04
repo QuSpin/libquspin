@@ -49,8 +49,8 @@ namespace quspin {
       }
     };
 
-    this->internals_ = visit_or_error<quantum_operators>(constructor, data_variants, indptr_variants,
-                                                  indices_variants, cindices_variants);
+    this->internals_ = visit_or_error<quantum_operators>(
+        constructor, data_variants, indptr_variants, indices_variants, cindices_variants);
   }
 
 }  // namespace quspin

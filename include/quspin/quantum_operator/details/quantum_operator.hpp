@@ -22,7 +22,7 @@ namespace quspin {
       quantum_operator() = default;
 
       quantum_operator(std::size_t dim, array<T> &data, array<I> &indptr, array<I> &indices,
-                array<J> &cindices)
+                       array<J> &cindices)
           : dim_(dim), data_(data), indptr_(indptr), indices_(indices), cindices_(cindices) {}
 
       T *data() { return data_.mut_data(); }
@@ -40,19 +40,19 @@ namespace quspin {
       std::size_t dim() const { return dim_; }
     };
 
-    using quantum_operators
-        = std::variant<quantum_operator<int8_t, int32_t, uint8_t>, quantum_operator<int16_t, int32_t, uint8_t>,
-                       quantum_operator<float, int32_t, uint8_t>, quantum_operator<double, int32_t, uint8_t>,
-                       quantum_operator<cfloat, int32_t, uint8_t>, quantum_operator<cdouble, int32_t, uint8_t>,
-                       quantum_operator<int8_t, int64_t, uint8_t>, quantum_operator<int16_t, int64_t, uint8_t>,
-                       quantum_operator<float, int64_t, uint8_t>, quantum_operator<double, int64_t, uint8_t>,
-                       quantum_operator<cfloat, int64_t, uint8_t>, quantum_operator<cdouble, int64_t, uint8_t>,
-                       quantum_operator<int8_t, int32_t, uint16_t>, quantum_operator<int16_t, int32_t, uint16_t>,
-                       quantum_operator<float, int32_t, uint16_t>, quantum_operator<double, int32_t, uint16_t>,
-                       quantum_operator<cfloat, int32_t, uint16_t>, quantum_operator<cdouble, int32_t, uint16_t>,
-                       quantum_operator<int8_t, int64_t, uint16_t>, quantum_operator<int16_t, int64_t, uint16_t>,
-                       quantum_operator<float, int64_t, uint16_t>, quantum_operator<double, int64_t, uint16_t>,
-                       quantum_operator<cfloat, int64_t, uint16_t>, quantum_operator<cdouble, int64_t, uint16_t>>;
+    using quantum_operators = std::variant<
+        quantum_operator<int8_t, int32_t, uint8_t>, quantum_operator<int16_t, int32_t, uint8_t>,
+        quantum_operator<float, int32_t, uint8_t>, quantum_operator<double, int32_t, uint8_t>,
+        quantum_operator<cfloat, int32_t, uint8_t>, quantum_operator<cdouble, int32_t, uint8_t>,
+        quantum_operator<int8_t, int64_t, uint8_t>, quantum_operator<int16_t, int64_t, uint8_t>,
+        quantum_operator<float, int64_t, uint8_t>, quantum_operator<double, int64_t, uint8_t>,
+        quantum_operator<cfloat, int64_t, uint8_t>, quantum_operator<cdouble, int64_t, uint8_t>,
+        quantum_operator<int8_t, int32_t, uint16_t>, quantum_operator<int16_t, int32_t, uint16_t>,
+        quantum_operator<float, int32_t, uint16_t>, quantum_operator<double, int32_t, uint16_t>,
+        quantum_operator<cfloat, int32_t, uint16_t>, quantum_operator<cdouble, int32_t, uint16_t>,
+        quantum_operator<int8_t, int64_t, uint16_t>, quantum_operator<int16_t, int64_t, uint16_t>,
+        quantum_operator<float, int64_t, uint16_t>, quantum_operator<double, int64_t, uint16_t>,
+        quantum_operator<cfloat, int64_t, uint16_t>, quantum_operator<cdouble, int64_t, uint16_t>>;
 
   }  // namespace details
 }  // namespace quspin
