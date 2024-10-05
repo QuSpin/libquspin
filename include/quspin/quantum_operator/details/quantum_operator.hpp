@@ -27,15 +27,19 @@ namespace quspin {
 
       T *data() { return data_.mut_data(); }
       const T *data() const { return data_.data(); }
+      T data(const std::size_t &i) const { return data()[i]; }
 
       I *indptr() { return indptr_.mut_data(); }
       const I *indptr() const { return indptr_.data(); }
+      I indptr(const std::size_t &i) const { return indptr()[i]; }
 
       I *indices() { return indices_.mut_data(); }
       const I *indices() const { return indices_.data(); }
+      I indices(const std::size_t &i) const { return indices()[i]; }
 
       J *cindices() { return cindices_.mut_data(); }
       const J *cindices() const { return cindices_.data(); }
+      J cindices(const std::size_t &i) const { return cindices()[i]; }
 
       std::size_t dim() const { return dim_; }
     };
