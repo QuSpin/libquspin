@@ -19,11 +19,22 @@ jobs:
     
     runs-on: ${{ matrix.os }}
     steps:
-    - name: Checkout
+    - name: Fetch Sources
       uses: actions/checkout@v4
-    - name: Set up Python
+    - name: Setup Python
       uses: actions/setup-python@v5
-    - name: Setup Meson
-      uses: BSFishy/meson-setup@v1
       with:
-        action: test
+        python-version: '3.x'
+    - name: Install Python Dependencies
+      run: pip install meson ninja
+    - name: Prepare MSVC
+      if: matrix.os == 'windows-latest'
+      uses: bus1/cabuild/action/msdevshell@v1
+      with:
+        architecture: x64
+    - name: Prepare Build
+      run: meson setup build
+    - name: Run Build
+      run: meson compile -v -C build
+    - name: Run Test Suite
+      run: meson test -v -C build
