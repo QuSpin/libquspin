@@ -5,6 +5,10 @@ project(
     default_options: ['warning_level=3', 'cpp_std=c++20'],
 )
 
+if host_machine.system() == 'windows'
+    add_global_arguments('/bigobj', language: 'cpp')
+endif
+
 include = include_directories('libquspin/include')
 
 src_files = files(
