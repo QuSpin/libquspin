@@ -154,8 +154,8 @@ namespace quspin {
       T *begin() { return mut_data(); }
       T *end() { return mut_data() + size(); }
 
-      std::size_t stride(const int i) const { return stride_.at(i); }
-      std::size_t shape(const int i) const { return shape_.at(i); }
+      std::size_t stride(const std::size_t &i) const { return stride_.at(i); }
+      std::size_t shape(const std::size_t &i) const { return shape_.at(i); }
       std::vector<std::size_t> shape() const { return shape_; }
       std::vector<std::size_t> stride() const { return stride_; }
 
