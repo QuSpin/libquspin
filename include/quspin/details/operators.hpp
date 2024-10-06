@@ -31,7 +31,9 @@ template <typename T, typename U>
 quspin::details::upcast_t<T, U> operator+(const T &a, const U &b) {
   {
     return quspin::details::operator_binary(a, b, [](auto &&a, auto &&b) {
-      { return a + b; }
+      {
+        return a + b;
+      }
     });
   }
 }
@@ -40,7 +42,9 @@ template <typename T, typename U>
 quspin::details::upcast_t<T, U> operator-(const T &a, const U &b) {
   {
     return quspin::details::operator_binary(a, b, [](auto &&a, auto &&b) {
-      { return a - b; }
+      {
+        return a - b;
+      }
     });
   }
 }
@@ -49,7 +53,9 @@ template <typename T, typename U>
 quspin::details::upcast_t<T, U> operator*(const T &a, const U &b) {
   {
     return quspin::details::operator_binary(a, b, [](auto &&a, auto &&b) {
-      { return a * b; }
+      {
+        return a * b;
+      }
     });
   }
 }
@@ -58,7 +64,9 @@ template <typename T, typename U>
 quspin::details::upcast_t<T, U> operator/(const T &a, const U &b) {
   {
     return quspin::details::operator_binary(a, b, [](auto &&a, auto &&b) {
-      { return a / b; }
+      {
+        return a / b;
+      }
     });
   }
 }

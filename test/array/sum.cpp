@@ -1,12 +1,9 @@
 #include <cassert>
-#include <string>
 #include <exception>
-
-
 #include <quspin/array/array.hpp>
 #include <quspin/array/kernel/kernels.hpp>
 #include <quspin/dtype/dtype.hpp>
-
+#include <string>
 
 int main() {
   using namespace quspin;
@@ -27,7 +24,6 @@ int main() {
     assert(static_cast<float>(D[{i}]) == static_cast<float>(3 * i));
   }
 
-
   Array a({10}, Int64);
   Array b({9}, Float);
   Array c({10}, Int64);
@@ -44,5 +40,4 @@ int main() {
   } catch (const std::invalid_argument &e) {
     assert(std::string(e.what()) == std::string("Incompatible out type"));
   }
-  
 }

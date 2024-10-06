@@ -1,11 +1,9 @@
 #include <cassert>
-#include <string>
 #include <exception>
-
-
 #include <quspin/array/array.hpp>
 #include <quspin/array/kernel/kernels.hpp>
 #include <quspin/dtype/dtype.hpp>
+#include <string>
 
 int main() {
   using namespace quspin;
