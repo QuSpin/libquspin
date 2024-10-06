@@ -1,30 +1,30 @@
 project(
-    'testproject',
+    'libquspin',
     'cpp',
     version: '0.1.0',
     default_options: ['warning_level=3', 'cpp_std=c++20'],
 )
 
-include = include_directories('include')
+include = include_directories('libquspin/include')
 
 src_files = files(
-    'src/array/array.cpp',
-    'src/array/kernel/kernels.cpp',
-    'src/array/reference.cpp',
-    'src/array/scalar.cpp',
-    'src/dtype/dtype.cpp',
-    'src/quantum_operator/kernel/dot.cpp',
-    'src/quantum_operator/kernel/sum.cpp',
-    'src/quantum_operator/quantum_operator.cpp',
+    'libquspin/src/array/array.cpp',
+    'libquspin/src/array/kernel/kernels.cpp',
+    'libquspin/src/array/reference.cpp',
+    'libquspin/src/array/scalar.cpp',
+    'libquspin/src/dtype/dtype.cpp',
+    'libquspin/src/quantum_operator/kernel/dot.cpp',
+    'libquspin/src/quantum_operator/kernel/sum.cpp',
+    'libquspin/src/quantum_operator/quantum_operator.cpp',
 )
 
-quspin = static_library('quspin', src_files, include_directories: include)
+libquspin = static_library('quspin', src_files, include_directories: include)
 shared_library('quspin', src_files, include_directories: include)
 
 test_files = files(
-    'test/array/constructor.cpp',
-    'test/array/sum.cpp',
-    'test/dtype.cpp',
+    'libquspin/test/array/constructor.cpp',
+    'libquspin/test/array/sum.cpp',
+    'libquspin/test/dtype.cpp',
 )
 
 foreach test_file : test_files
@@ -33,9 +33,8 @@ foreach test_file : test_files
     exe = executable(
         exe_name,
         test_file,
-        link_with: quspin,
+        link_with: libquspin,
         include_directories: include,
     )
     test(test_name, exe)
 endforeach
-
