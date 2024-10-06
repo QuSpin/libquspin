@@ -3,6 +3,8 @@ FROM $IMAGE_URL
 
 WORKDIR /usr/libquspin/
 
+RUN mkdir -p /data
+
 # Install the required python packages
 RUN manylinux-interpreters ensure cp312-cp312
 RUN python3 -m venv .venv
@@ -11,10 +13,12 @@ RUN python3 -m ensurepip
 RUN python3 -m pip install meson ninja
 
 # Copy the requirements file
-COPY ../ ./
+COPY . ./
 
-RUN meson setup builddir --buildtype=release --reconfigure
-RUN meson compile -C builddir -v
-RUN meson test -C builddir
+# RUN meson setup builddir --buildtype=release --reconfigure
+# RUN meson compile -C builddir -v -j 1
+# RUN meson test -C builddir
 
-# COPY /libquspin/buildir/libquspin.a /data/libquspin.a
+RUN echo "test test test" > test.txt
+RUN ls -la
+# COPY --from=context test.txt /artifacts
