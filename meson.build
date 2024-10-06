@@ -9,26 +9,27 @@ if host_machine.system() == 'windows'
     add_global_arguments('/bigobj', language: 'cpp')
 endif
 
-include = include_directories('libquspin/include')
+include = include_directories('include')
 
 src_files = files(
-    'libquspin/src/array/array.cpp',
-    'libquspin/src/array/kernel/kernels.cpp',
-    'libquspin/src/array/reference.cpp',
-    'libquspin/src/array/scalar.cpp',
-    'libquspin/src/dtype/dtype.cpp',
-    'libquspin/src/quantum_operator/kernel/dot.cpp',
-    'libquspin/src/quantum_operator/kernel/sum.cpp',
-    'libquspin/src/quantum_operator/quantum_operator.cpp',
+    'src/array/array.cpp',
+    'src/array/kernel/kernels.cpp',
+    'src/array/reference.cpp',
+    'src/array/scalar.cpp',
+    'src/dtype/dtype.cpp',
+    'src/quantum_operator/kernel/dot.cpp',
+    'src/quantum_operator/kernel/sum.cpp',
+    'src/quantum_operator/quantum_operator.cpp',
 )
 
 libquspin = static_library('quspin', src_files, include_directories: include)
 shared_library('quspin', src_files, include_directories: include)
 
+
 test_files = files(
-    'libquspin/test/array/constructor.cpp',
-    'libquspin/test/array/sum.cpp',
-    'libquspin/test/dtype.cpp',
+    'test/array/constructor.cpp',
+    'test/array/sum.cpp',
+    'test/dtype.cpp',
 )
 
 foreach test_file : test_files
