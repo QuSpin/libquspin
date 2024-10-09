@@ -6,7 +6,7 @@ project(
 )
 
 if host_machine.system() == 'windows'
-    add_global_arguments('/bigobj', language: 'cpp')
+    add_project_arguments('/bigobj', language: 'cpp')
 endif
 
 include = include_directories('include')
@@ -22,9 +22,10 @@ src_files = files(
     'src/quantum_operator/quantum_operator.cpp',
 )
 
-libquspin = static_library('quspin', src_files, include_directories: include)
-shared_library('quspin', src_files, include_directories: include)
+libquspin = shared_library('quspin', src_files, include_directories: include)
 
+libquspin_dep = declare_dependency(include_directories : include,
+  link_with : libquspin)
 
 test_files = files(
     'test/array/constructor.cpp',
