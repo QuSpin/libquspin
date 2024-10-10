@@ -7,6 +7,9 @@ project(
 
 if host_machine.system() == 'windows'
     add_project_arguments('/bigobj', language: 'cpp')
+elif host_machine.system() == 'darwin'
+    add_project_arguments('-arch', 'x86_64', '-arch', 'arm64', '-mmacosx-version-min=10.14', language: 'cpp')
+    add_project_link_arguments('-arch', 'x86_64', '-arch', 'arm64', '-mmacosx-version-min=10.14', language: 'cpp')
 endif
 
 include = include_directories('include')
