@@ -12,6 +12,8 @@ elif host_machine.system() == 'darwin'
     add_project_link_arguments('-arch', 'x86_64', '-arch', 'arm64', '-mmacosx-version-min=10.14', language: 'cpp')
 endif
 
+add_global_arguments('-DVERSION_INFO=' + meson.project_version(), language: 'cpp')
+
 include = include_directories('include')
 
 src_files = files(
