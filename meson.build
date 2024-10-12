@@ -32,17 +32,16 @@ libquspin = shared_library('quspin', src_files, include_directories: include)
 libquspin_dep = declare_dependency(include_directories : include,
   link_with : libquspin)
 
-test_files = files(
+test_files = [
     'test/array/constructor.cpp',
     'test/array/sum.cpp',
     'test/dtype.cpp',
-)
+]
 
 foreach test_file : test_files
-    test_name = test_file.strip('.cpp')
-    exe_name = test_name.split('/')[-1]
+    test_name = test_file.strip('.cpp').replace('/', '_')
     exe = executable(
-        exe_name,
+        test_name,
         test_file,
         link_with: libquspin,
         include_directories: include,
