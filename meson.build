@@ -27,7 +27,7 @@ src_files = files(
     'src/quantum_operator/quantum_operator.cpp',
 )
 
-libquspin = shared_library('quspin', src_files, include_directories: include)
+libquspin = both_library('quspin', src_files, include_directories: include)
 
 libquspin_dep = declare_dependency(include_directories : include,
   link_with : libquspin)
