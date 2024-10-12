@@ -39,7 +39,7 @@ test_files = files(
 )
 
 foreach test_file : test_files
-    test_name = test_file.full_path().strip('.cpp')
+    test_name = test_file.strip('.cpp')
     exe_name = test_name.split('/')[-1]
     exe = executable(
         exe_name,
