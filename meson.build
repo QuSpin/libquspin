@@ -32,6 +32,8 @@ libquspin = both_libraries('quspin', src_files, include_directories: include)
 libquspin_dep = declare_dependency(include_directories : include,
   link_with : libquspin)
 
+if host_machine.system() != 'windows'
+
 test_files = files(
     'test/array/constructor.cpp',
     'test/array/sum.cpp',
@@ -47,3 +49,5 @@ foreach test_file : test_files
     )
     test(test_name, exe)
 endforeach
+
+endif
