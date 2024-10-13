@@ -18,26 +18,15 @@ namespace quspin {
       return real * real + imag * imag;
     }
 
-    template <typename T> T abs_squared(const T &A)
-      requires std::is_floating_point_v<T>
+    template <typename T> 
+    T abs_squared(const T &A)
     {
-      return A * A;
+      if constexpr (std::is_integral_v<T>) {
+        return double(A * A);
+      } else {
+        return A * A;
+      }
     }
-
-    template <typename T>  // cast integers to double for abs_squared
-    double abs_squared(const T &A)
-      requires std::is_integral_v<T>
-    {
-      return double(A * A);
-    }
-
-    template <typename T> inline T conj(const T &A) { return A; }
-
-    template <typename T> T sqrt(const T &A)
-      requires std::is_floating_point_v<T>
-    {
-      return std::sqrt(A);
-    }
-
+ 
   }  // namespace details
 }  // namespace quspin
