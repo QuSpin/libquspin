@@ -6,8 +6,13 @@ project(
 )
 
 if host_machine.system() == 'windows'
-    add_global_arguments('/bigobj', language: 'cpp')
+    add_project_arguments('/bigobj', language: 'cpp')
+elif host_machine.system() == 'darwin'
+    add_project_arguments('-arch', 'x86_64', '-arch', 'arm64', '-mmacosx-version-min=10.14', language: 'cpp')
+    add_project_link_arguments('-arch', 'x86_64', '-arch', 'arm64', '-mmacosx-version-min=10.14', language: 'cpp')
 endif
+
+add_global_arguments('-DVERSION_INFO=' + meson.project_version(), language: 'cpp')
 
 include = include_directories('include')
 
@@ -22,9 +27,12 @@ src_files = files(
     'src/quantum_operator/quantum_operator.cpp',
 )
 
-libquspin = static_library('quspin', src_files, include_directories: include)
-shared_library('quspin', src_files, include_directories: include)
+libquspin = shared_library('quspin', src_files, include_directories: include)
 
+libquspin_dep = declare_dependency(include_directories : include,
+  link_with : libquspin)
+
+if host_machine.system() != 'windows'
 
 test_files = files(
     'test/array/constructor.cpp',
@@ -33,13 +41,13 @@ test_files = files(
 )
 
 foreach test_file : test_files
-    test_name = test_file.full_path().strip('.cpp')
-    exe_name = test_name.split('/')[-1]
+    test_name = test_file.full_path().strip('.cpp').replace('/', '_').replace('\\', '_').replace(':', '_')
     exe = executable(
-        exe_name,
+        test_name,
         test_file,
-        link_with: libquspin,
-        include_directories: include,
+        dependencies: libquspin_dep
     )
     test(test_name, exe)
 endforeach
+
+endif
