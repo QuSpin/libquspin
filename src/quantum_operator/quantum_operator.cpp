@@ -49,7 +49,7 @@ namespace quspin {
       }
     };
 
-    this->internals_ = visit_or_error<quantum_operators>(
+    DTypeObject<details::quantum_operators>::internals_ = visit_or_error<quantum_operators>(
         constructor, data_variants, indptr_variants, indices_variants, cindices_variants);
   }
 

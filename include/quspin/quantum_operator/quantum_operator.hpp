@@ -6,9 +6,12 @@
 namespace quspin {
 
   class QuantumOperator : public DTypeObject<details::quantum_operators> {
-    using DTypeObject<details::quantum_operators>::internals_;
+    static details::quantum_operators default_value() {
+      return details::quantum_operators(details::quantum_operator<double, int32_t, uint8_t>());
+    }
 
   public:
+    QuantumOperator() : DTypeObject<details::quantum_operators>(default_value()) {}
     QuantumOperator(const QuantumOperator &op);
     QuantumOperator(const details::quantum_operators &op);
     template <typename T, typename I, typename J>

@@ -19,8 +19,6 @@ include = include_directories('include')
 src_files = files(
     'src/array/array.cpp',
     'src/array/kernel/kernels.cpp',
-    'src/array/reference.cpp',
-    'src/array/scalar.cpp',
     'src/dtype/dtype.cpp',
     'src/quantum_operator/kernel/dot.cpp',
     'src/quantum_operator/kernel/sum.cpp',
@@ -33,6 +31,12 @@ libquspin_dep = declare_dependency(include_directories : include,
   link_with : libquspin)
 
 if host_machine.system() != 'windows'
+
+executable(
+    'exe',
+    'test/exe.cpp',
+    dependencies: libquspin_dep
+)
 
 test_files = files(
     'test/array/constructor.cpp',
