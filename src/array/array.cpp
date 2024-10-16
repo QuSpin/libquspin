@@ -20,12 +20,10 @@ namespace quspin {
   // implementation of Array
 
   Array::Array(std::initializer_list<std::size_t> shape, const DType &dtype) {
-    std::cout << "here" << std::endl;
     DTypeObject<details::arrays>::internals_ = std::visit(
-        [&shape](const auto &dtype) {
-          using T = typename std::decay_t<decltype(dtype)>::value_type;
+        [&shape](const auto &d) {
+          using T = typename std::decay_t<decltype(d)>::value_type;
           details::array<T> arr(shape);
-          std::cout << "here" << std::endl;
           return details::arrays(arr);
         },
         dtype.get_variant_obj());
