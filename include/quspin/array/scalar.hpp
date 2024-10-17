@@ -19,7 +19,7 @@ namespace quspin {
     Scalar() : DTypeObject<details::scalars>(default_value()) {}
     Scalar(const Scalar &scalar) = default;
     template <typename T> Scalar(const T &value)
-        : DTypeObject<details::scalars>(details::scalars(details::scalar(value))){};
+        : DTypeObject<details::scalars>(details::scalars(details::scalar(value))) {}
 
     template <typename T> operator T() const;
 
