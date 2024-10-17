@@ -2,7 +2,9 @@
 
 #include <cmath>
 #include <complex>
+#include <quspin/details/cast.hpp>
 #include <quspin/details/operators.hpp>
+
 namespace quspin {
   namespace details {
 
@@ -18,15 +20,13 @@ namespace quspin {
       return real * real + imag * imag;
     }
 
-    template <typename T> 
-    T abs_squared(const T &A)
-    {
+    template <typename T> decltype(auto) abs_squared(const T &A) {
       if constexpr (std::is_integral_v<T>) {
-        return double(A * A);
+        return cast<double>(A * A);
       } else {
         return A * A;
       }
     }
- 
+
   }  // namespace details
 }  // namespace quspin
