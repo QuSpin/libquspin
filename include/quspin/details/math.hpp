@@ -20,7 +20,7 @@ namespace quspin {
       return real * real + imag * imag;
     }
 
-    template <typename T> T abs_squared(const T &A) {
+    template <typename T> decltype(auto) abs_squared(const T &A) {
       if constexpr (std::is_integral_v<T>) {
         return cast<double>(A * A);
       } else {
