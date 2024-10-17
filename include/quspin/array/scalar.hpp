@@ -13,9 +13,13 @@ namespace quspin {
   class Scalar : public DTypeObject<details::scalars> {
     using DTypeObject<details::scalars>::internals_;
 
+    details::scalars default_value() { return details::scalars(details::scalar<double>()); }
+
   public:
-    Scalar();
-    template <typename T> Scalar(const T &value);
+    Scalar() : DTypeObject<details::scalars>(default_value()) {}
+    Scalar(const Scalar &scalar) = default;
+    template <typename T> Scalar(const T &value)
+        : DTypeObject<details::scalars>(details::scalars(details::scalar(value))){};
 
     template <typename T> operator T() const;
 
@@ -28,9 +32,6 @@ namespace quspin {
     template <typename T> Scalar operator/(const T &other) const;
   };
 
-  template <typename T> Scalar::Scalar(const T &value) {
-    internals_ = details::scalars(details::scalar<T>(value));
-  }
   template Scalar::Scalar(const int8_t &);
   template Scalar::Scalar(const uint8_t &);
   template Scalar::Scalar(const int16_t &);

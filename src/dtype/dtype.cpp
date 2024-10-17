@@ -10,8 +10,6 @@
 
 namespace quspin {
 
-  DType::DType() { internals_ = details::dtype<double>(); }
-
   bool DType::operator==(const DType &dtype) const {
     return std::visit(
         [](auto &&lhs, auto &&rhs) {

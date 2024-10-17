@@ -16,14 +16,21 @@ namespace quspin {
   class Array : public DTypeObject<details::arrays> {
     using DTypeObject<details::arrays>::internals_;
 
+    static details::arrays default_value() { return details::arrays(details::array<double>()); }
+
   public:
-    Array();
-    Array(std::initializer_list<std::size_t> shape, const DType &dtype);
-    Array(const std::vector<std::size_t> &shape, const DType &dtype);
-    Array(const std::vector<std::size_t> &shape, const DType &dtype, void *data);
+    Array() : DTypeObject<details::arrays>(default_value()) {}
+    Array(std::initializer_list<std::size_t> shape, std::initializer_list<std::size_t> stride,
+          const DType &dtype, void *data);
+    Array(const std::vector<std::size_t> &shape, const std::vector<std::size_t> &stride,
+          const DType &dtype, void *data);
+    Array(std::initializer_list<std::size_t> shape, const DType &dtype = DType());
+    Array(const std::vector<std::size_t> &shape, const DType &dtype = DType());
 
     std::vector<std::size_t> shape() const;
     std::size_t shape(const std::size_t &) const;
+    std::vector<std::size_t> strides() const;
+    std::size_t strides(const std::size_t &) const;
     std::size_t ndim() const;
     std::size_t size() const;
 

@@ -12,12 +12,15 @@ namespace quspin {
   class Reference : public DTypeObject<details::references> {
     using DTypeObject<details::references>::internals_;
 
-  public:
-    Reference();
-    Reference(details::references &reference);
-    template <typename T> Reference(T &ref) {
-      internals_ = details::references(details::reference<T>(ref));
+    details::references default_value() {
+      return details::references(details::reference<double>());
     }
+
+  public:
+    Reference() : DTypeObject<details::references>(default_value()) {}
+    Reference(details::references &reference) : DTypeObject<details::references>(reference) {};
+    template <typename T> Reference(T &ref)
+        : DTypeObject<details::references>(details::references(details::reference<T>(ref))) {}
     template <typename T> operator T() const {
       return std::visit([](auto &&internals) { return details::cast<T>(internals.get()); },
                         internals_);

@@ -19,8 +19,6 @@ include = include_directories('include')
 src_files = files(
     'src/array/array.cpp',
     'src/array/kernel/kernels.cpp',
-    'src/array/reference.cpp',
-    'src/array/scalar.cpp',
     'src/dtype/dtype.cpp',
     'src/quantum_operator/kernel/dot.cpp',
     'src/quantum_operator/kernel/sum.cpp',

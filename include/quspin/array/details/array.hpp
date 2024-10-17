@@ -18,7 +18,7 @@ namespace quspin {
     template <typename T> struct reference_counted_ptr : public typed_object<T> {
       T *ptr;
       std::size_t *ref_count_;
-      bool owns_pointer;  // if true, the pointer can be deleted when ref_count_ == 0
+      bool owns_pointer;  // if true, the pointer can be deleted when ref_count_ == 1
       std::size_t size;
 
       void inc() { (*ref_count_)++; }
@@ -66,14 +66,13 @@ namespace quspin {
       ~reference_counted_ptr() { dec(); }
 
       reference_counted_ptr<T> &operator=(const reference_counted_ptr<T> &other) {
-        if (this != &other) {
-          dec();
-          ptr = other.ptr;
-          ref_count_ = other.ref_count_;
-          owns_pointer = other.owns_pointer;
-          size = other.size;
-          (*ref_count_)++;
-        }
+        dec();
+        ptr = other.ptr;
+        ref_count_ = other.ref_count_;
+        owns_pointer = other.owns_pointer;
+        size = other.size;
+        inc();
+
         return *this;
       }
 
@@ -110,8 +109,9 @@ namespace quspin {
         return offset / sizeof(T);
       }
 
-      void init_from_stl_(const std::vector<std::size_t> &shape, T *data) {
-        std::copy(shape.begin(), shape.end(), std::back_inserter(shape_));
+      void init_from_shape_(const std::vector<std::size_t> &shape) {
+        shape_.resize(shape.size());
+        std::copy(shape.begin(), shape.end(), shape_.begin());
         ndim_ = shape.size();
         size_ = (ndim_ > 0 ? std::reduce(shape.begin(), shape.end(), std::size_t(1),
                                          std::multiplies<std::size_t>())
@@ -126,23 +126,38 @@ namespace quspin {
             stride_[i] = shape[i + 1] * sizeof(T);
           }
         }
+        data_ = reference_counted_ptr<T>(size_);
+      }
 
-        if (data == nullptr) {
-          data_ = reference_counted_ptr<T>(size_);
-        } else {
-          // does not own the memory, do not delete
-          data_ = reference_counted_ptr<T>(data, size_);
-          ;
-        }
+      void init_from_buffer_(const std::vector<std::size_t> &shape,
+                             const std::vector<std::size_t> &stride, T *data) {
+        shape_.resize(shape.size());
+        stride_.resize(stride.size());
+
+        std::copy(shape.cbegin(), shape.cend(), shape_.begin());
+        std::copy(stride.cbegin(), stride.cend(), stride_.begin());
+        ndim_ = shape.size();
+        size_ = (ndim_ > 0 ? std::reduce(shape.begin(), shape.end(), std::size_t(1),
+                                         std::multiplies<std::size_t>())
+                           : 0);
+
+        // does not own the memory, do not delete
+        data_ = reference_counted_ptr<T>(data, size_);
       }
 
     public:
       array() : data_(reference_counted_ptr<T>()), stride_({}), shape_({}), size_(0), ndim_(0) {};
-      array(std::initializer_list<std::size_t> shape, T *data = nullptr) {
-        init_from_stl_(std::vector<std::size_t>(shape), data);
+      array(std::initializer_list<std::size_t> shape) {
+        init_from_shape_(std::vector<std::size_t>(shape));
       }
-      array(const std::vector<std::size_t> &shape, T *data = nullptr) {
-        init_from_stl_(shape, data);
+      array(const std::vector<std::size_t> &shape) { init_from_shape_(shape); }
+      array(std::initializer_list<std::size_t> shape, std::initializer_list<std::size_t> stride,
+            T *data) {
+        init_from_buffer_(std::vector<std::size_t>(shape), std::vector<std::size_t>(stride), data);
+      }
+      array(const std::vector<std::size_t> &shape, const std::vector<std::size_t> &stride,
+            T *data) {
+        init_from_buffer_(shape, stride, data);
       }
 
       const T *data() const { return data_.get(); }
@@ -154,10 +169,10 @@ namespace quspin {
       T *begin() { return mut_data(); }
       T *end() { return mut_data() + size(); }
 
-      std::size_t stride(const std::size_t &i) const { return stride_.at(i); }
+      std::size_t strides(const std::size_t &i) const { return stride_.at(i); }
       std::size_t shape(const std::size_t &i) const { return shape_.at(i); }
       std::vector<std::size_t> shape() const { return shape_; }
-      std::vector<std::size_t> stride() const { return stride_; }
+      std::vector<std::size_t> strides() const { return stride_; }
 
       std::size_t ndim() const { return ndim_; }
       std::size_t size() const { return size_; }
