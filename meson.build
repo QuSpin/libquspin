@@ -32,12 +32,6 @@ libquspin_dep = declare_dependency(include_directories : include,
 
 if host_machine.system() != 'windows'
 
-executable(
-    'exe',
-    'test/exe.cpp',
-    dependencies: libquspin_dep
-)
-
 test_files = files(
     'test/array/constructor.cpp',
     'test/array/sum.cpp',

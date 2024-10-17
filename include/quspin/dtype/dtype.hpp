@@ -15,7 +15,6 @@ namespace quspin {
 
   public:
     DType() : details::VariantContainer<details::dtypes>(default_value()) {};
-    DType(const details::dtypes &dtype);
     template <typename T> DType(const details::dtype<T> &dtype) {
       internals_ = details::dtypes(dtype);
     }
