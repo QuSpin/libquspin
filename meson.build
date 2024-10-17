@@ -42,7 +42,11 @@ src_files = files(
     'src' / 'quantum_operator' / 'quantum_operator.cpp',
 )
 
-libquspin = shared_library('quspin', src_files, include_directories: include)
+if host_machine.system() == 'windows'
+    libquspin = static_library('quspin', src_files, include_directories: include, name_suffix: '.lib')
+else
+    libquspin = shared_library('quspin', src_files, include_directories: include)
+endif
 
 libquspin_dep = declare_dependency(
     include_directories: include,
