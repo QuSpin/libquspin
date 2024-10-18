@@ -43,7 +43,7 @@ src_files = files(
 )
 
 if host_machine.system() == 'windows'
-    libquspin = static_library('quspin', src_files, include_directories: include, name_suffix: '.lib')
+    libquspin = static_library('quspin', src_files, include_directories: include, name_suffix: 'lib')
 else
     libquspin = shared_library('quspin', src_files, include_directories: include)
 endif
