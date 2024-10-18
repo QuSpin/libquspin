@@ -18,7 +18,7 @@ namespace quspin {
 
   public:
     Reference() : DTypeObject<details::references>(default_value()) {}
-    Reference(details::references &reference) : DTypeObject<details::references>(reference) {};
+    Reference(details::references &reference) : DTypeObject<details::references>(reference) {}
     template <typename T> Reference(T &ref)
         : DTypeObject<details::references>(details::references(details::reference<T>(ref))) {}
     template <typename T> operator T() const {

@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <quspin/array/details/array.hpp>
 #include <quspin/quantum_operator/details/quantum_operator.hpp>
+#include <thread>
 
 namespace quspin {
   namespace details {
