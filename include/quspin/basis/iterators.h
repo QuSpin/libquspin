@@ -1,5 +1,0 @@
-#ifndef __QUSPIN_BASIS_ITERATORS_H__
-#define __QUSPIN_BASIS_ITERATORS_H__
-
-
-#endif
