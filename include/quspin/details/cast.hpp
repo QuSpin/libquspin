@@ -1,27 +1,28 @@
 #pragma once
 
 #include <complex>
+#include <quspin/details/type_concepts.hpp>
 
 namespace quspin {
   namespace details {
 
-    template <typename T> using complex_wrapper = std::complex<T>;
+    template <Floating T> using complex_wrapper = std::complex<T>;
 
     typedef std::complex<float> cfloat;
     typedef std::complex<double> cdouble;
     typedef std::complex<long double> cldouble;
 
-    template <typename T> struct is_complex : std::false_type {};
+    template <PrimativeTypes T> struct is_complex : std::false_type {};
 
-    template <typename T> struct is_complex<std::complex<T>> : std::true_type {};
+    template <Floating T> struct is_complex<std::complex<T>> : std::true_type {};
 
-    template <typename T> inline constexpr bool is_complex_v = is_complex<T>::value;
+    template <PrimativeTypes T> inline constexpr bool is_complex_v = is_complex<T>::value;
 
-    template <typename... Ts> using upcast_t = std::common_type_t<Ts...>;
+    template <PrimativeTypes... Ts> using upcast_t = std::common_type_t<Ts...>;
 
-    template <class from, class to> struct can_safe_cast : std::false_type {};
+    template <PrimativeTypes from, PrimativeTypes to> struct can_safe_cast : std::false_type {};
 
-    template <class from, class to> inline constexpr bool can_safe_cast_v
+    template <PrimativeTypes from, PrimativeTypes to> inline constexpr bool can_safe_cast_v
         = can_safe_cast<from, to>::value;
 
 #ifdef _MSC_VER
@@ -29,7 +30,7 @@ namespace quspin {
 #  pragma warning(disable : 4244)
 #endif
 
-    template <typename To, typename From> inline To cast(const From &value) {
+    template <PrimativeTypes To, PrimativeTypes From> inline To cast(const From &value) {
       if constexpr (is_complex_v<From> && !is_complex_v<To>) {
         return static_cast<To>(value.real());
       } else {
