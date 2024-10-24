@@ -19,27 +19,35 @@ namespace quspin {
       static constexpr J max_coeff = std::numeric_limits<J>::max();
 
     public:
+      using value_type = T;
+      using index_type = I;
+      using cindex_type = J;
+
       quantum_operator() = default;
 
       quantum_operator(std::size_t dim, array<T> &data, array<I> &indptr, array<I> &indices,
                        array<J> &cindices)
           : dim_(dim), data_(data), indptr_(indptr), indices_(indices), cindices_(cindices) {}
 
-      T *data() { return data_.mut_data(); }
-      const T *data() const { return data_.data(); }
-      T data(const std::size_t &i) const { return data()[i]; }
+      array<T> data() const { return data_; }
+      T *data_ptr() { return data_.mut_data(); }
+      const T *data_ptr() const { return data_.data(); }
+      T data(const std::size_t &i) const { return data_ptr()[i]; }
 
-      I *indptr() { return indptr_.mut_data(); }
-      const I *indptr() const { return indptr_.data(); }
-      I indptr(const std::size_t &i) const { return indptr()[i]; }
+      array<I> indptr() const { return indptr_; }
+      I *indptr_ptr() { return indptr_.mut_data(); }
+      const I *indptr_ptr() const { return indptr_.data(); }
+      I indptr_at(const std::size_t &i) const { return indptr_ptr()[i]; }
 
-      I *indices() { return indices_.mut_data(); }
-      const I *indices() const { return indices_.data(); }
-      I indices(const std::size_t &i) const { return indices()[i]; }
+      array<I> indices() const { return indices_; }
+      I *indices_ptr() { return indices_.mut_data(); }
+      const I *indices_ptr() const { return indices_.data(); }
+      I indices_at(const std::size_t &i) const { return indices_ptr()[i]; }
 
-      J *cindices() { return cindices_.mut_data(); }
-      const J *cindices() const { return cindices_.data(); }
-      J cindices(const std::size_t &i) const { return cindices()[i]; }
+      array<J> cindices() const { return cindices_; }
+      J *cindices_ptr() { return cindices_.mut_data(); }
+      const J *cindices_ptr() const { return cindices_.data(); }
+      J cindices(const std::size_t &i) const { return cindices_ptr()[i]; }
 
       std::size_t dim() const { return dim_; }
     };

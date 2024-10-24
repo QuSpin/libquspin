@@ -187,6 +187,11 @@ namespace quspin {
       T &at(std::initializer_list<std::size_t> &input) {
         return at(std::vector<std::size_t>(input));
       }
+      array<T> copy() const {
+        array<T> out(shape_);
+        std::copy(cbegin(), cend(), out.begin());
+        return out;
+      }
     };
 
     template <typename T> struct value_type<array<T>> {

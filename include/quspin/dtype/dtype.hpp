@@ -22,7 +22,7 @@ namespace quspin {
 
     template <typename T> static DType of() {
       using val_t = details::value_type_t<std::decay_t<T>>;
-      return DType(details::dtype<details::value_type_t<val_t>>());
+      return DType(details::dtype<val_t>());
     }
 
     bool operator==(const DType &dtype) const;

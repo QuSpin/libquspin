@@ -8,9 +8,10 @@
 namespace quspin {
   namespace details {
 
-    template <typename... Types, typename Variant> std::variant<Types...> select(Variant variant) {
-      using select_variant_t = std::variant<Types...>;
-      return visit_or_error<std::variant<Types...>>(
+    template <typename... Types, typename Variants>
+    DTypeObject<std::variant<Types...>> select(DTypeObject<Variants> obj) {
+      using select_variant_t = DTypeObject<std::variant<Types...>>;
+      return visit_or_error<select_variant_t>(
           [](auto &&arg) {
             using arg_t = std::decay_t<decltype(arg)>;
             if constexpr (std::is_convertible_v<arg_t, select_variant_t>) {
@@ -31,7 +32,7 @@ namespace quspin {
               return ErrorOr<select_variant_t>(error);
             }
           },
-          variant);
+          obj.get_variant_obj());
     }
 
   }  // namespace details

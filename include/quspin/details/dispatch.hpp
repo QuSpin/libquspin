@@ -4,6 +4,7 @@
 #  pragma warning(disable : 4100)
 #endif
 
+#include <any>
 #include <quspin/array/array.hpp>
 #include <quspin/array/details/array.hpp>
 #include <quspin/array/scalar.hpp>
@@ -20,33 +21,33 @@ namespace quspin {
 
     template <typename Kernel, typename StaticArgsCheck, typename DynamicArgsCheck,
               typename... Args>
-    void dispatch_core(Kernel &&kernel, StaticArgsCheck &&static_args_check,
-                       DynamicArgsCheck &&dynamic_args_check, Array out, Args... args) {
-      ReturnVoidError err = dynamic_args_check(out, args...);
+    void dispatch(Kernel &&kernel, StaticArgsCheck &&static_args_check,
+                  DynamicArgsCheck &&dynamic_args_check, Args... args) {
+      ReturnVoidError err = dynamic_args_check(args...);
 
       if (err.has_error()) {
         err.get_error().throw_error();
       }
 
       visit_or_error<std::monostate>(
-          [&kernel](auto out, const auto &...args) {
-            using can_dispatch_t = decltype(static_args_check(out, args...));
+          [&kernel](auto &...args) {
+            using can_dispatch_t = decltype(static_args_check(args...));
 
             if constexpr (can_dispatch_t::has_error()) {
               return ReturnVoidError(can_dispatch_t::get_error());
             } else {
-              return kernel(out, args...);
+              return kernel(args...);
             }
           },
-          out.get_variant_obj(), args.get_variant_obj()...);
+          args.get_variant_obj()...);
     }
 
     template <typename Kernel, typename ResultShape, typename ResultDType, typename StaticArgsCheck,
               class DynamicArgsCheck, typename... Args>
-    Array dispatch_general(Kernel &&kernel, ResultShape &&result_shape_func,
-                           ResultDType &&result_dtype_func, StaticArgsCheck &&static_args_check,
-                           DynamicArgsCheck &&dynamic_args_check, Optional<Array> out_option,
-                           Args... args) {
+    Array dispatch_array(Kernel &&kernel, ResultShape &&result_shape_func,
+                         ResultDType &&result_dtype_func, StaticArgsCheck &&static_args_check,
+                         DynamicArgsCheck &&dynamic_args_check, Optional<Array> out_option,
+                         Args... args) {
       std::vector<std::size_t> shape = result_shape_func(args...);
       DType output_dtype = result_dtype_func(args...);
 
@@ -54,14 +55,13 @@ namespace quspin {
 
       Array out = out_option.get(default_result);
 
-      dispatch_core(kernel, static_args_check, dynamic_args_check, out, args...);
+      dispatch(kernel, static_args_check, dynamic_args_check, out, args...);
 
       return out;
     }
 
-    template <typename Kernel, typename... Args>
-    Array dispatch_elementwise(Kernel &&kernel, Optional<Array> out, const Array &lhs,
-                               const Array &rhs) {
+    template <typename Kernel> Array dispatch_elementwise(Kernel &&kernel, Optional<Array> out,
+                                                          const Array &lhs, const Array &rhs) {
       struct InvalidDtype {
         static constexpr bool has_error() { return true; }
         static Error get_error() { return Error(ErrorType::ValueError, "Incompatible out type"); }
@@ -94,8 +94,8 @@ namespace quspin {
         return ReturnVoidError();
       };
 
-      return dispatch_general(kernel, result_shape, result_dtype_func, static_args_check,
-                              dynamic_args_check, out, lhs, rhs);
+      return dispatch_array(kernel, result_shape, result_dtype_func, static_args_check,
+                            dynamic_args_check, out, lhs, rhs);
     }
 
     template <typename Kernel, typename StaticArgsCheck, typename DynamicArgsCheck,

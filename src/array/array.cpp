@@ -107,4 +107,8 @@ namespace quspin {
                       internals_);
   }
 
+  Array Array::copy() const {
+    return std::visit([](const auto &internals) { return Array(internals.copy()); }, internals_);
+  }
+
 }  // namespace quspin
