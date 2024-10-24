@@ -2,26 +2,28 @@
 
 #include <cstdint>
 #include <quspin/details/operators.hpp>
+#include <quspin/details/type_concepts.hpp>
 #include <variant>
 
 namespace quspin {
   namespace details {
 
-    template <typename T> struct typed_object {
+    template <PrimativeTypes T> struct typed_object {
     public:
       using value_type = T;
     };
 
-    template <typename T> struct dtype : public typed_object<T> {
+    template <PrimativeTypes T> struct dtype : public typed_object<T> {
       dtype() = default;
       static T default_value() { return T(); }
     };
 
-    template <typename... Ts> dtype<std::common_type_t<Ts...>> result_dtype(dtype<Ts>...) {
+    template <PrimativeTypes... Ts> dtype<std::common_type_t<Ts...>> result_dtype(dtype<Ts>...) {
       return dtype<std::common_type_t<Ts...>>();
     }
 
-    template <typename... Ts> std::common_type<Ts...> object_result_type(typed_object<Ts>...) {
+    template <PrimativeTypes... Ts>
+    std::common_type<Ts...> object_result_type(typed_object<Ts>...) {
       return std::common_type<Ts...>();
     }
 
@@ -29,7 +31,7 @@ namespace quspin {
       using type = T;
     };
 
-    template <typename T> struct value_type<dtype<T>> {
+    template <PrimativeTypes T> struct value_type<dtype<T>> {
       using type = T;
     };
 

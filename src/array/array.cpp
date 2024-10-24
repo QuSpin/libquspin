@@ -19,6 +19,19 @@ namespace quspin {
 
   // implementation of Array
 
+  template Array::Array(const details::array<int8_t> &);
+  template Array::Array(const details::array<uint8_t> &);
+  template Array::Array(const details::array<int16_t> &);
+  template Array::Array(const details::array<uint16_t> &);
+  template Array::Array(const details::array<uint32_t> &);
+  template Array::Array(const details::array<int32_t> &);
+  template Array::Array(const details::array<uint64_t> &);
+  template Array::Array(const details::array<int64_t> &);
+  template Array::Array(const details::array<float> &);
+  template Array::Array(const details::array<double> &);
+  template Array::Array(const details::array<details::cfloat> &);
+  template Array::Array(const details::array<details::cdouble> &);
+
   Array::Array(std::initializer_list<std::size_t> shape, const DType &dtype) {
     DTypeObject<details::arrays>::internals_ = std::visit(
         [&shape](const auto &d) {

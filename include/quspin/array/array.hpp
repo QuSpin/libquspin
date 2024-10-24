@@ -26,7 +26,7 @@ namespace quspin {
           const DType &dtype, void *data);
     Array(std::initializer_list<std::size_t> shape, const DType &dtype = DType());
     Array(const std::vector<std::size_t> &shape, const DType &dtype = DType());
-    template <typename T> Array(const details::array<T> &array)
+    template <PrimativeTypes T> Array(const details::array<T> &array)
         : DTypeObject<details::arrays>(details::arrays(array)) {}
 
     std::vector<std::size_t> shape() const;
@@ -42,18 +42,4 @@ namespace quspin {
     Reference operator[](std::initializer_list<std::size_t> index);
     Array copy() const;
   };
-
-  template Array::Array(const details::array<int8_t> &);
-  template Array::Array(const details::array<uint8_t> &);
-  template Array::Array(const details::array<int16_t> &);
-  template Array::Array(const details::array<uint16_t> &);
-  template Array::Array(const details::array<uint32_t> &);
-  template Array::Array(const details::array<int32_t> &);
-  template Array::Array(const details::array<uint64_t> &);
-  template Array::Array(const details::array<int64_t> &);
-  template Array::Array(const details::array<float> &);
-  template Array::Array(const details::array<double> &);
-  template Array::Array(const details::array<details::cfloat> &);
-  template Array::Array(const details::array<details::cdouble> &);
-
 }  // namespace quspin

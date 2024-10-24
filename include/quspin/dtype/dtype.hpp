@@ -22,24 +22,11 @@ namespace quspin {
 
     template <typename T> static DType of() {
       using val_t = details::value_type_t<std::decay_t<T>>;
-      return DType(details::dtype<val_t>());
+      return DType(details::dtype<details::value_type_t<val_t>>());
     }
 
     bool operator==(const DType &dtype) const;
   };
-
-  template DType::DType(const details::dtype<int8_t> &);
-  template DType::DType(const details::dtype<uint8_t> &);
-  template DType::DType(const details::dtype<int16_t> &);
-  template DType::DType(const details::dtype<uint16_t> &);
-  template DType::DType(const details::dtype<int32_t> &);
-  template DType::DType(const details::dtype<uint32_t> &);
-  template DType::DType(const details::dtype<int64_t> &);
-  template DType::DType(const details::dtype<uint64_t> &);
-  template DType::DType(const details::dtype<float> &);
-  template DType::DType(const details::dtype<double> &);
-  template DType::DType(const details::dtype<details::cfloat> &);
-  template DType::DType(const details::dtype<details::cdouble> &);
 
   DType result_dtype(std::vector<DType> &);
   bool int_dtype(const DType &);

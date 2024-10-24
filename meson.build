@@ -35,6 +35,8 @@ include = include_directories('include')
 
 src_files = files(
     'src' / 'array' / 'array.cpp',
+    'src' / 'array' / 'scalar.cpp',
+    'src' / 'array' / 'reference.cpp',
     'src' / 'array' / 'kernel' / 'kernels.cpp',
     'src' / 'dtype' / 'dtype.cpp',
     'src' / 'quantum_operator' / 'kernel' / 'dot.cpp',
@@ -58,6 +60,7 @@ test_files = [
     ('test' / 'array' / 'constructor.cpp'),
     ('test' / 'array' / 'sum.cpp'),
     ('test' / 'dtype.cpp'),
+    ('test' / 'quantum_operator' / 'constructor.cpp'),
 ]
 
 foreach test_file : test_files
