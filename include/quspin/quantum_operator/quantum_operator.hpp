@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iostream>
 #include <quspin/array/array.hpp>
 #include <quspin/dtype/dtype.hpp>
 #include <quspin/quantum_operator/details/quantum_operator.hpp>
@@ -17,7 +18,8 @@ namespace quspin {
     QuantumOperator(const details::quantum_operators &op);
     template <typename T, typename I, typename J>
     QuantumOperator(const details::quantum_operator<T, I, J> &op);
-    QuantumOperator(Array, Array, Array, Array);
+    QuantumOperator(Array data, Array indptr, Array indices, Array cindices);
+    ~QuantumOperator() { std::cout << "here" << std::endl; }
 
     std::size_t dim() const;
 

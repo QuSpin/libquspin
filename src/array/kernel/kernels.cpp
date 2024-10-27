@@ -1,4 +1,6 @@
+#include <algorithm>
 #include <array>
+#include <numeric>
 #include <quspin/array/array.hpp>
 #include <quspin/array/kernel/kernels.hpp>
 #include <quspin/details/broadcast.hpp>
@@ -8,6 +10,7 @@
 #include <quspin/details/math.hpp>
 #include <quspin/details/operators.hpp>
 #include <quspin/details/optional.hpp>
+#include <variant>
 
 namespace quspin {
 

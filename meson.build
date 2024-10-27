@@ -61,6 +61,7 @@ test_files = [
     ('test' / 'array' / 'sum.cpp'),
     ('test' / 'dtype.cpp'),
     ('test' / 'quantum_operator' / 'constructor.cpp'),
+    ('test' / 'details' / 'select.cpp'),
 ]
 
 foreach test_file : test_files

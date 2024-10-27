@@ -14,7 +14,7 @@ namespace quspin {
       return visit_or_error<select_variant_t>(
           [](auto &&arg) {
             using arg_t = std::decay_t<decltype(arg)>;
-            if constexpr (std::is_convertible_v<arg_t, select_variant_t>) {
+            if constexpr ((std::is_same_v<arg_t, Types> || ...)) {
               select_variant_t select_variant(arg);
               return ErrorOr<select_variant_t>(select_variant);
             } else {
