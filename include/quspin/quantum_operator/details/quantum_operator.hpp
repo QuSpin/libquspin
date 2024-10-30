@@ -2,6 +2,7 @@
 
 #include <numeric>
 #include <quspin/array/details/array.hpp>
+#include <quspin/details/type_concepts.hpp>
 #include <quspin/dtype/details/dtype.hpp>
 #include <type_traits>
 #include <variant>
@@ -9,7 +10,8 @@
 namespace quspin {
   namespace details {
 
-    template <typename T, typename I, typename J> struct quantum_operator : public typed_object<T> {
+    template <PrimativeTypes T, PrimativeTypes I, PrimativeTypes J> struct quantum_operator
+        : public typed_object<T> {
     private:
       std::size_t dim_;
       array<T> data_;
@@ -32,7 +34,7 @@ namespace quspin {
       array<T> data() const { return data_; }
       T *data_ptr() { return data_.mut_data(); }
       const T *data_ptr() const { return data_.data(); }
-      T data(const std::size_t &i) const { return data_ptr()[i]; }
+      T data_at(const std::size_t &i) const { return data_ptr()[i]; }
 
       array<I> indptr() const { return indptr_; }
       I *indptr_ptr() { return indptr_.mut_data(); }
@@ -47,9 +49,14 @@ namespace quspin {
       array<J> cindices() const { return cindices_; }
       J *cindices_ptr() { return cindices_.mut_data(); }
       const J *cindices_ptr() const { return cindices_.data(); }
-      J cindices(const std::size_t &i) const { return cindices_ptr()[i]; }
+      J cindices_at(const std::size_t &i) const { return cindices_ptr()[i]; }
 
       std::size_t dim() const { return dim_; }
+    };
+
+    template <PrimativeTypes T, PrimativeTypes I, PrimativeTypes J>
+    struct value_type<quantum_operator<T, I, J>> {
+      using type = T;
     };
 
     using quantum_operators = std::variant<

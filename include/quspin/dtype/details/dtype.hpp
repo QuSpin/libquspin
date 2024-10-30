@@ -31,11 +31,13 @@ namespace quspin {
       using type = T;
     };
 
-    template <PrimativeTypes T> struct value_type<dtype<T>> {
+    template <typename T> using value_type_t = typename value_type<T>::type;
+
+    template <typename T>
+      requires PrimativeTypes<T>
+    struct value_type<dtype<T>> {
       using type = T;
     };
-
-    template <typename T> using value_type_t = typename value_type<T>::type;
 
     using dtypes = std::variant<dtype<int8_t>, dtype<uint8_t>, dtype<int16_t>, dtype<uint16_t>,
                                 dtype<uint32_t>, dtype<int32_t>, dtype<uint64_t>, dtype<int64_t>,

@@ -57,10 +57,12 @@ libquspin_dep = declare_dependency(
 
 
 test_files = [
+    ( 'test' / 'array' / 'iterator.cpp'),
     ('test' / 'array' / 'constructor.cpp'),
     ('test' / 'array' / 'sum.cpp'),
     ('test' / 'dtype.cpp'),
     ('test' / 'quantum_operator' / 'constructor.cpp'),
+    ('test' / 'quantum_operator' / 'sum.cpp'),
     ('test' / 'details' / 'select.cpp'),
 ]
 

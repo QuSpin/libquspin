@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <quspin/array/array.hpp>
+#include <quspin/details/type_concepts.hpp>
 #include <quspin/dtype/dtype.hpp>
 #include <quspin/quantum_operator/details/quantum_operator.hpp>
 
@@ -14,12 +15,10 @@ namespace quspin {
 
   public:
     QuantumOperator() : DTypeObject<details::quantum_operators>(default_value()) {}
-    QuantumOperator(const QuantumOperator &op);
     QuantumOperator(const details::quantum_operators &op);
-    template <typename T, typename I, typename J>
+    template <PrimativeTypes T, PrimativeTypes I, PrimativeTypes J>
     QuantumOperator(const details::quantum_operator<T, I, J> &op);
     QuantumOperator(Array data, Array indptr, Array indices, Array cindices);
-    ~QuantumOperator() { std::cout << "here" << std::endl; }
 
     std::size_t dim() const;
 

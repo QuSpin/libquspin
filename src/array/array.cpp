@@ -32,16 +32,6 @@ namespace quspin {
   template Array::Array(const details::array<details::cfloat> &);
   template Array::Array(const details::array<details::cdouble> &);
 
-  Array::Array(std::initializer_list<std::size_t> shape, const DType &dtype) {
-    DTypeObject<details::arrays>::internals_ = std::visit(
-        [&shape](const auto &d) {
-          using T = typename std::decay_t<decltype(d)>::value_type;
-          details::array<T> arr(shape);
-          return details::arrays(arr);
-        },
-        dtype.get_variant_obj());
-  }
-
   Array::Array(const std::vector<std::size_t> &shape, const DType &dtype) {
     DTypeObject<details::arrays>::internals_ = std::visit(
         [&shape](const auto &dtype) {
@@ -63,16 +53,18 @@ namespace quspin {
         dtype.get_variant_obj());
   }
 
-  Array::Array(std::initializer_list<std::size_t> shape, std::initializer_list<std::size_t> stride,
-               const DType &dtype, void *data) {
-    DTypeObject<details::arrays>::internals_ = std::visit(
-        [&shape, &stride, &data](const auto &dtype) {
-          using T = typename std::decay_t<decltype(dtype)>::value_type;
-          details::array<T> arr(shape, stride, static_cast<T *>(data));
-          return details::arrays(arr);
-        },
-        dtype.get_variant_obj());
-  }
+  template Array::Array(std::initializer_list<int8_t>);
+  template Array::Array(std::initializer_list<uint8_t>);
+  template Array::Array(std::initializer_list<int16_t>);
+  template Array::Array(std::initializer_list<uint16_t>);
+  template Array::Array(std::initializer_list<int32_t>);
+  template Array::Array(std::initializer_list<uint32_t>);
+  template Array::Array(std::initializer_list<int64_t>);
+  template Array::Array(std::initializer_list<uint64_t>);
+  template Array::Array(std::initializer_list<float>);
+  template Array::Array(std::initializer_list<double>);
+  template Array::Array(std::initializer_list<details::cfloat>);
+  template Array::Array(std::initializer_list<details::cdouble>);
 
   std::vector<std::size_t> Array::shape() const {
     return std::visit([](const auto &internals) { return internals.shape(); }, internals_);
@@ -122,6 +114,21 @@ namespace quspin {
 
   Array Array::copy() const {
     return std::visit([](const auto &internals) { return Array(internals.copy()); }, internals_);
+  }
+
+  Array Array::astype(const DType &dtype) const {
+    Array out(shape(), dtype);
+
+    std::visit(
+        [](auto &&from, auto &&to) {
+          using to_t = std::decay_t<decltype(to)>::value_type;
+
+          auto func = [](auto &&value) { return details::cast<to_t>(value); };
+          std::transform(from.begin(), from.end(), to.begin(), func);
+        },
+        get_variant_obj(), out.get_variant_obj());
+
+    return out;
   }
 
 }  // namespace quspin

@@ -22,7 +22,7 @@ namespace quspin {
       using out_t = typename std::decay_t<decltype(out)>::value_type;
 
       std::transform(
-          lhs.cbegin(), lhs.cend(), rhs.cbegin(), out.begin(),
+          lhs.begin(), lhs.end(), rhs.begin(), out.begin(),
           [](const auto &lhs, const auto &rhs) { return details::cast<out_t>(lhs + rhs); });
       return details::ReturnVoidError();
     };
@@ -34,26 +34,11 @@ namespace quspin {
       using T = typename std::decay_t<decltype(arr)>::value_type;
       using norm_t = std::decay_t<decltype(details::abs_squared(T()))>;
 
-      constexpr std::size_t batch = 64 / sizeof(norm_t);
+      norm_t result = std::accumulate(arr.begin(), arr.end(), norm_t(), [](auto &&acc, auto &&val) {
+        return acc + details::abs_squared(val);
+      });
 
-      std::array<norm_t, batch> norms({norm_t(0)});
-
-      std::size_t niter = arr.size() / norms.size();
-      std::size_t nleft = arr.size() % norms.size();
-
-      auto ptr = arr.cbegin();
-
-      for (std::size_t i = 0; i < niter; i++) {
-        for (auto &norm : norms) {
-          norm += details::abs_squared(*ptr++);
-        }
-      }
-      norm_t extra = norm_t(0);
-      for (std::size_t i = 0; i < nleft; i++) {
-        extra += details::abs_squared(*ptr++);
-      }
-      Scalar result = std::accumulate(norms.cbegin(), norms.cend(), extra);
-      return details::ErrorOr<Scalar>(result);
+      return details::ErrorOr<Scalar>(Scalar(details::cast<double>(std::sqrt(result))));
     };
 
     auto static_args_check = [](const auto &) { return details::ValidArgs(); };

@@ -4,26 +4,28 @@
 #include <cstddef>
 #include <quspin/array/details/array.hpp>
 #include <quspin/details/threading.hpp>
+#include <quspin/details/type_concepts.hpp>
 #include <quspin/quantum_operator/details/quantum_operator.hpp>
 #include <thread>
 
 namespace quspin {
   namespace details {
 
-    template <typename Op, typename T1, typename T2, typename I, typename J> struct row_sum_tasks {
+    template <typename Op, PrimativeTypes T, PrimativeTypes I, PrimativeTypes J>
+    struct row_sum_tasks {
       Op &&op;
-      const quantum_operator<T1, I, J> lhs;
-      const quantum_operator<T2, I, J> rhs;
+      const quantum_operator<T, I, J> lhs;
+      const quantum_operator<T, I, J> rhs;
       I *indptr;
 
     public:
-      row_sum_tasks(Op &&op, const quantum_operator<T1, I, J> &lhs,
-                    const quantum_operator<T2, I, J> &rhs, I *indptr)
+      row_sum_tasks(Op &&op, const quantum_operator<T, I, J> &lhs,
+                    const quantum_operator<T, I, J> &rhs, I *indptr)
           : op(op), lhs(lhs), rhs(rhs), indptr(indptr) {}
 
       std::size_t size() const { return lhs.dim(); }
 
-      void do_work(const std::size_t row_index) {
+      void do_work(const std::size_t row_index, const std::size_t) {
         I sum_size = 0;
 
         I lhs_row_start = lhs.indptr_at(row_index);
@@ -52,8 +54,9 @@ namespace quspin {
             ++rhs_row_start;
             ++sum_size;
           } else {
-            auto result = op(lhs.data_at(lhs_row_start), rhs.data_at(rhs_row_start));
-            if (result != 0) {
+            const T result = op(lhs.data_at(lhs_row_start), rhs.data_at(rhs_row_start));
+
+            if (result != T()) {
               ++sum_size;
             }
             ++lhs_row_start;
@@ -75,17 +78,17 @@ namespace quspin {
       }
     };
 
-    template <typename Op, typename T1, typename T2, typename I, typename J>
-    void get_sum_size(Op &&op, const quantum_operator<T1, I, J> &lhs,
-                      const quantum_operator<T2, I, J> &rhs, array<I> &out_indptr) {
+    template <typename Op, PrimativeTypes T, PrimativeTypes I, PrimativeTypes J>
+    void elementwise_binop_size(Op &&op, const quantum_operator<T, I, J> &lhs,
+                                const quantum_operator<T, I, J> &rhs, array<I> &out_indptr) {
       assert(lhs.dim() == rhs.dim());
       assert(lhs.dim() == out_indptr.size() - 1);
 
       I *indptr = out_indptr.mut_data();
       indptr[0] = 0;
 
-      WorkQueue(row_sum_tasks(op, lhs, rhs, indptr))
-          .run(Schedule::SequentialBlocks, std::thread::hardware_concurrency());
+      row_sum_tasks<Op, T, I, J> tasks(op, lhs, rhs, indptr);
+      WorkQueue(tasks).run(Schedule::SequentialBlocks, std::thread::hardware_concurrency());
 
       // cumulaive sum
       for (std::size_t row_index = 1; row_index <= lhs.dim(); ++row_index) {
@@ -93,21 +96,21 @@ namespace quspin {
       }
     }
 
-    template <typename Op, typename T1, typename T2, typename T3, typename I, typename J>
+    template <typename Op, PrimativeTypes T, PrimativeTypes I, PrimativeTypes J>
     class populate_row_tasks {
       Op &&op;
-      const quantum_operator<T1, I, J> lhs;
-      const quantum_operator<T2, I, J> rhs;
-      quantum_operator<T3, I, J> out;
-
-      populate_row_tasks(Op &&op, const quantum_operator<T1, I, J> &lhs,
-                         const quantum_operator<T2, I, J> &rhs, quantum_operator<T3, I, J> &out)
-          : op(op), lhs(lhs), rhs(rhs), out(out) {}
+      const quantum_operator<T, I, J> lhs;
+      const quantum_operator<T, I, J> rhs;
+      quantum_operator<T, I, J> out;
 
     public:
+      populate_row_tasks(Op &&op, const quantum_operator<T, I, J> &lhs,
+                         const quantum_operator<T, I, J> &rhs, quantum_operator<T, I, J> &out)
+          : op(op), lhs(lhs), rhs(rhs), out(out) {}
+
       std::size_t size() const { return lhs.dim(); }
 
-      void do_work(const std::size_t row_index) {
+      void do_work(const std::size_t row_index, const std::size_t) {
         I lhs_row_start = lhs.indptr_at(row_index);
         const I lhs_row_end = lhs.indptr_at(row_index + 1);
 
@@ -116,10 +119,9 @@ namespace quspin {
 
         I out_row_start = out.indptr_at(row_index);
 
-        I *out_indptr = out.indptr_ptr();
         I *out_indices = out.indices_ptr();
         J *out_cindices = out.cindices_ptr();
-        T3 *out_data = out.data_ptr();
+        T *out_data = out.data_ptr();
 
         while (lhs_row_start != lhs_row_end && rhs_row_start != rhs_row_end) {
           const I lhs_col = lhs.indices_at(lhs_row_start);
@@ -131,37 +133,38 @@ namespace quspin {
           if (lhs_col < rhs_col) {
             out_indices[out_row_start] = lhs_col;
             out_cindices[out_row_start] = lhs_cindex;
-            out_data[out_row_start] = static_cast<T3>(lhs.data_at(lhs_row_start));
+            out_data[out_row_start] = lhs.data_at(lhs_row_start);
             ++lhs_row_start;
             ++out_row_start;
 
           } else if (lhs_col > rhs_col) {
             out_indices[out_row_start] = rhs_col;
             out_cindices[out_row_start] = rhs_cindex;
-            out_data[out_row_start] = static_cast<T3>(rhs.data_at(rhs_row_start));
+            out_data[out_row_start] = rhs.data_at(rhs_row_start);
             ++rhs_row_start;
             ++out_row_start;
 
           } else if (lhs_cindex > rhs_cindex) {
             out_indices[out_row_start] = lhs_col;
             out_cindices[out_row_start] = lhs_cindex;
-            out_data[out_row_start] = static_cast<T3>(lhs.data_at(lhs_row_start));
+            out_data[out_row_start] = lhs.data_at(lhs_row_start);
             ++lhs_row_start;
             ++out_row_start;
 
           } else if (lhs_cindex < rhs_cindex) {
             out_indices[out_row_start] = rhs_col;
             out_cindices[out_row_start] = rhs_cindex;
-            out_data[out_row_start] = static_cast<T3>(rhs.data_at(rhs_row_start));
+            out_data[out_row_start] = rhs.data_at(rhs_row_start);
             ++rhs_row_start;
             ++out_row_start;
 
           } else {
-            auto result = op(lhs.data_at(lhs_row_start), rhs.data_at(rhs_row_start));
-            if (result != 0) {
+            const T result = op(lhs.data_at(lhs_row_start), rhs.data_at(rhs_row_start));
+
+            if (result != T()) {
               out_indices[out_row_start] = lhs_col;
               out_cindices[out_row_start] = lhs_cindex;
-              out_data[out_row_start] = static_cast<T3>(result);
+              out_data[out_row_start] = result;
               ++out_row_start;
             }
             ++lhs_row_start;
@@ -171,15 +174,18 @@ namespace quspin {
       }
     };
 
-    template <typename Op, typename T1, typename T2, typename T3, typename I, typename J>
-    void elementwise_binary_operation(Op &&op, const quantum_operator<T1, I, J> &lhs,
-                                      const quantum_operator<T2, I, J> &rhs,
-                                      quantum_operator<T3, I, J> &out) {
+    template <typename Op, PrimativeTypes T, PrimativeTypes I, PrimativeTypes J>
+    void elementwise_binary_operation(Op &&op, const quantum_operator<T, I, J> &lhs,
+                                      const quantum_operator<T, I, J> &rhs,
+                                      quantum_operator<T, I, J> &out) {
+      static_assert(std::is_invocable_v<Op, T, T>, "Incompatible Operator with input types");
+      static_assert(std::is_same_v<T, std::decay_t<std::invoke_result_t<Op, T, T>>>,
+                    "Incompatible output type");
       assert(lhs.dim() == rhs.dim());
       assert(lhs.dim() == out.dim());
 
-      WorkQueue(populate_row_tasks(op, lhs, rhs, out))
-          .run(Schedule::SequentialBlocks, std::thread::hardware_concurrency());
+      populate_row_tasks<Op, T, I, J> tasks(op, lhs, rhs, out);
+      WorkQueue(tasks).run(Schedule::SequentialBlocks, std::thread::hardware_concurrency());
     }
   }  // namespace details
 }  // namespace quspin

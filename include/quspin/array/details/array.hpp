@@ -1,12 +1,14 @@
 #pragma once
 
 #include <algorithm>
+#include <cassert>
 #include <cstdint>
 #include <functional>
 #include <iostream>
 #include <numeric>
 #include <quspin/details/operators.hpp>
 #include <quspin/dtype/details/dtype.hpp>
+#include <sstream>
 #include <stdexcept>
 #include <type_traits>
 #include <variant>
@@ -15,7 +17,10 @@
 namespace quspin {
   namespace details {
 
-    template <typename T> struct reference_counted_ptr : public typed_object<T> {
+    template <PrimativeTypes T> struct array_iterator;
+    template <PrimativeTypes T> struct const_array_iterator;
+
+    template <PrimativeTypes T> struct reference_counted_ptr : public typed_object<T> {
       T *ptr;
       std::size_t *ref_count_;
       bool owns_pointer;  // if true, the pointer can be deleted when ref_count_ == 1
@@ -85,7 +90,7 @@ namespace quspin {
       void *data() const { return reinterpret_cast<void *>(ptr); }
     };
 
-    template <typename T> struct array : public typed_object<T> {
+    template <PrimativeTypes T> struct array : public typed_object<T> {
     private:
       reference_counted_ptr<T> data_;
       std::vector<std::size_t> stride_;
@@ -134,40 +139,54 @@ namespace quspin {
         shape_.resize(shape.size());
         stride_.resize(stride.size());
 
-        std::copy(shape.cbegin(), shape.cend(), shape_.begin());
-        std::copy(stride.cbegin(), stride.cend(), stride_.begin());
+        std::copy(shape.begin(), shape.end(), shape_.begin());
+        std::copy(stride.begin(), stride.end(), stride_.begin());
         ndim_ = shape.size();
         size_ = (ndim_ > 0 ? std::reduce(shape.begin(), shape.end(), std::size_t(1),
                                          std::multiplies<std::size_t>())
                            : 0);
+
+        if (ndim_ >= MAX_DIM) {
+          std::stringstream err_stream;
+
+          err_stream << "NDim must be smaller than ";
+          err_stream << MAX_DIM;
+          err_stream << " got a value of ";
+          err_stream << ndim_;
+
+          throw std::invalid_argument(err_stream.str());
+        }
 
         // does not own the memory, do not delete
         data_ = reference_counted_ptr<T>(data, size_);
       }
 
     public:
+      static constexpr std::size_t MAX_DIM = 64;
+
       array() : data_(reference_counted_ptr<T>()), stride_({}), shape_({}), size_(0), ndim_(0) {};
-      array(std::initializer_list<std::size_t> shape) {
-        init_from_shape_(std::vector<std::size_t>(shape));
-      }
       array(const std::vector<std::size_t> &shape) { init_from_shape_(shape); }
-      array(std::initializer_list<std::size_t> shape, std::initializer_list<std::size_t> stride,
-            T *data) {
-        init_from_buffer_(std::vector<std::size_t>(shape), std::vector<std::size_t>(stride), data);
-      }
       array(const std::vector<std::size_t> &shape, const std::vector<std::size_t> &stride,
             T *data) {
         init_from_buffer_(shape, stride, data);
+      }
+      array(std::initializer_list<T> values) {
+        data_ = reference_counted_ptr<T>(values.size());
+        stride_ = {sizeof(T)};
+        shape_ = {values.size()};
+        ndim_ = 1;
+        size_ = values.size();
+
+        std::copy(values.begin(), values.end(), begin());
       }
 
       const T *data() const { return data_.get(); }
       T *mut_data() { return data_.get(); }
 
-      const T *cbegin() const { return data(); }
-      const T *cend() const { return data() + size(); }
-
-      T *begin() { return mut_data(); }
-      T *end() { return mut_data() + size(); }
+      const_array_iterator<T> begin() const;
+      const_array_iterator<T> end() const;
+      array_iterator<T> begin();
+      array_iterator<T> end();
 
       std::size_t strides(const std::size_t &i) const { return stride_.at(i); }
       std::size_t shape(const std::size_t &i) const { return shape_.at(i); }
@@ -189,10 +208,140 @@ namespace quspin {
       }
       array<T> copy() const {
         array<T> out(shape_);
-        std::copy(cbegin(), cend(), out.begin());
+        std::copy(begin(), end(), out.begin());
         return out;
       }
     };
+
+    template <PrimativeTypes T> struct array_iterator {
+    private:
+      static constexpr std::size_t MAX_DIM = array<T>::MAX_DIM;
+      array<T> &parent;
+      std::size_t index;
+      std::size_t dim;
+
+      std::array<std::size_t, MAX_DIM> dim_indices;
+      std::array<std::size_t, MAX_DIM> steps;
+
+    public:
+      array_iterator(array<T> &arr, std::size_t start) : parent(arr), index(start) {
+        std::fill(steps.begin(), steps.end(), std::size_t());
+        std::fill(dim_indices.begin(), dim_indices.end(), std::size_t());
+
+        for (std::size_t dim = 0; dim < arr.ndim(); dim++) {
+          const std::size_t step = arr.strides(dim) / sizeof(T);
+
+          std::size_t dim_index = (start / step) % arr.shape(dim);
+
+          steps[dim] = step;
+          dim_indices[dim] = dim_index;
+
+          start -= dim_index;
+        }
+      }
+
+      bool operator==(array_iterator<T> &other) const {
+        return (&parent == &other.parent) && (index == other.index);
+      }
+
+      array_iterator<T> &operator++() {
+        for (std::size_t dim = parent.ndim(); dim > 0; --dim) {
+          const std::size_t dim_id = dim - 1;
+          const std::size_t dim_size = parent.shape(dim_id);
+
+          if (dim_indices[dim_id] < (dim_size - 1)) {
+            dim_indices[dim_id]++;
+            index += steps[dim_id];
+            return *this;
+          } else if (dim_id > 1) {
+            index -= steps[dim_id] * (dim_size - 1);
+            dim_indices[dim_id] = 0;
+          }
+        }
+        index++;
+        return *this;
+      }
+
+      std::size_t index_() const { return index; }
+
+      T &operator*() { return parent.mut_data()[index]; }
+    };
+
+    template <PrimativeTypes T> struct const_array_iterator {
+    private:
+      static constexpr std::size_t MAX_DIM = array<T>::MAX_DIM;
+      const array<T> &parent;
+      std::size_t index;
+      std::array<std::size_t, MAX_DIM> dim_indices;
+      std::array<std::size_t, MAX_DIM> steps;
+
+    public:
+      const_array_iterator(const array<T> &arr, std::size_t start) : parent(arr), index(start) {
+        std::fill(steps.begin(), steps.end(), std::size_t());
+        std::fill(dim_indices.begin(), dim_indices.end(), std::size_t());
+
+        assert(arr.ndim() == arr.shape().size());
+        assert(arr.ndim() == arr.strides().size());
+
+        for (std::size_t dim = 0; dim < arr.ndim(); dim++) {
+          const std::size_t step = arr.strides(dim) / sizeof(T);
+
+          std::size_t dim_index = (start / step) % arr.shape(dim);
+
+          assert(dim_index >= 0 && dim_index < arr.shape(dim));
+          steps[dim] = step;
+          dim_indices[dim] = dim_index;
+
+          start -= dim_index;
+        }
+      }
+
+      bool operator!=(const_array_iterator<T> &other) {
+        return (&parent != &other.parent) || (index != other.index);
+      }
+
+      const_array_iterator<T> &operator++() {
+        for (std::size_t dim = parent.ndim(); dim > 0; --dim) {
+          const std::size_t dim_id = dim - 1;
+          const std::size_t dim_size = parent.shape(dim_id);
+
+          if (dim_indices[dim_id] < (dim_size - 1)) {
+            dim_indices[dim_id]++;
+            index += steps[dim_id];
+            return *this;
+          }
+
+          if (dim_id > 1) {
+            index -= steps[dim_id] * (dim_size - 1);
+            dim_indices[dim_id] = 0;
+          }
+        }
+        index++;
+        return *this;
+      }
+
+      const T &operator*() { return parent.data()[index]; }
+    };
+
+    template <PrimativeTypes T> const_array_iterator<T> array<T>::begin() const {
+      const_array_iterator<T> iter(*this, 0);
+      return iter;
+    }
+
+    template <PrimativeTypes T> const_array_iterator<T> array<T>::end() const {
+      const_array_iterator<T> iter(*this, size());
+      return iter;
+    }
+
+    template <PrimativeTypes T> array_iterator<T> array<T>::begin() {
+      array_iterator<T> iter(*this, 0);
+      return iter;
+    }
+
+    template <PrimativeTypes T> array_iterator<T> array<T>::end() {
+      array_iterator<T> iter(*this, size());
+      return iter;
+    }
 
     template <typename T> struct value_type<array<T>> {
       using type = T;

@@ -1,4 +1,3 @@
-
 #include <cassert>
 #include <quspin/array/array.hpp>
 #include <quspin/details/dispatch.hpp>
@@ -9,59 +8,88 @@
 
 namespace quspin {
 
-  struct MismatchIndexTypes {
+  struct MismatchInputIndexTypes {
     static constexpr bool has_error() { return true; }
     static details::Error get_error() {
-      return details::Error(details::ErrorType::ValueError, "mismatch in index dtypes.");
+      return details::Error(details::ErrorType::ValueError, "mismatch input index dtypes.");
     }
   };
 
-  struct MismatchCoeffIndexTypes {
+  struct MismatchInputCoeffIndexTypes {
     static constexpr bool has_error() { return true; }
     static details::Error get_error() {
       return details::Error(details::ErrorType::ValueError,
-                            "mismatch in coefficient index dtypes.");
+                            "mismatch input coefficient index dtypes.");
     }
   };
 
-  struct MismatchOutIndexTypes {
+  struct MismatchInputDataTypes {
+    static constexpr bool has_error() { return true; }
+    static details::Error get_error() {
+      return details::Error(details::ErrorType::ValueError, "mismatch in input data dtypes.");
+    }
+  };
+
+  struct MismatchOutputIndexTypes {
     static constexpr bool has_error() { return true; }
     static details::Error get_error() {
       return details::Error(details::ErrorType::ValueError, "mismatch in output index dtypes.");
     }
   };
 
-  struct MismatchOutDataTypes {
+  struct MismatchOutputCoeffIndexTypes {
     static constexpr bool has_error() { return true; }
     static details::Error get_error() {
-      return details::Error(details::ErrorType::ValueError, "mismatch in output data dtypes.");
+      return details::Error(details::ErrorType::ValueError,
+                            "mismatch output coefficient index dtypes.");
     }
   };
 
-  template <typename Op>
-  QuantumOperator sum(Op &&op, const QuantumOperator lhs, const QuantumOperator rhs) {
+  struct MismatchOutputDataTypes {
+    static constexpr bool has_error() { return true; }
+    static details::Error get_error() {
+      return details::Error(details::ErrorType::ValueError, "mismatch in output data dtype.");
+    }
+  };
+
+  QuantumOperator sum(const QuantumOperator lhs, const QuantumOperator rhs) {
     using namespace details;
 
-    auto static_checks_nonzero = [](const auto &lhs, const auto &rhs, auto &out) {
+    auto static_check_inputs = [](const auto &lhs, const auto &rhs) {
       using lhs_index_t = typename std::decay_t<decltype(lhs)>::index_type;
       using rhs_index_t = typename std::decay_t<decltype(rhs)>::index_type;
+
       using lhs_cindex_t = typename std::decay_t<decltype(lhs)>::cindex_type;
       using rhs_cindex_t = typename std::decay_t<decltype(rhs)>::cindex_type;
-      using out_t = typename std::decay_t<decltype(out)>::value_type;
+
+      using lhs_data_t = typename std::decay_t<decltype(lhs)>::value_type;
+      using rhs_data_t = typename std::decay_t<decltype(rhs)>::value_type;
 
       if constexpr (!std::is_same_v<lhs_index_t, rhs_index_t>) {
-        return MismatchIndexTypes();
+        return MismatchInputIndexTypes();
       } else if constexpr (!std::is_same_v<lhs_cindex_t, rhs_cindex_t>) {
-        return MismatchCoeffIndexTypes();
-      } else if constexpr (!std::is_same_v<lhs_index_t, out_t>) {
-        return MismatchOutIndexTypes();
+        return MismatchInputCoeffIndexTypes();
+      } else if constexpr (!std::is_same_v<lhs_data_t, rhs_data_t>) {
+        return MismatchInputDataTypes();
       } else {
         return details::ValidArgs();
       }
     };
 
+    auto static_checks_nonzero
+        = [&static_check_inputs](const auto &lhs, const auto &rhs, auto &out) {
+            using lhs_index_t = typename std::decay_t<decltype(lhs)>::index_type;
+            using out_t = typename std::decay_t<decltype(out)>::value_type;
+
+            if constexpr (!std::is_same_v<lhs_index_t, out_t>) {
+              return MismatchOutputIndexTypes();
+            } else {
+              return static_check_inputs(lhs, rhs);
+            }
+          };
+
     auto dynamic_checks_nonzero = [](const auto &lhs, const auto &rhs, auto &out) {
-      if (lhs.dim() != rhs.dim() || lhs.indptr().shape() != out.shape(0)) {
+      if (lhs.dim() != rhs.dim() || lhs.indptr().shape(0) != out.shape(0)) {
         return details::ReturnVoidError(
             details::Error(details::ErrorType::ValueError, "Incompatible shapes"));
       }
@@ -72,38 +100,41 @@ namespace quspin {
 
     auto out = details::select<array<int32_t>, array<int64_t>>(indptr);
 
-    auto calc_nonzeros
-        = [&op](const auto &lhs, const auto &rhs, auto &out) { get_sum_size(op, lhs, rhs, out); };
+    auto op = [](auto &&lhs, auto &&rhs) {
+      using lhs_t = std::decay_t<decltype(lhs)>;
+      using rhs_t = std::decay_t<decltype(rhs)>;
+      static_assert(std::is_same_v<lhs_t, rhs_t>, "Mismatching types");
+      return static_cast<lhs_t>(lhs + rhs);
+    };
+
+    auto calc_nonzeros = [&op](const auto &lhs, const auto &rhs, auto &out) {
+      elementwise_binop_size(op, lhs, rhs, out);
+      return details::ReturnVoidError();
+    };
 
     details::dispatch(calc_nonzeros, static_checks_nonzero, dynamic_checks_nonzero, lhs, rhs, out);
 
-    auto static_checks_operator = [](const auto &lhs, const auto &rhs, auto &res) {
-      using lhs_index_t = typename std::decay_t<decltype(lhs)>::index_type;
-      using rhs_index_t = typename std::decay_t<decltype(rhs)>::index_type;
-      using res_index_t = typename std::decay_t<decltype(res)>::index_type;
+    auto static_checks_operator
+        = [&static_check_inputs](const auto &lhs, const auto &rhs, auto &res) {
+            using lhs_index_t = typename std::decay_t<decltype(lhs)>::index_type;
+            using res_index_t = typename std::decay_t<decltype(res)>::index_type;
 
-      using lhs_cindex_t = typename std::decay_t<decltype(lhs)>::cindex_type;
-      using rhs_cindex_t = typename std::decay_t<decltype(rhs)>::cindex_type;
-      using res_cindex_t = typename std::decay_t<decltype(res)>::cindex_type;
+            using lhs_cindex_t = typename std::decay_t<decltype(lhs)>::cindex_type;
+            using res_cindex_t = typename std::decay_t<decltype(res)>::cindex_type;
 
-      using lhs_data_t = typename std::decay_t<decltype(lhs)>::value_type;
-      using rhs_data_t = typename std::decay_t<decltype(rhs)>::value_type;
-      using res_data_t = typename std::decay_t<decltype(res)>::value_type;
+            using lhs_data_t = typename std::decay_t<decltype(lhs)>::value_type;
+            using res_data_t = typename std::decay_t<decltype(res)>::value_type;
 
-      using expected_data_t = details::upcast_t<lhs_data_t, rhs_data_t>;
-
-      if constexpr (!std::is_same_v<lhs_index_t, res_index_t>
-                    | !std::is_same_v<rhs_index_t, res_index_t>) {
-        return MismatchIndexTypes();
-      } else if constexpr (!std::is_same_v<lhs_cindex_t, res_cindex_t>
-                           | !std::is_same_v<rhs_cindex_t, res_cindex_t>) {
-        return MismatchCoeffIndexTypes();
-      } else if constexpr (!std::is_same_v<expected_data_t, res_data_t>) {
-        return MismatchOutDataTypes();
-      } else {
-        return details::ValidArgs();
-      }
-    };
+            if constexpr (!std::is_same_v<lhs_index_t, res_index_t>) {
+              return MismatchOutputIndexTypes();
+            } else if constexpr (!std::is_same_v<lhs_cindex_t, res_cindex_t>) {
+              return MismatchOutputCoeffIndexTypes();
+            } else if constexpr (!std::is_same_v<lhs_data_t, res_data_t>) {
+              return MismatchOutputDataTypes();
+            } else {
+              return static_check_inputs(lhs, rhs);
+            }
+          };
 
     auto dynamic_checks_operator = [](const auto &lhs, const auto &rhs, auto &res) {
       if (lhs.dim() != rhs.dim() || lhs.dim() != res.dim()) {
@@ -113,15 +144,15 @@ namespace quspin {
       return details::ReturnVoidError();
     };
 
-    auto calc_quantum_operator
-        = [&op](const auto &lhs, const auto &rhs, auto &result) { sum_data(op, lhs, rhs, result); };
+    auto calc_quantum_operator = [&op](const auto &lhs, const auto &rhs, auto &result) {
+      elementwise_binary_operation(op, lhs, rhs, result);
+      return details::ReturnVoidError();
+    };
 
-    const std::size_t nnz = indptr[{indptr.size()}];
+    const std::size_t nnz = indptr[{indptr.size() - 1}];
     Array indices({nnz}, lhs.indices().dtype());
     Array cindices({nnz}, lhs.cindices().dtype());
-
-    std::vector<DType> dtypes = {lhs.dtype(), rhs.dtype()};
-    Array data({nnz}, result_dtype(dtypes));
+    Array data({nnz}, lhs.dtype());
 
     QuantumOperator result(data, indptr, indices, cindices);
 
@@ -130,5 +161,4 @@ namespace quspin {
 
     return result;
   }
-
 }  // namespace quspin

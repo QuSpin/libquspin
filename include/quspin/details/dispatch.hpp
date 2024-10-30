@@ -23,20 +23,26 @@ namespace quspin {
               typename... Args>
     void dispatch(Kernel &&kernel, StaticArgsCheck &&static_args_check,
                   DynamicArgsCheck &&dynamic_args_check, Args... args) {
-      ReturnVoidError err = dynamic_args_check(args...);
-
-      if (err.has_error()) {
-        err.get_error().throw_error();
-      }
-
       visit_or_error<std::monostate>(
-          [&kernel](auto &...args) {
-            using can_dispatch_t = decltype(static_args_check(args...));
+          [&kernel, &dynamic_args_check](auto &...args) {
+            using static_args_check_return_t = decltype(static_args_check(args...));
 
-            if constexpr (can_dispatch_t::has_error()) {
-              return ReturnVoidError(can_dispatch_t::get_error());
+            if constexpr (static_args_check_return_t::has_error()) {
+              return ReturnVoidError(static_args_check_return_t::get_error());
             } else {
-              return kernel(args...);
+              using kernel_return_t = decltype(kernel(args...));
+              using dynamic_args_check_return_t = decltype(dynamic_args_check(args...));
+              static_assert(std::is_same_v<dynamic_args_check_return_t, ReturnVoidError>,
+                            "Dynamic args check must return ReturnVoidError");
+              static_assert(std::is_same_v<kernel_return_t, ReturnVoidError>,
+                            "Kernel must return ReturnVoidError");
+
+              ReturnVoidError err = dynamic_args_check(args...);
+              if (err.has_error()) {
+                return err;
+              } else {
+                return kernel(args...);
+              }
             }
           },
           args.get_variant_obj()...);
@@ -102,20 +108,27 @@ namespace quspin {
               typename... Args>
     Scalar dispatch_scalar(Kernel &&kernel, StaticArgsCheck &&static_args_check,
                            DynamicArgsCheck &&dynamic_args_check, const Args &...args) {
-      ReturnVoidError err = dynamic_args_check(args...);
-
-      if (err.has_error()) {
-        err.get_error().throw_error();
-      }
-
       return visit_or_error<Scalar>(
-          [&kernel](const auto &...args) {
-            using can_dispatch_t = decltype(static_args_check(args...));
+          [&kernel, &dynamic_args_check](const auto &...args) {
+            using static_args_check_return_t = decltype(static_args_check(args...));
 
-            if constexpr (can_dispatch_t::has_error()) {
-              return ErrorOr<Scalar>(can_dispatch_t::get_error());
+            if constexpr (static_args_check_return_t::has_error()) {
+              return ErrorOr<Scalar>(static_args_check_return_t::get_error());
             } else {
-              return kernel(args...);
+              using kernel_return_t = decltype(kernel(args...));
+              using dynamic_args_check_return_t = decltype(dynamic_args_check(args...));
+              static_assert(std::is_same_v<dynamic_args_check_return_t, ReturnVoidError>,
+                            "Dynamic args check must return Scalar");
+              static_assert(std::is_same_v<kernel_return_t, ErrorOr<Scalar>>,
+                            "Kernel must return Scalar");
+
+              ReturnVoidError err = dynamic_args_check(args...);
+
+              if (err.has_error()) {
+                return ErrorOr<Scalar>(err.get_error());
+              } else {
+                return kernel(args...);
+              }
             }
           },
           args.get_variant_obj()...);

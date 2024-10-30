@@ -8,16 +8,15 @@ namespace quspin {
   namespace details {
 
     template <typename Type>
-    concept WorkTasksInterface = requires(Type work_tasks, const std::size_t task_id) {
-      { work_tasks.size() } -> std::convertible_to<std::size_t>;
-      { work_tasks.do_work(task_id) } -> std::same_as<void>;
-    };
+    concept WorkTasksInterface
+        = requires(Type work_tasks, const std::size_t task_id, const std::size_t thread_id) {
+            { work_tasks.size() } -> std::convertible_to<std::size_t>;
+            { work_tasks.do_work(task_id, thread_id) } -> std::same_as<void>;
+          };
 
     enum class Schedule { Interleaved, SequentialBlocks };
 
-    template <typename WorkTasks>
-      requires WorkTasksInterface<WorkTasks>
-    class WorkQueue {
+    template <WorkTasksInterface WorkTasks> class WorkQueue {
       WorkTasks work_tasks;
 
     public:
@@ -42,7 +41,7 @@ namespace quspin {
       void run(const Schedule schedule, const std::size_t num_threads) {
         if (num_threads <= 0) {
           for (std::size_t i = 0; i < work_tasks.size(); i++) {
-            work_tasks.do_work(i);
+            this->work_tasks.do_work(i, 0);
           }
           return;
         }
@@ -53,9 +52,9 @@ namespace quspin {
           const std::size_t start = std::get<0>(res);
           const std::size_t end = std::get<1>(res);
           const std::size_t step = std::get<2>(res);
-          workers.emplace_back(std::thread([res, this]() {
+          workers.emplace_back(std::thread([start, end, step, this, nt]() {
             for (std::size_t i = start; i < end; i += step) {
-              this->work_tasks.do_work(i);
+              this->work_tasks.do_work(i, nt);
             }
           }));
         }

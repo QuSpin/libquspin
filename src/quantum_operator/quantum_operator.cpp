@@ -13,17 +13,22 @@ namespace quspin {
   decltype(auto) select_data_variants(const Array &data) {
     using namespace details;
     return select<array<int8_t>, array<int16_t>, array<float>, array<double>, array<cfloat>,
-                  array<cdouble>>(data);
+                  array<cdouble>>(data, "data");
   }
 
-  decltype(auto) select_index_variants(const Array &indptr) {
+  decltype(auto) select_indptr_variants(const Array &indptr) {
     using namespace details;
-    return select<array<int32_t>, array<int64_t>>(indptr);
+    return select<array<int32_t>, array<int64_t>>(indptr, "indptr");
+  }
+
+  decltype(auto) select_indices_variants(const Array &indptr) {
+    using namespace details;
+    return select<array<int32_t>, array<int64_t>>(indptr, "indices");
   }
 
   decltype(auto) select_cindex_variants(const Array &cindices) {
     using namespace details;
-    return select<array<uint8_t>, array<uint16_t>>(cindices);
+    return select<array<uint8_t>, array<uint16_t>>(cindices, "cindices");
   }
 
   QuantumOperator::QuantumOperator(Array data, Array indptr, Array indices, Array cindices) {
@@ -32,8 +37,8 @@ namespace quspin {
     const std::size_t dim = indptr.size() - 1;
 
     auto data_select = select_data_variants(data);
-    auto indptr_select = select_index_variants(indptr);
-    auto indices_select = select_index_variants(indices);
+    auto indptr_select = select_indptr_variants(indptr);
+    auto indices_select = select_indices_variants(indices);
     auto cindices_select = select_cindex_variants(cindices);
 
     auto constructor = [&dim](auto &&data, auto &&indptr, auto &&indices, auto &&cindices) {
@@ -72,7 +77,7 @@ namespace quspin {
   }
 
   Array QuantumOperator::cindices() const {
-    return std::visit([](auto &&arg) { return Array(arg.data()); },
+    return std::visit([](auto &&arg) { return Array(arg.cindices()); },
                       DTypeObject<details::quantum_operators>::internals_);
   }
 
