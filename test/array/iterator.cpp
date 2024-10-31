@@ -5,11 +5,18 @@
 using namespace quspin::details;
 
 int main() {
-  std::vector<std::size_t> shape = {100000};
-  array<float> arr(shape);
+  array<float> arr(std::vector<std::size_t>({1000000}));
 
+  //   int i = 0;
   for (auto it = arr.begin(); it != arr.end(); ++it) {
-    std::cout << *it << " " << it.index_() << std::endl;
+    auto dim_indices = it.dim_indices();
+    std::cout << *it << " " << it.index_();
+    // for (auto &dim_index : dim_indices) {
+    //   std::cout << " " << dim_index;
+    // }
+    std::cout << std::endl;
+    // i++;
+    // if(i > 10000) break;
   }
 
   return 0;
