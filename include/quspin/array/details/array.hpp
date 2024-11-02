@@ -6,7 +6,10 @@
 #include <functional>
 #include <iostream>
 #include <numeric>
+#include <quspin/array/details/iterator.hpp>
+#include <quspin/array/details/pointer.hpp>
 #include <quspin/details/operators.hpp>
+#include <quspin/details/type_concepts.hpp>
 #include <quspin/dtype/details/dtype.hpp>
 #include <ranges>
 #include <sstream>
@@ -20,76 +23,6 @@ namespace quspin {
 
     template <PrimativeTypes T> struct array_iterator;
     template <PrimativeTypes T> struct const_array_iterator;
-
-    template <PrimativeTypes T> struct reference_counted_ptr : public typed_object<T> {
-      T *ptr;
-      std::size_t *ref_count_;
-      bool owns_pointer;  // if true, the pointer can be deleted when ref_count_ == 1
-      std::size_t size;
-
-      void inc() { (*ref_count_)++; }
-
-      void dec() {
-        if (*ref_count_ == 1) {
-          delete ref_count_;
-          if (owns_pointer) {
-            delete[] ptr;
-          }
-        } else {
-          (*ref_count_)--;
-        }
-      }
-
-    public:
-      reference_counted_ptr()
-          : ptr(nullptr),
-            ref_count_(new std::size_t(1)),
-            owns_pointer(false),  // cannot delete nullptr
-            size(0) {}
-
-      reference_counted_ptr(T *ptr, std::size_t size)
-          : ptr(ptr),
-            ref_count_(new std::size_t(1)),
-            owns_pointer(false),  // does not own the memory, do not delete
-            size(size) {}
-
-      reference_counted_ptr(std::size_t size)
-          : ptr(new T[size]),
-            ref_count_(new std::size_t(1)),
-            owns_pointer(true),  // objects all own the memory, can delete
-            size(size) {
-        std::fill(ptr, ptr + size, T());
-      }
-
-      reference_counted_ptr(const reference_counted_ptr &other)
-          : ptr(other.ptr),
-            ref_count_(other.ref_count_),
-            owns_pointer(other.owns_pointer),  // inherit ownership of memory
-            size(other.size) {
-        inc();
-      }
-
-      ~reference_counted_ptr() { dec(); }
-
-      reference_counted_ptr<T> &operator=(const reference_counted_ptr<T> &other) {
-        dec();
-        ptr = other.ptr;
-        ref_count_ = other.ref_count_;
-        owns_pointer = other.owns_pointer;
-        size = other.size;
-        inc();
-
-        return *this;
-      }
-
-      std::size_t use_count() const { return *ref_count_; }
-
-      T *get() { return ptr; }
-
-      const T *get() const { return static_cast<const T *>(ptr); }
-
-      void *data() const { return reinterpret_cast<void *>(ptr); }
-    };
 
     template <PrimativeTypes T> struct array : public typed_object<T> {
     private:
@@ -212,139 +145,6 @@ namespace quspin {
         std::copy(begin(), end(), out.begin());
         return out;
       }
-    };
-
-    template <PrimativeTypes T> struct array_iterator {
-    private:
-      static constexpr std::size_t MAX_DIM = array<T>::MAX_DIM;
-      array<T> &parent;
-      std::size_t index;
-      const std::size_t ndim;
-
-      std::array<std::size_t, 3 * MAX_DIM> step_size_index;
-
-    public:
-      array_iterator(array<T> &arr, std::size_t start)
-          : parent(arr), index(start), ndim(arr.ndim()) {
-        step_size_index.fill(std::size_t());
-
-        for (std::size_t dim = 0; dim < arr.ndim(); dim++) {
-          const std::size_t step = arr.strides(dim) / sizeof(T);
-          const std::size_t dim_size = arr.shape(dim);
-          const std::size_t dim_index = (start / step) % dim_size;
-
-          step_size_index[3 * dim] = step;
-          step_size_index[3 * dim + 1] = dim_size;
-          step_size_index[3 * dim + 2] = dim_index;
-
-          start -= dim_index;
-        }
-      }
-
-      bool operator==(array_iterator<T> &other) const {
-        return (&parent == &other.parent) && (index == other.index);
-      }
-
-      array_iterator<T> &operator++() {
-        std::size_t dim = ndim;
-        for (; dim > 1; --dim) {
-          const std::size_t dim_id = dim - 1;
-          const std::size_t &dim_step = step_size_index[3 * dim_id];
-          const std::size_t &dim_size = step_size_index[3 * dim_id + 1];
-          std::size_t &dim_index = step_size_index[3 * dim_id + 2];
-
-          index += dim_step;
-          dim_index++;
-
-          if (dim_index < dim_size) {
-            return *this;
-          }
-
-          index -= dim_step * dim_index;
-          dim_index = 0;
-        }
-
-        const std::size_t dim_id = 0;
-        const std::size_t &dim_step = step_size_index[3 * dim_id];
-        std::size_t &dim_index = step_size_index[3 * dim_id + 2];
-        index += dim_step;
-        dim_index++;
-
-        return *this;
-      }
-
-      std::size_t index_() const { return index; }
-
-      std::vector<std::size_t> dim_indices() {
-        std::vector<std::size_t> out;
-        for (std::size_t i = 0; i < ndim; i++) {
-          out.push_back(step_size_index[3 * i + 2]);
-        }
-        return out;
-      }
-
-      T &operator*() { return parent.mut_data()[index]; }
-    };
-
-    template <PrimativeTypes T> struct const_array_iterator {
-    private:
-      static constexpr std::size_t MAX_DIM = array<T>::MAX_DIM;
-      const array<T> &parent;
-      std::size_t index;
-      const std::size_t ndim;
-      std::array<std::size_t, 3 * MAX_DIM> step_size_index;
-
-    public:
-      const_array_iterator(const array<T> &arr, std::size_t start)
-          : parent(arr), index(start), ndim(arr.ndim()) {
-        step_size_index.fill(std::size_t());
-
-        for (std::size_t dim = 0; dim < arr.ndim(); dim++) {
-          const std::size_t step = arr.strides(dim) / sizeof(T);
-          const std::size_t dim_size = arr.shape(dim);
-          const std::size_t dim_index = (start / step) % dim_size;
-
-          step_size_index[3 * dim] = step;
-          step_size_index[3 * dim + 1] = dim_size;
-          step_size_index[3 * dim + 2] = dim_index;
-
-          start -= dim_index;
-        }
-      }
-
-      bool operator!=(const_array_iterator<T> &other) {
-        return (&parent != &other.parent) || (index != other.index);
-      }
-
-      const_array_iterator<T> &operator++() {
-        std::size_t dim = ndim;
-        for (; dim > 1; --dim) {
-          const std::size_t dim_id = dim - 1;
-          const std::size_t &dim_step = step_size_index[3 * dim_id];
-          const std::size_t &dim_size = step_size_index[3 * dim_id + 1];
-          std::size_t &dim_index = step_size_index[3 * dim_id + 2];
-
-          index += dim_step;
-          dim_index++;
-
-          if (dim_index < dim_size) {
-            return *this;
-          }
-
-          index -= dim_step * dim_index;
-          dim_index = 0;
-        }
-
-        const std::size_t dim_id = 0;
-        const std::size_t &dim_step = step_size_index[3 * dim_id];
-        std::size_t &dim_index = step_size_index[3 * dim_id + 2];
-        index += dim_step;
-        dim_index++;
-
-        return *this;
-      }
-
-      const T &operator*() { return parent.data()[index]; }
     };
 
     template <PrimativeTypes T> const_array_iterator<T> array<T>::begin() const {
