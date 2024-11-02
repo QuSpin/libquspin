@@ -2,7 +2,6 @@
 #include <chrono>
 #include <iostream>
 #include <quspin/array/details/array.hpp>
-#include <quspin/array/details/iterator.hpp>
 #include <tuple>
 #include <vector>
 
@@ -18,7 +17,7 @@ template <typename Func, typename... Args> decltype(auto) time_func(Func func, A
 std::size_t test(array<float> &arr) {
   std::size_t i = 0;
   for (auto it = arr.begin(); it != arr.end(); ++it) {
-    i += 1;
+    i += it.index_();
   }
   return i;
 }
