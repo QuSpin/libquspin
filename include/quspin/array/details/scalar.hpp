@@ -1,13 +1,14 @@
 #pragma once
 
 #include <quspin/details/operators.hpp>
+#include <quspin/details/type_concepts.hpp>
 #include <quspin/dtype/details/dtype.hpp>
 #include <variant>
 
 namespace quspin {
   namespace details {
 
-    template <typename T> class scalar : public typed_object<T> {
+    template <PrimativeTypes T> class scalar : public typed_object<T> {
       T value_;
 
     public:
