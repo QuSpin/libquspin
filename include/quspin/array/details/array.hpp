@@ -31,8 +31,9 @@ namespace quspin {
       std::vector<std::size_t> shape_;
       std::size_t size_;
       std::size_t ndim_;
+      bool is_contiguous_;
 
-      std::size_t get_offset(std::vector<std::size_t> &input) const {
+      std::size_t get_offset(const std::vector<std::size_t> &input) const {
         if (input.size() != shape_.size()) {
           throw std::runtime_error("Invalid number of indices");
         }
@@ -48,69 +49,87 @@ namespace quspin {
         return offset / sizeof(T);
       }
 
-      void init_from_shape_(const std::vector<std::size_t> &shape) {
-        shape_.resize(shape.size());
-        std::copy(shape.begin(), shape.end(), shape_.begin());
-        ndim_ = shape.size();
-        size_ = (ndim_ > 0 ? std::reduce(shape.begin(), shape.end(), std::size_t(1),
-                                         std::multiplies<std::size_t>())
-                           : 0);
+      static std::size_t get_ndim(const std::vector<std::size_t> &shape) { return shape.size(); }
 
-        stride_.resize(ndim_);
-        if (ndim_ == 1) {
-          stride_[0] = sizeof(T);
-        } else if (ndim_ > 1) {
-          stride_[ndim_ - 1] = sizeof(T);
-          for (int i = static_cast<int>(ndim_) - 2; i >= 0; i--) {
-            stride_[i] = shape[i + 1] * stride_[i + 1];
-          }
-        }
-        data_ = reference_counted_ptr<T>(size_);
+      static std::size_t get_size(const std::vector<std::size_t> &shape) {
+        return (shape.size() > 0 ? std::reduce(shape.begin(), shape.end(), std::size_t(1),
+                                               std::multiplies<std::size_t>())
+                                 : 0);
       }
 
-      void init_from_buffer_(const std::vector<std::size_t> &shape,
-                             const std::vector<std::size_t> &stride, T *data) {
-        shape_.resize(shape.size());
-        stride_.resize(stride.size());
-
-        std::copy(shape.begin(), shape.end(), shape_.begin());
-        std::copy(stride.begin(), stride.end(), stride_.begin());
-        ndim_ = shape.size();
-        size_ = (ndim_ > 0 ? std::reduce(shape.begin(), shape.end(), std::size_t(1),
-                                         std::multiplies<std::size_t>())
-                           : 0);
-
-        if (ndim_ >= MAX_DIM) {
-          std::stringstream err_stream;
-
-          err_stream << "NDim must be smaller than ";
-          err_stream << MAX_DIM;
-          err_stream << " got a value of ";
-          err_stream << ndim_;
-
-          throw std::invalid_argument(err_stream.str());
+      static std::vector<std::size_t> get_strides(const std::vector<std::size_t> &shape) {
+        std::vector<std::size_t> &&strides = std::vector<std::size_t>(shape.size());
+        if (shape.size() == 0) {
+          return std::move(strides);
         }
 
-        // does not own the memory, do not delete
-        data_ = reference_counted_ptr<T>(data, size_);
+        strides[shape.size() - 1] = sizeof(T);
+        for (int i = static_cast<int>(shape.size()) - 2; i >= 0; i--) {
+          strides[i] = shape[i + 1] * strides[i + 1];
+        }
+        return std::move(strides);
+      }
+
+      static bool check_contiguous(const std::vector<std::size_t> &stride,
+                                   const std::vector<std::size_t> &shape) {
+        if (stride.size() != shape.size()) {
+          throw std::invalid_argument("Stride and shape must have the same size");
+        }
+
+        if (stride.size() == 0) {  // empty array
+          return true;
+        }
+
+        const std::size_t ndim = stride.size();
+        std::size_t last_stride = stride[ndim - 1];
+
+        if (last_stride != sizeof(T)) {
+          return false;
+        }
+
+        if (ndim == 1) {
+          return true;
+        }
+        for (std::size_t i = ndim - 2; i >= 0; i--) {
+          if (stride[i] != last_stride * shape[i + 1]) {
+            return false;
+          }
+          last_stride = stride[i];
+        }
+        return true;
       }
 
     public:
       static constexpr std::size_t MAX_DIM = 64;
 
-      array() : data_(reference_counted_ptr<T>()), stride_({}), shape_({}), size_(0), ndim_(0) {};
-      array(const std::vector<std::size_t> &shape) { init_from_shape_(shape); }
-      array(const std::vector<std::size_t> &shape, const std::vector<std::size_t> &stride,
-            T *data) {
-        init_from_buffer_(shape, stride, data);
-      }
-      array(std::initializer_list<T> values) {
-        data_ = reference_counted_ptr<T>(values.size());
-        stride_ = {sizeof(T)};
-        shape_ = {values.size()};
-        ndim_ = 1;
-        size_ = values.size();
-
+      array()
+          : data_(reference_counted_ptr<T>()),
+            stride_({}),
+            shape_({}),
+            size_(0),
+            ndim_(0),
+            is_contiguous_(true) {};
+      array(const std::vector<std::size_t> &shape)
+          : data_(reference_counted_ptr<T>(get_size(shape))),
+            stride_(get_strides(shape)),
+            shape_(shape),
+            size_(get_size(shape)),
+            ndim_(get_ndim(shape)),
+            is_contiguous_(true) {}
+      array(const std::vector<std::size_t> &shape, const std::vector<std::size_t> &stride, T *data)
+          : data_(reference_counted_ptr<T>(data)),
+            stride_(stride),
+            shape_(shape),
+            size_(get_size(shape)),
+            ndim_(get_ndim(shape)),
+            is_contiguous_(check_contiguous(stride, shape)) {}
+      array(std::initializer_list<T> values)
+          : data_(reference_counted_ptr<T>(values.size())),
+            stride_({sizeof(T)}),
+            shape_({values.size()}),
+            size_(values.size()),
+            ndim_(1),
+            is_contiguous_(true) {
         std::copy(values.begin(), values.end(), begin());
       }
 
@@ -121,6 +140,8 @@ namespace quspin {
       const_array_iterator<T> end() const;
       array_iterator<T> begin();
       array_iterator<T> end();
+
+      bool is_contiguous() const { return is_contiguous_; }
 
       std::size_t strides(const std::size_t &i) const { return stride_.at(i); }
       std::size_t shape(const std::size_t &i) const { return shape_.at(i); }

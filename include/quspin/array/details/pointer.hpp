@@ -10,7 +10,6 @@ namespace quspin {
       T *ptr;
       std::size_t *ref_count_;
       bool owns_pointer;  // if true, the pointer can be deleted when ref_count_ == 1
-      std::size_t size;
 
       void inc() { (*ref_count_)++; }
 
@@ -29,28 +28,28 @@ namespace quspin {
       reference_counted_ptr()
           : ptr(nullptr),
             ref_count_(new std::size_t(1)),
-            owns_pointer(false),  // cannot delete nullptr
-            size(0) {}
+            owns_pointer(false)  // cannot delete nullptr
+      {}
 
-      reference_counted_ptr(T *ptr, std::size_t size)
+      reference_counted_ptr(T *ptr)
           : ptr(ptr),
             ref_count_(new std::size_t(1)),
-            owns_pointer(false),  // does not own the memory, do not delete
-            size(size) {}
+            owns_pointer(false)  // objects all own the memory, can delete
+      {}
 
       reference_counted_ptr(std::size_t size)
           : ptr(new T[size]),
             ref_count_(new std::size_t(1)),
-            owns_pointer(true),  // objects all own the memory, can delete
-            size(size) {
+            owns_pointer(true)  // objects all own the memory, can delete
+      {
         std::fill(ptr, ptr + size, T());
       }
 
       reference_counted_ptr(const reference_counted_ptr &other)
           : ptr(other.ptr),
             ref_count_(other.ref_count_),
-            owns_pointer(other.owns_pointer),  // inherit ownership of memory
-            size(other.size) {
+            owns_pointer(other.owns_pointer)  // inherit ownership of memory
+      {
         inc();
       }
 
@@ -61,7 +60,6 @@ namespace quspin {
         ptr = other.ptr;
         ref_count_ = other.ref_count_;
         owns_pointer = other.owns_pointer;
-        size = other.size;
         inc();
 
         return *this;

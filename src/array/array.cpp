@@ -66,6 +66,9 @@ namespace quspin {
   template Array::Array(std::initializer_list<details::cfloat>);
   template Array::Array(std::initializer_list<details::cdouble>);
 
+  bool Array::is_contiguous() const {
+    return std::visit([](const auto &internals) { return internals.is_contiguous(); }, internals_);
+  }
   std::vector<std::size_t> Array::shape() const {
     return std::visit([](const auto &internals) { return internals.shape(); }, internals_);
   }

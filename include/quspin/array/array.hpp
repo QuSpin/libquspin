@@ -32,6 +32,7 @@ namespace quspin {
         : DTypeObject<details::arrays>(details::arrays(array)) {}
     template <PrimativeTypes T> Array(std::initializer_list<T> values)
         : DTypeObject<details::arrays>(details::arrays(details::array<T>(values))) {}
+    bool is_contiguous() const;
     std::vector<std::size_t> shape() const;
     std::size_t shape(const std::size_t &) const;
     std::vector<std::size_t> strides() const;
