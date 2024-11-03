@@ -80,7 +80,8 @@ namespace quspin {
 
     template <typename Op, PrimativeTypes T, PrimativeTypes I, PrimativeTypes J>
     void elementwise_binop_size(Op &&op, const quantum_operator<T, I, J> &lhs,
-                                const quantum_operator<T, I, J> &rhs, array<I> &out_indptr) {
+                                const quantum_operator<T, I, J> &rhs, array<I> &out_indptr,
+                                const std::size_t num_threads = 0) {
       assert(lhs.dim() == rhs.dim());
       assert(lhs.dim() == out_indptr.size() - 1);
 
@@ -88,7 +89,7 @@ namespace quspin {
       indptr[0] = 0;
 
       row_sum_tasks<Op, T, I, J> tasks(op, lhs, rhs, indptr);
-      WorkQueue(tasks).run(Schedule::SequentialBlocks, std::thread::hardware_concurrency());
+      WorkQueue(tasks).run(Schedule::SequentialBlocks, num_threads);
 
       // cumulaive sum
       for (std::size_t row_index = 1; row_index <= lhs.dim(); ++row_index) {
@@ -177,7 +178,8 @@ namespace quspin {
     template <typename Op, PrimativeTypes T, PrimativeTypes I, PrimativeTypes J>
     void elementwise_binary_operation(Op &&op, const quantum_operator<T, I, J> &lhs,
                                       const quantum_operator<T, I, J> &rhs,
-                                      quantum_operator<T, I, J> &out) {
+                                      quantum_operator<T, I, J> &out,
+                                      const std::size_t num_threads = 0) {
       static_assert(std::is_invocable_v<Op, T, T>, "Incompatible Operator with input types");
       static_assert(std::is_same_v<T, std::decay_t<std::invoke_result_t<Op, T, T>>>,
                     "Incompatible output type");
@@ -185,7 +187,7 @@ namespace quspin {
       assert(lhs.dim() == out.dim());
 
       populate_row_tasks<Op, T, I, J> tasks(op, lhs, rhs, out);
-      WorkQueue(tasks).run(Schedule::SequentialBlocks, std::thread::hardware_concurrency());
+      WorkQueue(tasks).run(Schedule::SequentialBlocks, num_threads);
     }
   }  // namespace details
 }  // namespace quspin

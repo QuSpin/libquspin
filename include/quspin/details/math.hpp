@@ -12,7 +12,7 @@ namespace quspin {
       return std::hypot(A.real(), A.imag());
     }
 
-    template <typename T> T abs(const T &A) { return std::abs(A); }
+    template <typename T> T abs(const T &A) { return (A >= 0 ? A : -A); }
 
     template <typename T> double abs_squared(const complex_wrapper<T> &A) {  // abs(A)^2
       const T real = A.real();

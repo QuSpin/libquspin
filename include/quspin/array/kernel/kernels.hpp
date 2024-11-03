@@ -10,4 +10,7 @@ namespace quspin {
 
   Scalar norm(const Array &array);
 
+  bool allclose(const Array &lhs, const Array &rhs, const double rtol = 1e-5,
+                const double atol = 1e-8);
+
 }  // namespace quspin

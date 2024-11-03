@@ -52,7 +52,8 @@ namespace quspin {
     }
   };
 
-  QuantumOperator sum(const QuantumOperator lhs, const QuantumOperator rhs) {
+  QuantumOperator sum(const QuantumOperator lhs, const QuantumOperator rhs,
+                      const std::size_t num_threads /* = 0 */) {
     using namespace details;
 
     auto static_check_inputs = [](const auto &lhs, const auto &rhs) {
@@ -107,8 +108,8 @@ namespace quspin {
       return static_cast<lhs_t>(lhs + rhs);
     };
 
-    auto calc_nonzeros = [&op](const auto &lhs, const auto &rhs, auto &out) {
-      elementwise_binop_size(op, lhs, rhs, out);
+    auto calc_nonzeros = [&op, &num_threads](const auto &lhs, const auto &rhs, auto &out) {
+      elementwise_binop_size(op, lhs, rhs, out, num_threads);
       return details::ReturnVoidError();
     };
 
@@ -144,10 +145,11 @@ namespace quspin {
       return details::ReturnVoidError();
     };
 
-    auto calc_quantum_operator = [&op](const auto &lhs, const auto &rhs, auto &result) {
-      elementwise_binary_operation(op, lhs, rhs, result);
-      return details::ReturnVoidError();
-    };
+    auto calc_quantum_operator
+        = [&op, &num_threads](const auto &lhs, const auto &rhs, auto &result) {
+            elementwise_binary_operation(op, lhs, rhs, result, num_threads);
+            return details::ReturnVoidError();
+          };
 
     const std::size_t nnz = indptr[{indptr.size() - 1}];
     Array indices({nnz}, lhs.indices().dtype());

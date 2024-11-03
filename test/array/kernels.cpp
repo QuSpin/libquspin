@@ -40,4 +40,6 @@ int main() {
   } catch (const std::invalid_argument &e) {
     assert(std::string(e.what()) == std::string("Incompatible out type"));
   }
+
+  assert(allclose(A, A));
 }

@@ -105,8 +105,8 @@ namespace quspin {
         }
       }
 
-      bool operator!=(const_array_iterator<T> &other) {
-        return (&parent != &other.parent) || (index != other.index);
+      bool operator==(const_array_iterator<T> &other) {
+        return (&parent == &other.parent) && (index == other.index);
       }
 
       const_array_iterator<T> &operator++() {
