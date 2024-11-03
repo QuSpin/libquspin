@@ -20,16 +20,42 @@ namespace quspin {
       array<J> cindices_;
       static constexpr J max_coeff = std::numeric_limits<J>::max();
 
+      static void check_fields(const std::size_t dim, const array<T> &data, const array<I> &indptr,
+                               const array<I> &indices, const array<J> &cindices) {
+        if (dim != indptr.size() - 1) {
+          throw std::runtime_error("Invalid number of rows");
+        }
+        if (indices.size() != cindices.size()) {
+          throw std::runtime_error("misaligned size of indices and coefficients");
+        }
+        if (data.size() != indices.size()) {
+          throw std::runtime_error("misaligned size of data and indices");
+        }
+        if (!indptr.is_contiguous() || indptr.ndim() != 1) {
+          throw std::runtime_error("indptr must be contiguous 1D array");
+        }
+        if (!indices.is_contiguous() || indices.ndim() != 1) {
+          throw std::runtime_error("indices must be contiguous 1D array");
+        }
+        if (!cindices.is_contiguous() || cindices.ndim() != 1) {
+          throw std::runtime_error("cindices must be contiguous 1D array");
+        }
+        if (!data.is_contiguous() || data.ndim() != 1) {
+          throw std::runtime_error("data must be contiguous 1D array");
+        }
+      }
+
     public:
       using value_type = T;
       using index_type = I;
       using cindex_type = J;
 
       quantum_operator() = default;
-
-      quantum_operator(std::size_t dim, array<T> &data, array<I> &indptr, array<I> &indices,
+      quantum_operator(const std::size_t dim, array<T> &data, array<I> &indptr, array<I> &indices,
                        array<J> &cindices)
-          : dim_(dim), data_(data), indptr_(indptr), indices_(indices), cindices_(cindices) {}
+          : dim_(dim), data_(data), indptr_(indptr), indices_(indices), cindices_(cindices) {
+        check_fields(dim, data, indptr, indices, cindices);
+      }
 
       array<T> data() const { return data_; }
       T *data_ptr() { return data_.mut_data(); }
