@@ -1,6 +1,6 @@
 #pragma once
 
-#include <quspin/basis/bitbasis/info.hpp>
+#include <quspin/basis/details/bitbasis/info.hpp>
 
 namespace quspin::basis {
 

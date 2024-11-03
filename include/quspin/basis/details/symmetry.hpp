@@ -2,10 +2,10 @@
 
 #include <algorithm>
 #include <cassert>
-#include <quspin/basis/bitbasis/benes.hpp>
-#include <quspin/basis/bitbasis/bits.hpp>
-#include <quspin/basis/bitbasis/dits.hpp>
-#include <quspin/basis/bitbasis/utils.hpp>
+#include <quspin/basis/details/bitbasis/benes.hpp>
+#include <quspin/basis/details/bitbasis/bits.hpp>
+#include <quspin/basis/details/bitbasis/dits.hpp>
+#include <quspin/basis/details/bitbasis/utils.hpp>
 #include <quspin/basis/types.hpp>
 #include <quspin/utils/functions.hpp>
 #include <vector>

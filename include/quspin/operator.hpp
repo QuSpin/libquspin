@@ -7,8 +7,8 @@
 #include <limits>
 #include <list>
 #include <memory>
-#include <quspin/basis/bitbasis/bits.hpp>
-#include <quspin/basis/bitbasis/dits.hpp>
+#include <quspin/basis/details/bitbasis/bits.hpp>
+#include <quspin/basis/details/bitbasis/dits.hpp>
 #include <quspin/utils/functions.hpp>
 #include <unordered_map>
 #include <utility>

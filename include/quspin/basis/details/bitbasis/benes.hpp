@@ -1,6 +1,6 @@
 #pragma once
 
-#include <quspin/basis/bitbasis/info.h>
+#include <quspin/basis/details/bitbasis/info.h>
 
 namespace quspin::basis::benes {
 

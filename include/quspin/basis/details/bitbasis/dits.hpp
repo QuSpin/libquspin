@@ -1,7 +1,7 @@
 #pragma once
 
 #include <array>
-#include <quspin/basis/bitbasis/info.hpp>
+#include <quspin/basis/details/bitbasis/info.hpp>
 #include <quspin/basis/types.hpp>
 #include <sstream>
 #include <string>
