@@ -2,8 +2,8 @@
 #include <quspin/array/array.hpp>
 #include <quspin/details/dispatch.hpp>
 #include <quspin/details/select.hpp>
-#include <quspin/quantum_operator/kernel/details/sum.hpp>
-#include <quspin/quantum_operator/quantum_operator.hpp>
+#include <quspin/qmatrix/kernel/details/sum.hpp>
+#include <quspin/qmatrix/qmatrix.hpp>
 #include <string>
 
 namespace quspin {
@@ -145,11 +145,10 @@ namespace quspin {
       return details::ReturnVoidError();
     };
 
-    auto calc_quantum_operator
-        = [&op, &num_threads](const auto &lhs, const auto &rhs, auto &result) {
-            elementwise_binary_operation(op, lhs, rhs, result, num_threads);
-            return details::ReturnVoidError();
-          };
+    auto calc_qmatrix = [&op, &num_threads](const auto &lhs, const auto &rhs, auto &result) {
+      elementwise_binary_operation(op, lhs, rhs, result, num_threads);
+      return details::ReturnVoidError();
+    };
 
     const std::size_t nnz = indptr[{indptr.size() - 1}];
     Array indices({nnz}, lhs.indices().dtype());
@@ -158,8 +157,8 @@ namespace quspin {
 
     QuantumOperator result(data, indptr, indices, cindices);
 
-    details::dispatch(calc_quantum_operator, static_checks_operator, dynamic_checks_operator, lhs,
-                      rhs, result);
+    details::dispatch(calc_qmatrix, static_checks_operator, dynamic_checks_operator, lhs, rhs,
+                      result);
 
     return result;
   }

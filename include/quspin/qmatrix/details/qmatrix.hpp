@@ -10,7 +10,7 @@
 namespace quspin {
   namespace details {
 
-    template <PrimativeTypes T, PrimativeTypes I, PrimativeTypes J> struct quantum_operator
+    template <PrimativeTypes T, PrimativeTypes I, PrimativeTypes J> struct qmatrix
         : public typed_object<T> {
     private:
       std::size_t dim_;
@@ -50,9 +50,9 @@ namespace quspin {
       using index_type = I;
       using cindex_type = J;
 
-      quantum_operator() = default;
-      quantum_operator(const std::size_t dim, array<T> &data, array<I> &indptr, array<I> &indices,
-                       array<J> &cindices)
+      qmatrix() = default;
+      qmatrix(const std::size_t dim, array<T> &data, array<I> &indptr, array<I> &indices,
+              array<J> &cindices)
           : dim_(dim), data_(data), indptr_(indptr), indices_(indices), cindices_(cindices) {
         check_fields(dim, data, indptr, indices, cindices);
       }
@@ -81,23 +81,23 @@ namespace quspin {
     };
 
     template <PrimativeTypes T, PrimativeTypes I, PrimativeTypes J>
-    struct value_type<quantum_operator<T, I, J>> {
+    struct value_type<qmatrix<T, I, J>> {
       using type = T;
     };
 
-    using quantum_operators = std::variant<
-        quantum_operator<int8_t, int32_t, uint8_t>, quantum_operator<int16_t, int32_t, uint8_t>,
-        quantum_operator<float, int32_t, uint8_t>, quantum_operator<double, int32_t, uint8_t>,
-        quantum_operator<cfloat, int32_t, uint8_t>, quantum_operator<cdouble, int32_t, uint8_t>,
-        quantum_operator<int8_t, int64_t, uint8_t>, quantum_operator<int16_t, int64_t, uint8_t>,
-        quantum_operator<float, int64_t, uint8_t>, quantum_operator<double, int64_t, uint8_t>,
-        quantum_operator<cfloat, int64_t, uint8_t>, quantum_operator<cdouble, int64_t, uint8_t>,
-        quantum_operator<int8_t, int32_t, uint16_t>, quantum_operator<int16_t, int32_t, uint16_t>,
-        quantum_operator<float, int32_t, uint16_t>, quantum_operator<double, int32_t, uint16_t>,
-        quantum_operator<cfloat, int32_t, uint16_t>, quantum_operator<cdouble, int32_t, uint16_t>,
-        quantum_operator<int8_t, int64_t, uint16_t>, quantum_operator<int16_t, int64_t, uint16_t>,
-        quantum_operator<float, int64_t, uint16_t>, quantum_operator<double, int64_t, uint16_t>,
-        quantum_operator<cfloat, int64_t, uint16_t>, quantum_operator<cdouble, int64_t, uint16_t>>;
+    using qmatrixs
+        = std::variant<qmatrix<int8_t, int32_t, uint8_t>, qmatrix<int16_t, int32_t, uint8_t>,
+                       qmatrix<float, int32_t, uint8_t>, qmatrix<double, int32_t, uint8_t>,
+                       qmatrix<cfloat, int32_t, uint8_t>, qmatrix<cdouble, int32_t, uint8_t>,
+                       qmatrix<int8_t, int64_t, uint8_t>, qmatrix<int16_t, int64_t, uint8_t>,
+                       qmatrix<float, int64_t, uint8_t>, qmatrix<double, int64_t, uint8_t>,
+                       qmatrix<cfloat, int64_t, uint8_t>, qmatrix<cdouble, int64_t, uint8_t>,
+                       qmatrix<int8_t, int32_t, uint16_t>, qmatrix<int16_t, int32_t, uint16_t>,
+                       qmatrix<float, int32_t, uint16_t>, qmatrix<double, int32_t, uint16_t>,
+                       qmatrix<cfloat, int32_t, uint16_t>, qmatrix<cdouble, int32_t, uint16_t>,
+                       qmatrix<int8_t, int64_t, uint16_t>, qmatrix<int16_t, int64_t, uint16_t>,
+                       qmatrix<float, int64_t, uint16_t>, qmatrix<double, int64_t, uint16_t>,
+                       qmatrix<cfloat, int64_t, uint16_t>, qmatrix<cdouble, int64_t, uint16_t>>;
 
   }  // namespace details
 }  // namespace quspin

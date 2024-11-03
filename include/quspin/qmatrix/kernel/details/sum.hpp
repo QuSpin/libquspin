@@ -5,7 +5,7 @@
 #include <quspin/array/details/array.hpp>
 #include <quspin/details/threading.hpp>
 #include <quspin/details/type_concepts.hpp>
-#include <quspin/quantum_operator/details/quantum_operator.hpp>
+#include <quspin/qmatrix/details/qmatrix.hpp>
 #include <thread>
 
 namespace quspin {
@@ -14,13 +14,12 @@ namespace quspin {
     template <typename Op, PrimativeTypes T, PrimativeTypes I, PrimativeTypes J>
     struct row_sum_tasks {
       Op &&op;
-      const quantum_operator<T, I, J> lhs;
-      const quantum_operator<T, I, J> rhs;
+      const qmatrix<T, I, J> lhs;
+      const qmatrix<T, I, J> rhs;
       I *indptr;
 
     public:
-      row_sum_tasks(Op &&op, const quantum_operator<T, I, J> &lhs,
-                    const quantum_operator<T, I, J> &rhs, I *indptr)
+      row_sum_tasks(Op &&op, const qmatrix<T, I, J> &lhs, const qmatrix<T, I, J> &rhs, I *indptr)
           : op(op), lhs(lhs), rhs(rhs), indptr(indptr) {}
 
       std::size_t size() const { return lhs.dim(); }
@@ -79,9 +78,8 @@ namespace quspin {
     };
 
     template <typename Op, PrimativeTypes T, PrimativeTypes I, PrimativeTypes J>
-    void elementwise_binop_size(Op &&op, const quantum_operator<T, I, J> &lhs,
-                                const quantum_operator<T, I, J> &rhs, array<I> &out_indptr,
-                                const std::size_t num_threads = 0) {
+    void elementwise_binop_size(Op &&op, const qmatrix<T, I, J> &lhs, const qmatrix<T, I, J> &rhs,
+                                array<I> &out_indptr, const std::size_t num_threads = 0) {
       assert(lhs.dim() == rhs.dim());
       assert(lhs.dim() == out_indptr.size() - 1);
 
@@ -100,13 +98,13 @@ namespace quspin {
     template <typename Op, PrimativeTypes T, PrimativeTypes I, PrimativeTypes J>
     class populate_row_tasks {
       Op &&op;
-      const quantum_operator<T, I, J> lhs;
-      const quantum_operator<T, I, J> rhs;
-      quantum_operator<T, I, J> out;
+      const qmatrix<T, I, J> lhs;
+      const qmatrix<T, I, J> rhs;
+      qmatrix<T, I, J> out;
 
     public:
-      populate_row_tasks(Op &&op, const quantum_operator<T, I, J> &lhs,
-                         const quantum_operator<T, I, J> &rhs, quantum_operator<T, I, J> &out)
+      populate_row_tasks(Op &&op, const qmatrix<T, I, J> &lhs, const qmatrix<T, I, J> &rhs,
+                         qmatrix<T, I, J> &out)
           : op(op), lhs(lhs), rhs(rhs), out(out) {}
 
       std::size_t size() const { return lhs.dim(); }
@@ -176,9 +174,8 @@ namespace quspin {
     };
 
     template <typename Op, PrimativeTypes T, PrimativeTypes I, PrimativeTypes J>
-    void elementwise_binary_operation(Op &&op, const quantum_operator<T, I, J> &lhs,
-                                      const quantum_operator<T, I, J> &rhs,
-                                      quantum_operator<T, I, J> &out,
+    void elementwise_binary_operation(Op &&op, const qmatrix<T, I, J> &lhs,
+                                      const qmatrix<T, I, J> &rhs, qmatrix<T, I, J> &out,
                                       const std::size_t num_threads = 0) {
       static_assert(std::is_invocable_v<Op, T, T>, "Incompatible Operator with input types");
       static_assert(std::is_same_v<T, std::decay_t<std::invoke_result_t<Op, T, T>>>,

@@ -3,8 +3,8 @@
 #include <quspin/array/array.hpp>
 #include <quspin/array/details/array.hpp>
 #include <quspin/details/select.hpp>
-#include <quspin/quantum_operator/details/quantum_operator.hpp>
-#include <quspin/quantum_operator/quantum_operator.hpp>
+#include <quspin/qmatrix/details/qmatrix.hpp>
+#include <quspin/qmatrix/qmatrix.hpp>
 #include <type_traits>
 #include <variant>
 
@@ -43,42 +43,42 @@ namespace quspin {
 
     auto constructor = [&dim](auto &&data, auto &&indptr, auto &&indices, auto &&cindices) {
       if constexpr (!std::is_same_v<decltype(indptr), decltype(indices)>) {
-        return ErrorOr<quantum_operators>(
+        return ErrorOr<qmatrixs>(
             Error(ErrorType::ValueError, "indptr and indices must have the same dtype"));
       } else {
-        quantum_operators op = quantum_operator(dim, data, indptr, indices, cindices);
-        return ErrorOr<quantum_operators>(op);
+        qmatrixs op = qmatrix(dim, data, indptr, indices, cindices);
+        return ErrorOr<qmatrixs>(op);
       }
     };
 
-    DTypeObject<details::quantum_operators>::internals_ = visit_or_error<quantum_operators>(
+    DTypeObject<details::qmatrixs>::internals_ = visit_or_error<qmatrixs>(
         constructor, data_select.get_variant_obj(), indptr_select.get_variant_obj(),
         indices_select.get_variant_obj(), cindices_select.get_variant_obj());
   }
 
   std::size_t QuantumOperator::dim() const {
     return std::visit([](auto &&arg) { return arg.dim(); },
-                      DTypeObject<details::quantum_operators>::internals_);
+                      DTypeObject<details::qmatrixs>::internals_);
   }
 
   Array QuantumOperator::indptr() const {
     return std::visit([](auto &&arg) { return Array(arg.indptr()); },
-                      DTypeObject<details::quantum_operators>::internals_);
+                      DTypeObject<details::qmatrixs>::internals_);
   }
 
   Array QuantumOperator::indices() const {
     return std::visit([](auto &&arg) { return Array(arg.indices()); },
-                      DTypeObject<details::quantum_operators>::internals_);
+                      DTypeObject<details::qmatrixs>::internals_);
   }
 
   Array QuantumOperator::data() const {
     return std::visit([](auto &&arg) { return Array(arg.data()); },
-                      DTypeObject<details::quantum_operators>::internals_);
+                      DTypeObject<details::qmatrixs>::internals_);
   }
 
   Array QuantumOperator::cindices() const {
     return std::visit([](auto &&arg) { return Array(arg.cindices()); },
-                      DTypeObject<details::quantum_operators>::internals_);
+                      DTypeObject<details::qmatrixs>::internals_);
   }
 
 }  // namespace quspin

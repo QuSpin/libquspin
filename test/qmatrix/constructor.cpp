@@ -3,7 +3,7 @@
 #include <exception>
 #include <quspin/array/array.hpp>
 #include <quspin/dtype/dtype.hpp>
-#include <quspin/quantum_operator/quantum_operator.hpp>
+#include <quspin/qmatrix/qmatrix.hpp>
 #include <string>
 
 using namespace quspin;

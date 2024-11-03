@@ -2,7 +2,7 @@
 
 #include <quspin/array/array.hpp>
 #include <quspin/details/optional.hpp>
-#include <quspin/quantum_operator/quantum_operator.hpp>
+#include <quspin/qmatrix/qmatrix.hpp>
 
 namespace quspin {
   Array dot(const QuantumOperator op, const Array coeff, const Array input,

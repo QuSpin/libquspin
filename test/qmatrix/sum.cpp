@@ -2,8 +2,8 @@
 #include <quspin/array/array.hpp>
 #include <quspin/array/kernel/kernels.hpp>
 #include <quspin/dtype/dtype.hpp>
-#include <quspin/quantum_operator/kernel/sum.hpp>
-#include <quspin/quantum_operator/quantum_operator.hpp>
+#include <quspin/qmatrix/kernel/sum.hpp>
+#include <quspin/qmatrix/qmatrix.hpp>
 
 using namespace quspin;
 

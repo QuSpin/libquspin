@@ -39,9 +39,9 @@ src_files = files(
     'src' / 'array' / 'reference.cpp',
     'src' / 'array' / 'kernel' / 'kernels.cpp',
     'src' / 'dtype' / 'dtype.cpp',
-    'src' / 'quantum_operator' / 'kernel' / 'dot.cpp',
-    'src' / 'quantum_operator' / 'kernel' / 'sum.cpp',
-    'src' / 'quantum_operator' / 'quantum_operator.cpp',
+    'src' / 'qmatrix' / 'kernel' / 'dot.cpp',
+    'src' / 'qmatrix' / 'kernel' / 'sum.cpp',
+    'src' / 'qmatrix' / 'qmatrix.cpp',
 )
 
 if host_machine.system() == 'windows'
@@ -61,8 +61,8 @@ test_files = [
     ('test' / 'array' / 'constructor.cpp'),
     ('test' / 'array' / 'kernels.cpp'),
     ('test' / 'dtype.cpp'),
-    ('test' / 'quantum_operator' / 'constructor.cpp'),
-    ('test' / 'quantum_operator' / 'sum.cpp'),
+    ('test' / 'qmatrix' / 'constructor.cpp'),
+    ('test' / 'qmatrix' / 'sum.cpp'),
     ('test' / 'details' / 'select.cpp'),
 ]
 
