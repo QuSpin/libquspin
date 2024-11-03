@@ -1,6 +1,6 @@
 
 #include <quspin/array/array.hpp>
-#include <quspin/array/kernel/kernels.hpp>
+#include <quspin/array/kernels.hpp>
 #include <quspin/dtype/dtype.hpp>
 #include <quspin/qmatrix/kernel/sum.hpp>
 #include <quspin/qmatrix/qmatrix.hpp>

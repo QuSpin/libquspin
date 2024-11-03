@@ -37,7 +37,7 @@ src_files = files(
     'src' / 'array' / 'array.cpp',
     'src' / 'array' / 'scalar.cpp',
     'src' / 'array' / 'reference.cpp',
-    'src' / 'array' / 'kernel' / 'kernels.cpp',
+    'src' / 'array' / 'kernels.cpp',
     'src' / 'dtype' / 'dtype.cpp',
     'src' / 'qmatrix' / 'kernel' / 'dot.cpp',
     'src' / 'qmatrix' / 'kernel' / 'sum.cpp',

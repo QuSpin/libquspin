@@ -2,7 +2,7 @@
 #include <array>
 #include <numeric>
 #include <quspin/array/array.hpp>
-#include <quspin/array/kernel/kernels.hpp>
+#include <quspin/array/kernels.hpp>
 #include <quspin/details/broadcast.hpp>
 #include <quspin/details/cast.hpp>
 #include <quspin/details/dispatch.hpp>
