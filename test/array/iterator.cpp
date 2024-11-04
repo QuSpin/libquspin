@@ -17,7 +17,7 @@ template <typename Func, typename... Args> decltype(auto) time_func(Func func, A
 std::size_t test(array<float> &arr) {
   std::size_t i = 0;
   for (auto it = arr.begin(); it != arr.end(); ++it) {
-    i += it.index_();
+    i += 1;
   }
   return i;
 }

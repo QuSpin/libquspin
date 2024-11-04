@@ -1,4 +1,5 @@
 
+#include <iostream>
 #include <quspin/array/array.hpp>
 #include <quspin/array/details/array.hpp>
 #include <quspin/details/select.hpp>

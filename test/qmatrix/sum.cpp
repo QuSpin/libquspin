@@ -1,4 +1,5 @@
 
+#include <cassert>
 #include <quspin/array/array.hpp>
 #include <quspin/array/kernels.hpp>
 #include <quspin/dtype/dtype.hpp>

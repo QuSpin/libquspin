@@ -66,16 +66,6 @@ namespace quspin {
         return *this;
       }
 
-      std::size_t index_() const { return index; }
-
-      std::vector<std::size_t> dim_indices() {
-        std::vector<std::size_t> out;
-        for (std::size_t i = 0; i < ndim; i++) {
-          out.push_back(step_size_index[3 * i + 2]);
-        }
-        return out;
-      }
-
       T &operator*() { return parent.mut_data()[index]; }
     };
 

@@ -21,6 +21,7 @@ elif host_machine.system() == 'darwin'
         'x86_64',
         '-arch',
         'arm64',
+        '-flto',
         '-mmacosx-version-min=10.14',
         language: 'cpp',
     )
@@ -35,6 +36,8 @@ include = include_directories('include')
 
 src_files = files(
     'src' / 'array' / 'array.cpp',
+    'src' / 'array' / 'details' / 'array.cpp',
+    'src' / 'array' / 'details' / 'pointer.cpp',
     'src' / 'array' / 'scalar.cpp',
     'src' / 'array' / 'reference.cpp',
     'src' / 'array' / 'kernels.cpp',
