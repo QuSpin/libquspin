@@ -46,6 +46,7 @@ src_files = files(
     'src' / 'qmatrix' / 'kernel' / 'dot.cpp',
     'src' / 'qmatrix' / 'kernel' / 'sum.cpp',
     'src' / 'qmatrix' / 'qmatrix.cpp',
+    'src' / 'qmatrix' / 'details' / 'qmatrix.cpp',
 )
 
 if host_machine.system() == 'windows'

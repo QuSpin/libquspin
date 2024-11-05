@@ -20,31 +20,6 @@ namespace quspin {
       array<J> cindices_;
       static constexpr J max_coeff = std::numeric_limits<J>::max();
 
-      static void check_fields(const std::size_t dim, const array<T> &data, const array<I> &indptr,
-                               const array<I> &indices, const array<J> &cindices) {
-        if (dim != indptr.size() - 1) {
-          throw std::runtime_error("Invalid number of rows");
-        }
-        if (indices.size() != cindices.size()) {
-          throw std::runtime_error("misaligned size of indices and coefficients");
-        }
-        if (data.size() != indices.size()) {
-          throw std::runtime_error("misaligned size of data and indices");
-        }
-        if (!indptr.is_contiguous() || indptr.ndim() != 1) {
-          throw std::runtime_error("indptr must be contiguous 1D array");
-        }
-        if (!indices.is_contiguous() || indices.ndim() != 1) {
-          throw std::runtime_error("indices must be contiguous 1D array");
-        }
-        if (!cindices.is_contiguous() || cindices.ndim() != 1) {
-          throw std::runtime_error("cindices must be contiguous 1D array");
-        }
-        if (!data.is_contiguous() || data.ndim() != 1) {
-          throw std::runtime_error("data must be contiguous 1D array");
-        }
-      }
-
     public:
       using value_type = T;
       using index_type = I;
@@ -52,32 +27,29 @@ namespace quspin {
 
       qmatrix() = default;
       qmatrix(const std::size_t dim, array<T> &data, array<I> &indptr, array<I> &indices,
-              array<J> &cindices)
-          : dim_(dim), data_(data), indptr_(indptr), indices_(indices), cindices_(cindices) {
-        check_fields(dim, data, indptr, indices, cindices);
-      }
+              array<J> &cindices);
 
-      array<T> data() const { return data_; }
-      T *data_ptr() { return data_.mut_data(); }
-      const T *data_ptr() const { return data_.data(); }
-      T data_at(const std::size_t &i) const { return data_ptr()[i]; }
+      array<T> data() const;
+      T *data_ptr();
+      const T *data_ptr() const;
+      T data_at(const std::size_t &i) const;
 
-      array<I> indptr() const { return indptr_; }
-      I *indptr_ptr() { return indptr_.mut_data(); }
-      const I *indptr_ptr() const { return indptr_.data(); }
-      I indptr_at(const std::size_t &i) const { return indptr_ptr()[i]; }
+      array<I> indptr() const;
+      I *indptr_ptr();
+      const I *indptr_ptr() const;
+      I indptr_at(const std::size_t &i) const;
 
-      array<I> indices() const { return indices_; }
-      I *indices_ptr() { return indices_.mut_data(); }
-      const I *indices_ptr() const { return indices_.data(); }
-      I indices_at(const std::size_t &i) const { return indices_ptr()[i]; }
+      array<I> indices() const;
+      I *indices_ptr();
+      const I *indices_ptr() const;
+      I indices_at(const std::size_t &i) const;
 
-      array<J> cindices() const { return cindices_; }
-      J *cindices_ptr() { return cindices_.mut_data(); }
-      const J *cindices_ptr() const { return cindices_.data(); }
-      J cindices_at(const std::size_t &i) const { return cindices_ptr()[i]; }
+      array<J> cindices() const;
+      J *cindices_ptr();
+      const J *cindices_ptr() const;
+      J cindices_at(const std::size_t &i) const;
 
-      std::size_t dim() const { return dim_; }
+      std::size_t dim() const;
     };
 
     template <PrimativeTypes T, PrimativeTypes I, PrimativeTypes J>
