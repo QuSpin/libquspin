@@ -119,22 +119,22 @@ namespace quspin {
     template <PrimativeTypes T> T *array<T>::mut_data() { return data_.get(); }
 
     template <PrimativeTypes T> const_array_iterator<T> array<T>::begin() const {
-      const_array_iterator<T> iter(*this, 0);
+      const_array_iterator<T> iter(data(), shape_, stride_, 0);
       return iter;
     }
 
     template <PrimativeTypes T> const_array_iterator<T> array<T>::end() const {
-      const_array_iterator<T> iter(*this, size());
+      const_array_iterator<T> iter(data(), shape_, stride_, size());
       return iter;
     }
 
     template <PrimativeTypes T> array_iterator<T> array<T>::begin() {
-      array_iterator<T> iter(*this, 0);
+      array_iterator<T> iter(mut_data(), shape_, stride_, 0);
       return iter;
     }
 
     template <PrimativeTypes T> array_iterator<T> array<T>::end() {
-      array_iterator<T> iter(*this, size());
+      array_iterator<T> iter(mut_data(), shape_, stride_, size());
       return iter;
     }
 

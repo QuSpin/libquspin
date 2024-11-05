@@ -1,6 +1,7 @@
 #pragma once
 
 #include <quspin/details/type_concepts.hpp>
+#include <vector>
 
 namespace quspin {
   namespace details {
@@ -9,125 +10,127 @@ namespace quspin {
 
     template <PrimativeTypes T> struct array_iterator {
     private:
-      static constexpr std::size_t MAX_DIM = array<T>::MAX_DIM;
-      array<T> &parent;
-      std::size_t index;
-      const std::size_t ndim;
+      static constexpr std::size_t MAX_DIM = 64;
+      T *data_;
+      std::size_t index_;
+      const std::size_t ndim_;
 
-      std::array<std::size_t, 3 * MAX_DIM> step_size_index;
+      std::array<std::size_t, 3 * MAX_DIM> step_size_index_;
 
     public:
-      array_iterator(array<T> &arr, std::size_t start)
-          : parent(arr), index(start), ndim(arr.ndim()) {
-        step_size_index.fill(std::size_t());
+      array_iterator(T *data, const std::vector<std::size_t> &shape,
+                     const std::vector<std::size_t> &strides, std::size_t start)
+          : data_(data), index_(start), ndim_(shape.size()) {
+        step_size_index_.fill(std::size_t());
 
-        for (std::size_t dim = 0; dim < arr.ndim(); dim++) {
-          const std::size_t step = arr.strides(dim) / sizeof(T);
-          const std::size_t dim_size = arr.shape(dim);
+        for (std::size_t dim = 0; dim < ndim_; dim++) {
+          const std::size_t step = strides.at(dim) / sizeof(T);
+          const std::size_t dim_size = shape.at(dim);
           const std::size_t dim_index = (start / step) % dim_size;
 
-          step_size_index[3 * dim] = step;
-          step_size_index[3 * dim + 1] = dim_size;
-          step_size_index[3 * dim + 2] = dim_index;
+          step_size_index_[3 * dim] = step;
+          step_size_index_[3 * dim + 1] = dim_size;
+          step_size_index_[3 * dim + 2] = dim_index;
 
           start -= dim_index;
         }
       }
 
       bool operator==(array_iterator<T> &other) const {
-        return (&parent == &other.parent) && (index == other.index);
+        return (data_ == other.data_) && (index_ == other.index_);
       }
 
       array_iterator<T> &operator++() {
-        std::size_t dim = ndim;
+        std::size_t dim = ndim_;
         for (; dim > 1; --dim) {
           const std::size_t dim_id = dim - 1;
-          const std::size_t &dim_step = step_size_index[3 * dim_id];
-          const std::size_t &dim_size = step_size_index[3 * dim_id + 1];
-          std::size_t &dim_index = step_size_index[3 * dim_id + 2];
+          const std::size_t &dim_step = step_size_index_[3 * dim_id];
+          const std::size_t &dim_size = step_size_index_[3 * dim_id + 1];
+          std::size_t &dim_index = step_size_index_[3 * dim_id + 2];
 
-          index += dim_step;
+          index_ += dim_step;
           dim_index++;
 
           if (dim_index < dim_size) {
             return *this;
           }
 
-          index -= dim_step * dim_index;
+          index_ -= dim_step * dim_index;
           dim_index = 0;
         }
 
         const std::size_t dim_id = 0;
-        const std::size_t &dim_step = step_size_index[3 * dim_id];
-        std::size_t &dim_index = step_size_index[3 * dim_id + 2];
-        index += dim_step;
+        const std::size_t &dim_step = step_size_index_[3 * dim_id];
+        std::size_t &dim_index = step_size_index_[3 * dim_id + 2];
+        index_ += dim_step;
         dim_index++;
 
         return *this;
       }
 
-      T &operator*() { return parent.mut_data()[index]; }
+      T &operator*() { return data_[index_]; }
     };
 
     template <PrimativeTypes T> struct const_array_iterator {
     private:
-      static constexpr std::size_t MAX_DIM = array<T>::MAX_DIM;
-      const array<T> &parent;
-      std::size_t index;
-      const std::size_t ndim;
-      std::array<std::size_t, 3 * MAX_DIM> step_size_index;
+      static constexpr std::size_t MAX_DIM = 64;
+      const T *data_;
+      std::size_t index_;
+      const std::size_t ndim_;
+      std::array<std::size_t, 3 * MAX_DIM> step_size_index_;
 
     public:
-      const_array_iterator(const array<T> &arr, std::size_t start)
-          : parent(arr), index(start), ndim(arr.ndim()) {
-        step_size_index.fill(std::size_t());
+      const_array_iterator(const T *data, const std::vector<std::size_t> &shape,
+                           const std::vector<std::size_t> &strides, std::size_t start)
+          : data_(data), index_(start), ndim_(shape.size()) {
+        step_size_index_.fill(std::size_t());
 
-        for (std::size_t dim = 0; dim < arr.ndim(); dim++) {
-          const std::size_t step = arr.strides(dim) / sizeof(T);
-          const std::size_t dim_size = arr.shape(dim);
+        for (std::size_t dim = 0; dim < ndim_; dim++) {
+          const std::size_t step = strides.at(dim) / sizeof(T);
+          const std::size_t dim_size = shape.at(dim);
           const std::size_t dim_index = (start / step) % dim_size;
 
-          step_size_index[3 * dim] = step;
-          step_size_index[3 * dim + 1] = dim_size;
-          step_size_index[3 * dim + 2] = dim_index;
+          step_size_index_[3 * dim] = step;
+          step_size_index_[3 * dim + 1] = dim_size;
+          step_size_index_[3 * dim + 2] = dim_index;
 
           start -= dim_index;
         }
       }
 
       bool operator==(const_array_iterator<T> &other) {
-        return (&parent == &other.parent) && (index == other.index);
+        return (data_ == other.data_) && (index_ == other.index_);
       }
 
       const_array_iterator<T> &operator++() {
-        std::size_t dim = ndim;
+        std::size_t dim = ndim_;
         for (; dim > 1; --dim) {
           const std::size_t dim_id = dim - 1;
-          const std::size_t &dim_step = step_size_index[3 * dim_id];
-          const std::size_t &dim_size = step_size_index[3 * dim_id + 1];
-          std::size_t &dim_index = step_size_index[3 * dim_id + 2];
+          const std::size_t &dim_step = step_size_index_[3 * dim_id];
+          const std::size_t &dim_size = step_size_index_[3 * dim_id + 1];
+          std::size_t &dim_index = step_size_index_[3 * dim_id + 2];
 
-          index += dim_step;
+          index_ += dim_step;
           dim_index++;
 
           if (dim_index < dim_size) {
             return *this;
           }
 
-          index -= dim_step * dim_index;
+          index_ -= dim_step * dim_index;
           dim_index = 0;
         }
 
         const std::size_t dim_id = 0;
-        const std::size_t &dim_step = step_size_index[3 * dim_id];
-        std::size_t &dim_index = step_size_index[3 * dim_id + 2];
-        index += dim_step;
+        const std::size_t &dim_step = step_size_index_[3 * dim_id];
+        std::size_t &dim_index = step_size_index_[3 * dim_id + 2];
+        index_ += dim_step;
         dim_index++;
 
         return *this;
       }
 
-      const T &operator*() { return parent.data()[index]; }
+      const T &operator*() { return data_[index_]; }
     };
 
   }  // namespace details
