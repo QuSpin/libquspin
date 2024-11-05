@@ -38,6 +38,7 @@ src_files = files(
     'src' / 'array' / 'array.cpp',
     'src' / 'array' / 'details' / 'array.cpp',
     'src' / 'array' / 'details' / 'pointer.cpp',
+    'src' / 'array' / 'details' / 'iterator.cpp',
     'src' / 'array' / 'scalar.cpp',
     'src' / 'array' / 'reference.cpp',
     'src' / 'array' / 'kernels.cpp',
