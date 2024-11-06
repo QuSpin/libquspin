@@ -1,12 +1,13 @@
 #pragma once
 
+#include <iterator>
 #include <numeric>
 #include <quspin/array/details/array.hpp>
 #include <quspin/details/type_concepts.hpp>
 #include <quspin/dtype/details/dtype.hpp>
 #include <type_traits>
 #include <variant>
-
+#include <vector>
 namespace quspin {
   namespace details {
 
@@ -29,6 +30,8 @@ namespace quspin {
       qmatrix(const std::size_t dim, array<T> &data, array<I> &indptr, array<I> &indices,
               array<J> &cindices);
 
+      void sort();
+
       array<T> data() const;
       T *data_ptr();
       const T *data_ptr() const;
@@ -50,6 +53,9 @@ namespace quspin {
       J cindices_at(const std::size_t &i) const;
 
       std::size_t dim() const;
+
+      // iterator row_begin(const std::size_t &row);
+      // iterator row_end(const std::size_t &row);
     };
 
     template <PrimativeTypes T, PrimativeTypes I, PrimativeTypes J>
@@ -57,7 +63,7 @@ namespace quspin {
       using type = T;
     };
 
-    using qmatrixs
+    using qmatrices
         = std::variant<qmatrix<int8_t, int32_t, uint8_t>, qmatrix<int16_t, int32_t, uint8_t>,
                        qmatrix<float, int32_t, uint8_t>, qmatrix<double, int32_t, uint8_t>,
                        qmatrix<cfloat, int32_t, uint8_t>, qmatrix<cdouble, int32_t, uint8_t>,

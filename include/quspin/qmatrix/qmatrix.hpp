@@ -8,14 +8,14 @@
 
 namespace quspin {
 
-  class QuantumOperator : public DTypeObject<details::qmatrixs> {
-    static details::qmatrixs default_value() {
-      return details::qmatrixs(details::qmatrix<double, int32_t, uint8_t>());
+  class QuantumOperator : public DTypeObject<details::qmatrices> {
+    static details::qmatrices default_value() {
+      return details::qmatrices(details::qmatrix<double, int32_t, uint8_t>());
     }
 
   public:
-    QuantumOperator() : DTypeObject<details::qmatrixs>(default_value()) {}
-    QuantumOperator(const details::qmatrixs &op);
+    QuantumOperator() : DTypeObject<details::qmatrices>(default_value()) {}
+    QuantumOperator(const details::qmatrices &op);
     template <PrimativeTypes T, PrimativeTypes I, PrimativeTypes J>
     QuantumOperator(const details::qmatrix<T, I, J> &op);
     QuantumOperator(Array data, Array indptr, Array indices, Array cindices);

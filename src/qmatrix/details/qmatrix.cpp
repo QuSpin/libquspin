@@ -1,9 +1,11 @@
 
+#include <algorithm>
+#include <boost/iterator/zip_iterator.hpp>
+#include <boost/sort/spreadsort/spreadsort.hpp>
 #include <quspin/array/details/array.hpp>
 #include <quspin/details/type_concepts.hpp>
 #include <quspin/qmatrix/details/qmatrix.hpp>
 #include <type_traits>
-#include <variant>
 
 namespace quspin {
   namespace details {
@@ -40,6 +42,8 @@ namespace quspin {
         : dim_(dim), data_(data), indptr_(indptr), indices_(indices), cindices_(cindices) {
       check_fields(dim, data, indptr, indices, cindices);
     }
+
+    template <PrimativeTypes T, PrimativeTypes I, PrimativeTypes J> void qmatrix<T, I, J>::sort() {}
 
     template <PrimativeTypes T, PrimativeTypes I, PrimativeTypes J>
     array<T> qmatrix<T, I, J>::data() const {

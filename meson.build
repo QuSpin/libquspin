@@ -34,6 +34,8 @@ add_global_arguments(
 
 include = include_directories('include')
 
+boost = dependency('boost')
+
 src_files = files(
     'src' / 'array' / 'array.cpp',
     'src' / 'array' / 'details' / 'array.cpp',
@@ -47,12 +49,13 @@ src_files = files(
     'src' / 'qmatrix' / 'kernel' / 'sum.cpp',
     'src' / 'qmatrix' / 'qmatrix.cpp',
     'src' / 'qmatrix' / 'details' / 'qmatrix.cpp',
+    'src' / 'qmatrix' / 'details' / 'iterator.cpp',
 )
 
 if host_machine.system() == 'windows'
-    libquspin = static_library('quspin', src_files, include_directories: include, name_suffix: 'lib')
+    libquspin = static_library('quspin', src_files, include_directories: include, name_suffix: 'lib', dependencies: boost)
 else
-    libquspin = shared_library('quspin', src_files, include_directories: include)
+    libquspin = shared_library('quspin', src_files, include_directories: include, dependencies: boost)
 endif
 
 libquspin_dep = declare_dependency(
