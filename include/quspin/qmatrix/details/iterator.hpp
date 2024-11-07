@@ -20,18 +20,8 @@ namespace quspin {
       row_info(row_info<T, I, J> &&other)
           : value(other.value), index(other.index), cindex(other.cindex) {};
 
-      row_info &operator=(row_info<T, I, J> &other) {
-        value = other.value;
-        index = other.index;
-        cindex = other.cindex;
-        return *this;
-      }
-      row_info &operator=(row_info<T, I, J> &&other) {
-        value = other.value;
-        index = other.index;
-        cindex = other.cindex;
-        return *this;
-      }
+      row_info &operator=(row_info<T, I, J> &other);
+      row_info &operator=(row_info<T, I, J> &&other);
       bool operator<(const row_info &other) const;
       bool operator>(const row_info &other) const;
       bool operator==(const row_info &other) const;

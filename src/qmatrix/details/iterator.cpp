@@ -7,6 +7,24 @@ namespace quspin {
 
     template <typename T, typename I, typename J>
       requires QuantumOperatorTypes<T, I, J>
+    row_info<T, I, J> &row_info<T, I, J>::operator=(row_info<T, I, J> &other) {
+      value = other.value;
+      index = other.index;
+      cindex = other.cindex;
+      return *this;
+    }
+
+    template <typename T, typename I, typename J>
+      requires QuantumOperatorTypes<T, I, J>
+    row_info<T, I, J> &row_info<T, I, J>::operator=(row_info<T, I, J> &&other) {
+      value = other.value;
+      index = other.index;
+      cindex = other.cindex;
+      return *this;
+    }
+
+    template <typename T, typename I, typename J>
+      requires QuantumOperatorTypes<T, I, J>
     bool row_info<T, I, J>::operator==(const row_info<T, I, J> &other) const {
       return index == other.index && cindex == other.cindex;
     }
