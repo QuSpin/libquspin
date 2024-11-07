@@ -15,10 +15,16 @@ namespace quspin {
   concept RealTypes = std::integral<T> || std::floating_point<T>;
 
   template <typename T>
-  concept ComplexTypes
-      = std::same_as<T, std::complex<float>> || std::same_as<T, std::complex<double>>;
+  concept ComplexTypes = std::same_as<std::decay_t<T>, std::complex<float>>
+                         || std::same_as<std::decay_t<T>, std::complex<double>>;
 
   template <typename T>
   concept PrimativeTypes = RealTypes<T> || ComplexTypes<T>;
+
+  template <typename T, typename I, typename J>
+  concept QuantumOperatorTypes
+      = PrimativeTypes<T>
+        && (std::same_as<std::decay_t<I>, int32_t> || std::same_as<std::decay_t<I>, int64_t>)
+        && (std::same_as<std::decay_t<J>, uint8_t> || std::same_as<std::decay_t<J>, uint16_t>);
 
 }  // namespace quspin

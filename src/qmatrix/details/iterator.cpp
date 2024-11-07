@@ -1,70 +1,86 @@
 #include <quspin/details/type_concepts.hpp>
+#include <quspin/dtype/details/dtype.hpp>
 #include <quspin/qmatrix/details/iterator.hpp>
 
 namespace quspin {
   namespace details {
 
-    template <PrimativeTypes T, PrimativeTypes I, PrimativeTypes J>
-    bool row_ref<T, I, J>::operator==(const row_ref<T, I, J> &other) const {
-      return index_ == other.index_ && cindex_ == other.cindex_;
+    template <typename T, typename I, typename J>
+      requires QuantumOperatorTypes<T, I, J>
+    bool row_info<T, I, J>::operator==(const row_info<T, I, J> &other) const {
+      return index == other.index && cindex == other.cindex;
     }
 
-    template <PrimativeTypes T, PrimativeTypes I, PrimativeTypes J>
-    bool row_ref<T, I, J>::operator!=(const row_ref<T, I, J> &other) const {
-      return index_ != other.index_ || cindex_ != other.cindex_;
+    template <typename T, typename I, typename J>
+      requires QuantumOperatorTypes<T, I, J>
+    bool row_info<T, I, J>::operator!=(const row_info<T, I, J> &other) const {
+      return index != other.index || cindex != other.cindex;
     }
 
-    template <PrimativeTypes T, PrimativeTypes I, PrimativeTypes J>
-    bool row_ref<T, I, J>::operator<(const row_ref<T, I, J> &other) const {
-      return index_ < other.index_ && cindex_ < other.cindex_;
+    template <typename T, typename I, typename J>
+      requires QuantumOperatorTypes<T, I, J>
+    bool row_info<T, I, J>::operator<(const row_info<T, I, J> &other) const {
+      return index < other.index && cindex < other.cindex;
     }
 
-    template <PrimativeTypes T, PrimativeTypes I, PrimativeTypes J>
-    bool row_ref<T, I, J>::operator>(const row_ref<T, I, J> &other) const {
-      return index_ > other.index_ && cindex_ > other.cindex_;
+    template <typename T, typename I, typename J>
+      requires QuantumOperatorTypes<T, I, J>
+    bool row_info<T, I, J>::operator>(const row_info<T, I, J> &other) const {
+      return index > other.index && cindex > other.cindex;
     }
 
-    template <PrimativeTypes T, PrimativeTypes I, PrimativeTypes J>
-    bool row_ref<T, I, J>::operator<=(const row_ref<T, I, J> &other) const {
+    template <typename T, typename I, typename J>
+      requires QuantumOperatorTypes<T, I, J>
+    bool row_info<T, I, J>::operator<=(const row_info<T, I, J> &other) const {
       return *this < other || *this == other;
     }
 
-    template <PrimativeTypes T, PrimativeTypes I, PrimativeTypes J>
-    bool row_ref<T, I, J>::operator>=(const row_ref<T, I, J> &other) const {
+    template <typename T, typename I, typename J>
+      requires QuantumOperatorTypes<T, I, J>
+    bool row_info<T, I, J>::operator>=(const row_info<T, I, J> &other) const {
       return *this > other || *this == other;
     }
 
-    template <PrimativeTypes T, PrimativeTypes I, PrimativeTypes J>
+    // iterator implementation
+
+    template <typename T, typename I, typename J>
+      requires QuantumOperatorTypes<T, I, J>
     bool iterator<T, I, J>::operator==(const iterator<T, I, J> &other) const {
       return data_ == other.data_ && indices_ == other.indices_ && cindices_ == other.cindices_;
     }
 
-    template <PrimativeTypes T, PrimativeTypes I, PrimativeTypes J>
+    template <typename T, typename I, typename J>
+      requires QuantumOperatorTypes<T, I, J>
     bool iterator<T, I, J>::operator!=(const iterator<T, I, J> &other) const {
       return data_ != other.data_ || indices_ != other.indices_ || cindices_ != other.cindices_;
     }
 
-    template <PrimativeTypes T, PrimativeTypes I, PrimativeTypes J>
+    template <typename T, typename I, typename J>
+      requires QuantumOperatorTypes<T, I, J>
     bool iterator<T, I, J>::operator<(const iterator<T, I, J> &other) const {
       return data_ < other.data_ && indices_ < other.indices_ && cindices_ < other.cindices_;
     }
 
-    template <PrimativeTypes T, PrimativeTypes I, PrimativeTypes J>
+    template <typename T, typename I, typename J>
+      requires QuantumOperatorTypes<T, I, J>
     bool iterator<T, I, J>::operator>(const iterator<T, I, J> &other) const {
       return data_ > other.data_ && indices_ > other.indices_ && cindices_ > other.cindices_;
     }
 
-    template <PrimativeTypes T, PrimativeTypes I, PrimativeTypes J>
+    template <typename T, typename I, typename J>
+      requires QuantumOperatorTypes<T, I, J>
     bool iterator<T, I, J>::operator<=(const iterator<T, I, J> &other) const {
       return *this < other || *this == other;
     }
 
-    template <PrimativeTypes T, PrimativeTypes I, PrimativeTypes J>
+    template <typename T, typename I, typename J>
+      requires QuantumOperatorTypes<T, I, J>
     bool iterator<T, I, J>::operator>=(const iterator<T, I, J> &other) const {
       return *this > other || *this == other;
     }
 
-    template <PrimativeTypes T, PrimativeTypes I, PrimativeTypes J>
+    template <typename T, typename I, typename J>
+      requires QuantumOperatorTypes<T, I, J>
     iterator<T, I, J> &iterator<T, I, J>::operator++() {
       data_++;
       indices_++;
@@ -72,7 +88,8 @@ namespace quspin {
       return *this;
     }
 
-    template <PrimativeTypes T, PrimativeTypes I, PrimativeTypes J>
+    template <typename T, typename I, typename J>
+      requires QuantumOperatorTypes<T, I, J>
     iterator<T, I, J> &iterator<T, I, J>::operator--() {
       data_--;
       indices_--;
@@ -80,60 +97,191 @@ namespace quspin {
       return *this;
     }
 
-    template <PrimativeTypes T, PrimativeTypes I, PrimativeTypes J>
+    template <typename T, typename I, typename J>
+      requires QuantumOperatorTypes<T, I, J>
     iterator<T, I, J> iterator<T, I, J>::operator++(int) {
       iterator temp = *this;
       ++*this;
       return temp;
     }
 
-    template <PrimativeTypes T, PrimativeTypes I, PrimativeTypes J>
+    template <typename T, typename I, typename J>
+      requires QuantumOperatorTypes<T, I, J>
     iterator<T, I, J> iterator<T, I, J>::operator--(int) {
       iterator temp = *this;
       --*this;
       return temp;
     }
 
-    template <PrimativeTypes T, PrimativeTypes I, PrimativeTypes J>
-    iterator<T, I, J> &iterator<T, I, J>::operator+=(const std::size_t &n) {
+    template <typename T, typename I, typename J>
+      requires QuantumOperatorTypes<T, I, J>
+    iterator<T, I, J> &iterator<T, I, J>::operator+=(const iterator<T, I, J>::difference_type &n) {
       data_ += n;
       indices_ += n;
       cindices_ += n;
       return *this;
     }
 
-    template <PrimativeTypes T, PrimativeTypes I, PrimativeTypes J>
-    iterator<T, I, J> &iterator<T, I, J>::operator-=(const std::size_t &n) {
+    template <typename T, typename I, typename J>
+      requires QuantumOperatorTypes<T, I, J>
+    iterator<T, I, J> &iterator<T, I, J>::operator-=(const iterator<T, I, J>::difference_type &n) {
       data_ -= n;
       indices_ -= n;
       cindices_ -= n;
       return *this;
     }
 
-    template <PrimativeTypes T, PrimativeTypes I, PrimativeTypes J>
-    iterator<T, I, J> iterator<T, I, J>::operator+(const std::size_t &n) const {
-      iterator temp = *this;
-      temp += n;
+    template <typename T, typename I, typename J>
+      requires QuantumOperatorTypes<T, I, J>
+    iterator<T, I, J> iterator<T, I, J>::operator+(const iterator<T, I, J>::difference_type &n) {
+      iterator temp(this->data_ + n, this->indices_ + n, this->cindices_ + n);
       return temp;
     }
 
-    template <PrimativeTypes T, PrimativeTypes I, PrimativeTypes J>
-    iterator<T, I, J> iterator<T, I, J>::operator-(const std::size_t &n) const {
-      iterator temp = *this;
-      temp -= n;
+    template <typename T, typename I, typename J>
+      requires QuantumOperatorTypes<T, I, J>
+    iterator<T, I, J> iterator<T, I, J>::operator-(const iterator<T, I, J>::difference_type &n) {
+      iterator temp(this->data_ - n, this->indices_ - n, this->cindices_ - n);
       return temp;
     }
 
-    template <PrimativeTypes T, PrimativeTypes I, PrimativeTypes J>
-    row_ref<T, I, J> iterator<T, I, J>::operator*() {
-      return row_ref(*data_, *indices_, *cindices_);
+    template <typename T, typename I, typename J>
+      requires QuantumOperatorTypes<T, I, J>
+    iterator<T, I, J> iterator<T, I, J>::operator+(
+        const iterator<T, I, J>::difference_type &n) const {
+      iterator temp(this->data_ + n, this->indices_ + n, this->cindices_ + n);
+      return temp;
     }
 
-    template <PrimativeTypes T, PrimativeTypes I, PrimativeTypes J>
-    row_ref<const T, const I, const J> iterator<T, I, J>::operator[](const std::size_t &n) const {
-      auto temp = *this + n;
-      return iterator<const T, const I, const J>(*temp.data_, *temp.indices_, *temp.cindices_);
+    template <typename T, typename I, typename J>
+      requires QuantumOperatorTypes<T, I, J>
+    iterator<T, I, J> iterator<T, I, J>::operator-(
+        const iterator<T, I, J>::difference_type &n) const {
+      iterator temp(this->data_ - n, this->indices_ - n, this->cindices_ - n);
+      return temp;
     }
+
+    template <typename T, typename I, typename J>
+      requires QuantumOperatorTypes<T, I, J>
+    iterator<T, I, J>::difference_type iterator<T, I, J>::operator-(
+        const iterator<T, I, J> &other) const {
+      return data_ - other.data_;
+    }
+
+    template <typename T, typename I, typename J>
+      requires QuantumOperatorTypes<T, I, J>
+    iterator<T, I, J>::reference_type iterator<T, I, J>::operator*() {
+      return row_info<T, I, J>(*data_, *indices_, *cindices_);
+    }
+
+    template <typename T, typename I, typename J>
+      requires QuantumOperatorTypes<T, I, J>
+    iterator<T, I, J>::reference_type iterator<T, I, J>::operator[](
+        const iterator<T, I, J>::difference_type &n) {
+      return *(*this + n);
+    }
+
+    template <typename T, typename I, typename J>
+      requires QuantumOperatorTypes<T, I, J>
+    iterator<T, I, J>::reference_type iterator<T, I, J>::operator*() const {
+      return row_info<T, I, J>(const_cast<T &>(*data_), const_cast<I &>(*indices_),
+                               const_cast<J &>(*cindices_));
+    }
+
+    template <typename T, typename I, typename J>
+      requires QuantumOperatorTypes<T, I, J>
+    iterator<T, I, J>::reference_type iterator<T, I, J>::operator[](
+        const iterator<T, I, J>::difference_type &n) const {
+      return *(*this + n);
+    }
+
+    template struct iterator<int8_t, int32_t, uint8_t>;
+    template struct iterator<uint8_t, int32_t, uint8_t>;
+    template struct iterator<int16_t, int32_t, uint8_t>;
+    template struct iterator<uint16_t, int32_t, uint8_t>;
+    template struct iterator<int32_t, int32_t, uint8_t>;
+    template struct iterator<int64_t, int32_t, uint8_t>;
+    template struct iterator<float, int32_t, uint8_t>;
+    template struct iterator<double, int32_t, uint8_t>;
+    template struct iterator<cfloat, int32_t, uint8_t>;
+    template struct iterator<cdouble, int32_t, uint8_t>;
+
+    template struct iterator<int8_t, int64_t, uint8_t>;
+    template struct iterator<uint8_t, int64_t, uint8_t>;
+    template struct iterator<int16_t, int64_t, uint8_t>;
+    template struct iterator<uint16_t, int64_t, uint8_t>;
+    template struct iterator<int32_t, int64_t, uint8_t>;
+    template struct iterator<int64_t, int64_t, uint8_t>;
+    template struct iterator<float, int64_t, uint8_t>;
+    template struct iterator<double, int64_t, uint8_t>;
+    template struct iterator<cfloat, int64_t, uint8_t>;
+    template struct iterator<cdouble, int64_t, uint8_t>;
+
+    template struct iterator<int8_t, int32_t, uint16_t>;
+    template struct iterator<uint8_t, int32_t, uint16_t>;
+    template struct iterator<int16_t, int32_t, uint16_t>;
+    template struct iterator<uint16_t, int32_t, uint16_t>;
+    template struct iterator<int32_t, int32_t, uint16_t>;
+    template struct iterator<int64_t, int32_t, uint16_t>;
+    template struct iterator<float, int32_t, uint16_t>;
+    template struct iterator<double, int32_t, uint16_t>;
+    template struct iterator<cfloat, int32_t, uint16_t>;
+    template struct iterator<cdouble, int32_t, uint16_t>;
+
+    template struct iterator<int8_t, int64_t, uint16_t>;
+    template struct iterator<uint8_t, int64_t, uint16_t>;
+    template struct iterator<int16_t, int64_t, uint16_t>;
+    template struct iterator<uint16_t, int64_t, uint16_t>;
+    template struct iterator<int32_t, int64_t, uint16_t>;
+    template struct iterator<int64_t, int64_t, uint16_t>;
+    template struct iterator<float, int64_t, uint16_t>;
+    template struct iterator<double, int64_t, uint16_t>;
+    template struct iterator<cfloat, int64_t, uint16_t>;
+    template struct iterator<cdouble, int64_t, uint16_t>;
+
+    template struct row_info<int8_t, int32_t, uint8_t>;
+    template struct row_info<uint8_t, int32_t, uint8_t>;
+    template struct row_info<int16_t, int32_t, uint8_t>;
+    template struct row_info<uint16_t, int32_t, uint8_t>;
+    template struct row_info<int32_t, int32_t, uint8_t>;
+    template struct row_info<int64_t, int32_t, uint8_t>;
+    template struct row_info<float, int32_t, uint8_t>;
+    template struct row_info<double, int32_t, uint8_t>;
+    template struct row_info<cfloat, int32_t, uint8_t>;
+    template struct row_info<cdouble, int32_t, uint8_t>;
+
+    template struct row_info<int8_t, int64_t, uint8_t>;
+    template struct row_info<uint8_t, int64_t, uint8_t>;
+    template struct row_info<int16_t, int64_t, uint8_t>;
+    template struct row_info<uint16_t, int64_t, uint8_t>;
+    template struct row_info<int32_t, int64_t, uint8_t>;
+    template struct row_info<int64_t, int64_t, uint8_t>;
+    template struct row_info<float, int64_t, uint8_t>;
+    template struct row_info<double, int64_t, uint8_t>;
+    template struct row_info<cfloat, int64_t, uint8_t>;
+    template struct row_info<cdouble, int64_t, uint8_t>;
+
+    template struct row_info<int8_t, int32_t, uint16_t>;
+    template struct row_info<uint8_t, int32_t, uint16_t>;
+    template struct row_info<int16_t, int32_t, uint16_t>;
+    template struct row_info<uint16_t, int32_t, uint16_t>;
+    template struct row_info<int32_t, int32_t, uint16_t>;
+    template struct row_info<int64_t, int32_t, uint16_t>;
+    template struct row_info<float, int32_t, uint16_t>;
+    template struct row_info<double, int32_t, uint16_t>;
+    template struct row_info<cfloat, int32_t, uint16_t>;
+    template struct row_info<cdouble, int32_t, uint16_t>;
+
+    template struct row_info<int8_t, int64_t, uint16_t>;
+    template struct row_info<uint8_t, int64_t, uint16_t>;
+    template struct row_info<int16_t, int64_t, uint16_t>;
+    template struct row_info<uint16_t, int64_t, uint16_t>;
+    template struct row_info<int32_t, int64_t, uint16_t>;
+    template struct row_info<int64_t, int64_t, uint16_t>;
+    template struct row_info<float, int64_t, uint16_t>;
+    template struct row_info<double, int64_t, uint16_t>;
+    template struct row_info<cfloat, int64_t, uint16_t>;
+    template struct row_info<cdouble, int64_t, uint16_t>;
 
   }  // namespace details
 }  // namespace quspin

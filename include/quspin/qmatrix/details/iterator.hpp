@@ -1,55 +1,134 @@
 #pragma once
 
+#include <algorithm>
 #include <quspin/details/type_concepts.hpp>
 
 namespace quspin {
   namespace details {
-    template <PrimativeTypes T, PrimativeTypes I, PrimativeTypes J> struct row_ref {
-    private:
-      T &value_;
-      I &index_;
-      J &cindex_;
 
+    template <typename T, typename I, typename J>
+      requires QuantumOperatorTypes<T, I, J>
+    struct row_info {
     public:
-      row_ref(T &value, I &index, J &cindex) : value_(value), index_(index), cindex_(cindex) {};
-      bool operator==(const row_ref &other) const;
-      bool operator!=(const row_ref &other) const;
-      bool operator<(const row_ref &other) const;
-      bool operator>(const row_ref &other) const;
-      bool operator<=(const row_ref &other) const;
-      bool operator>=(const row_ref &other) const;
+      T &value;
+      I &index;
+      J &cindex;
+
+      row_info(T &value, I &index, J &cindex) : value(value), index(index), cindex(cindex) {};
+      row_info(row_info<T, I, J> &other)
+          : value(other.value), index(other.index), cindex(other.cindex) {};
+      row_info(row_info<T, I, J> &&other)
+          : value(other.value), index(other.index), cindex(other.cindex) {};
+
+      row_info &operator=(row_info<T, I, J> &other) {
+        value = other.value;
+        index = other.index;
+        cindex = other.cindex;
+        return *this;
+      }
+      row_info &operator=(row_info<T, I, J> &&other) {
+        value = other.value;
+        index = other.index;
+        cindex = other.cindex;
+        return *this;
+      }
+      bool operator<(const row_info &other) const;
+      bool operator>(const row_info &other) const;
+      bool operator==(const row_info &other) const;
+      bool operator!=(const row_info &other) const;
+      bool operator<=(const row_info &other) const;
+      bool operator>=(const row_info &other) const;
     };
 
-    template <PrimativeTypes T, PrimativeTypes I, PrimativeTypes J> struct iterator {
+    static_assert(std::swappable<row_info<int8_t, int32_t, uint8_t>>,
+                  "row_info is not nothrow swappable");
+
+    template <typename T, typename I, typename J>
+    void swap(row_info<T, I, J> lhs, row_info<T, I, J> rhs) {
+      std::swap(lhs.value, rhs.value);
+      std::swap(lhs.index, rhs.index);
+      std::swap(lhs.cindex, rhs.cindex);
+    }
+
+    template <typename T, typename I, typename J>
+      requires QuantumOperatorTypes<T, I, J>
+    struct iterator {
     private:
       T *data_ = nullptr;
       I *indices_ = nullptr;
       J *cindices_ = nullptr;
 
     public:
-      iterator(T &data, I &indices, J &cindices)
+      using value_type = row_info<T, I, J>;
+      using reference_type = row_info<T, I, J>;
+      using difference_type = std::ptrdiff_t;
+      using iterator_category = std::random_access_iterator_tag;
+
+      iterator() {};
+      iterator(T *data, I *indices, J *cindices)
           : data_(data), indices_(indices), cindices_(cindices) {}
 
-      bool operator==(const iterator<T, I, J> &other) const;
-      bool operator!=(const iterator<T, I, J> &other) const;
-      bool operator<(const iterator<T, I, J> &other) const;
-      bool operator>(const iterator<T, I, J> &other) const;
-      bool operator<=(const iterator<T, I, J> &other) const;
-      bool operator>=(const iterator<T, I, J> &other) const;
+      bool operator<(const iterator &other) const;
+      bool operator>(const iterator &other) const;
+      bool operator==(const iterator &other) const;
+      bool operator!=(const iterator &other) const;
+      bool operator<=(const iterator &other) const;
+      bool operator>=(const iterator &other) const;
 
       iterator &operator++();
       iterator &operator--();
       iterator operator++(int);
       iterator operator--(int);
 
-      iterator &operator+=(const std::size_t &n);
-      iterator &operator-=(const std::size_t &n);
-      iterator operator+(const std::size_t &n) const;
-      iterator operator-(const std::size_t &n) const;
+      iterator &operator+=(const difference_type &n);
+      iterator &operator-=(const difference_type &n);
+      iterator operator+(const difference_type &n);
+      iterator operator-(const difference_type &n);
+      iterator operator+(const difference_type &n) const;
+      iterator operator-(const difference_type &n) const;
+      difference_type operator-(const iterator &other) const;
 
-      row_ref<T, I, J> operator*();
-      row_ref<const T, const I, const J> operator[](const std::size_t &n) const;
+      reference_type operator*();
+      reference_type operator[](const difference_type &n);
+
+      reference_type operator*() const;
+      reference_type operator[](const difference_type &n) const;
     };
+
+    template <typename T, typename I, typename J>
+      requires QuantumOperatorTypes<T, I, J>
+    iterator<T, I, J> operator+(const typename iterator<T, I, J>::difference_type &n,
+                                iterator<T, I, J> &other) {
+      iterator<T, I, J> temp(n + other.data_, n + other.indices_, n + other.cindices_);
+      return temp;
+    }
+
+    template <typename T, typename I, typename J>
+      requires QuantumOperatorTypes<T, I, J>
+    iterator<T, I, J> operator-(const typename iterator<T, I, J>::difference_type &n,
+                                iterator<T, I, J> &other) {
+      iterator<T, I, J> temp(n - other.data_, n - other.indices_, n - other.cindices_);
+      return temp;
+    }
+
+    template <typename T, typename I, typename J>
+      requires QuantumOperatorTypes<T, I, J>
+    iterator<T, I, J> operator+(const typename iterator<T, I, J>::difference_type &n,
+                                const iterator<T, I, J> &other) {
+      iterator<T, I, J> temp(n + other.data_, n + other.indices_, n + other.cindices_);
+      return temp;
+    }
+
+    template <typename T, typename I, typename J>
+      requires QuantumOperatorTypes<T, I, J>
+    iterator<T, I, J> operator-(const typename iterator<T, I, J>::difference_type &n,
+                                const iterator<T, I, J> &other) {
+      iterator<T, I, J> temp(n - other.data_, n - other.indices_, n - other.cindices_);
+      return temp;
+    }
+
+    static_assert(std::random_access_iterator<iterator<int8_t, int32_t, uint8_t>>,
+                  "iterator is not a random access iterator");
 
   }  // namespace details
 }  // namespace quspin

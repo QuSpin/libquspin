@@ -5,14 +5,17 @@
 #include <quspin/array/details/array.hpp>
 #include <quspin/details/type_concepts.hpp>
 #include <quspin/dtype/details/dtype.hpp>
+#include <quspin/qmatrix/details/iterator.hpp>
 #include <type_traits>
 #include <variant>
 #include <vector>
+
 namespace quspin {
   namespace details {
 
-    template <PrimativeTypes T, PrimativeTypes I, PrimativeTypes J> struct qmatrix
-        : public typed_object<T> {
+    template <typename T, typename I, typename J>
+      requires QuantumOperatorTypes<T, I, J>
+    struct qmatrix : public typed_object<T> {
     private:
       std::size_t dim_;
       array<T> data_;
@@ -35,30 +38,37 @@ namespace quspin {
       array<T> data() const;
       T *data_ptr();
       const T *data_ptr() const;
-      T data_at(const std::size_t &i) const;
+      const T &data_at(const std::size_t &i) const;
+      T &data_at(const std::size_t &i);
 
       array<I> indptr() const;
       I *indptr_ptr();
       const I *indptr_ptr() const;
-      I indptr_at(const std::size_t &i) const;
+      const I &indptr_at(const std::size_t &i) const;
+      I &indptr_at(const std::size_t &i);
 
       array<I> indices() const;
       I *indices_ptr();
       const I *indices_ptr() const;
-      I indices_at(const std::size_t &i) const;
+      const I &indices_at(const std::size_t &i) const;
+      I &indices_at(const std::size_t &i);
 
       array<J> cindices() const;
       J *cindices_ptr();
       const J *cindices_ptr() const;
-      J cindices_at(const std::size_t &i) const;
+      const J &cindices_at(const std::size_t &i) const;
+      J &cindices_at(const std::size_t &i);
 
       std::size_t dim() const;
 
-      // iterator row_begin(const std::size_t &row);
-      // iterator row_end(const std::size_t &row);
+      iterator<const T, const I, const J> row_begin(const std::size_t &row) const;
+      iterator<const T, const I, const J> row_end(const std::size_t &row) const;
+      iterator<T, I, J> row_begin(const std::size_t &row);
+      iterator<T, I, J> row_end(const std::size_t &row);
     };
 
-    template <PrimativeTypes T, PrimativeTypes I, PrimativeTypes J>
+    template <typename T, typename I, typename J>
+      requires QuantumOperatorTypes<T, I, J>
     struct value_type<qmatrix<T, I, J>> {
       using type = T;
     };
