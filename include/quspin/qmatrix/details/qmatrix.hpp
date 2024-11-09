@@ -33,7 +33,8 @@ namespace quspin {
       qmatrix(const std::size_t dim, array<T> &data, array<I> &indptr, array<I> &indices,
               array<J> &cindices);
 
-      void sort();
+      void sort_indices();
+      bool has_sorted_indices() const;
 
       array<T> data() const;
       T *data_ptr();
@@ -61,8 +62,8 @@ namespace quspin {
 
       std::size_t dim() const;
 
-      iterator<const T, const I, const J> row_begin(const std::size_t &row) const;
-      iterator<const T, const I, const J> row_end(const std::size_t &row) const;
+      const iterator<T, I, J> row_begin(const std::size_t &row) const;
+      const iterator<T, I, J> row_end(const std::size_t &row) const;
       iterator<T, I, J> row_begin(const std::size_t &row);
       iterator<T, I, J> row_end(const std::size_t &row);
     };

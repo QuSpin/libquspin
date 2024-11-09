@@ -1,8 +1,11 @@
 
 #include <algorithm>
+#include <iterator>
 #include <quspin/array/details/array.hpp>
 #include <quspin/details/type_concepts.hpp>
+#include <quspin/qmatrix/details/iterator.hpp>
 #include <quspin/qmatrix/details/qmatrix.hpp>
+#include <ranges>
 #include <type_traits>
 
 namespace quspin {
@@ -12,26 +15,54 @@ namespace quspin {
       requires QuantumOperatorTypes<T, I, J>
     void check_fields(const std::size_t dim, const array<T> &data, const array<I> &indptr,
                       const array<I> &indices, const array<J> &cindices) {
-      if (dim != indptr.size() - 1) {
-        throw std::runtime_error("Invalid number of rows");
+      if (dim + 1 != indptr.size()) {
+        throw std::invalid_argument("Invalid number of rows");
       }
+
       if (indices.size() != cindices.size()) {
-        throw std::runtime_error("misaligned size of indices and coefficients");
+        throw std::invalid_argument("misaligned size of indices and coefficients");
       }
+
       if (data.size() != indices.size()) {
-        throw std::runtime_error("misaligned size of data and indices");
+        throw std::invalid_argument("misaligned size of data and indices");
       }
+
       if (!indptr.is_contiguous() || indptr.ndim() != 1) {
-        throw std::runtime_error("indptr must be contiguous 1D array");
+        throw std::invalid_argument("indptr must be contiguous 1D array");
       }
+
       if (!indices.is_contiguous() || indices.ndim() != 1) {
-        throw std::runtime_error("indices must be contiguous 1D array");
+        throw std::invalid_argument("indices must be contiguous 1D array");
       }
+
       if (!cindices.is_contiguous() || cindices.ndim() != 1) {
-        throw std::runtime_error("cindices must be contiguous 1D array");
+        throw std::invalid_argument("cindices must be contiguous 1D array");
       }
+
       if (!data.is_contiguous() || data.ndim() != 1) {
-        throw std::runtime_error("data must be contiguous 1D array");
+        throw std::invalid_argument("data must be contiguous 1D array");
+      }
+
+      if (!std::is_sorted(indptr.begin(), indptr.end())) {
+        throw std::invalid_argument("indptr must be sorted");
+      }
+
+      const auto nnz_ = indptr.at({indptr.size() - 1});
+
+      if (nnz_ < 0) {
+        throw std::invalid_argument("indptr must be positive");
+      }
+
+      const std::size_t nnz = static_cast<std::size_t>(nnz_);
+
+      if (nnz != indices.size()) {
+        throw std::invalid_argument("indptr must be sorted");
+      }
+      if (nnz != cindices.size()) {
+        throw std::invalid_argument("indptr must be sorted");
+      }
+      if (nnz != data.size()) {
+        throw std::invalid_argument("indptr must be sorted");
       }
     }
 
@@ -41,16 +72,26 @@ namespace quspin {
                               array<I> &indices, array<J> &cindices)
         : dim_(dim), data_(data), indptr_(indptr), indices_(indices), cindices_(cindices) {
       check_fields(dim, data, indptr, indices, cindices);
+      if (!has_sorted_indices()) {
+        sort_indices();
+      }
     }
 
     template <typename T, typename I, typename J>
       requires QuantumOperatorTypes<T, I, J>
-    void qmatrix<T, I, J>::sort() {
-      for (std::size_t i = 0; i < dim_; ++i) {
-        auto r_begin = row_begin(i);
-        auto r_end = row_end(i);
-        std::sort(r_begin, r_end);
-      }
+    void qmatrix<T, I, J>::sort_indices() {
+      auto range_iter = std::ranges::iota_view{std::size_t(0), dim_};
+      std::ranges::for_each(range_iter,
+                            [this](auto &&i) { std::sort(this->row_begin(i), this->row_end(i)); });
+    }
+
+    template <typename T, typename I, typename J>
+      requires QuantumOperatorTypes<T, I, J>
+    bool qmatrix<T, I, J>::has_sorted_indices() const {
+      auto range_iter = std::ranges::iota_view{std::size_t(0), dim_};
+      return std::ranges::all_of(range_iter, [this](auto &&i) {
+        return std::is_sorted(this->row_begin(i), this->row_end(i));
+      });
     }
 
     template <typename T, typename I, typename J>
@@ -180,18 +221,28 @@ namespace quspin {
 
     template <typename T, typename I, typename J>
       requires QuantumOperatorTypes<T, I, J>
-    iterator<const T, const I, const J> qmatrix<T, I, J>::row_begin(const std::size_t &row) const {
+    const iterator<T, I, J> qmatrix<T, I, J>::row_begin(const std::size_t &row) const {
       const std::size_t offset = indptr_at(row);
-      return iterator<const T, const I, const J>(data_ptr() + offset, indices_ptr() + offset,
-                                                 cindices_ptr() + offset);
+      T *data = const_cast<T *>(data_ptr() + offset);
+      I *indices = const_cast<I *>(indices_ptr() + offset);
+      J *cindices = const_cast<J *>(cindices_ptr() + offset);
+
+      const iterator<T, I, J> tmp(data, indices, cindices);
+
+      return tmp;
     }
 
     template <typename T, typename I, typename J>
       requires QuantumOperatorTypes<T, I, J>
-    iterator<const T, const I, const J> qmatrix<T, I, J>::row_end(const std::size_t &row) const {
+    const iterator<T, I, J> qmatrix<T, I, J>::row_end(const std::size_t &row) const {
       const std::size_t offset = indptr_at(row + 1);
-      return iterator<const T, const I, const J>(data_ptr() + offset, indices_ptr() + offset,
-                                                 cindices_ptr() + offset);
+      T *data = const_cast<T *>(data_ptr() + offset);
+      I *indices = const_cast<I *>(indices_ptr() + offset);
+      J *cindices = const_cast<J *>(cindices_ptr() + offset);
+
+      const iterator<T, I, J> tmp(data, indices, cindices);
+
+      return tmp;
     }
 
     template <typename T, typename I, typename J>

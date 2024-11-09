@@ -46,8 +46,14 @@ namespace quspin {
         return ErrorOr<qmatrices>(
             Error(ErrorType::ValueError, "indptr and indices must have the same dtype"));
       } else {
-        qmatrices op = qmatrix(dim, data, indptr, indices, cindices);
-        return ErrorOr<qmatrices>(op);
+        try {
+          qmatrices op = qmatrix(dim, data, indptr, indices, cindices);
+          return ErrorOr<qmatrices>(op);
+        } catch (const std::invalid_argument &e) {
+          return ErrorOr<qmatrices>(Error(ErrorType::ValueError, e.what()));
+        } catch (...) {
+          return ErrorOr<qmatrices>(Error(ErrorType::RuntimeError, "Unknown error"));
+        }
       }
     };
 
