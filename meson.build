@@ -13,7 +13,7 @@ elif host_machine.system() == 'darwin'
         'x86_64',
         '-arch',
         'arm64',
-        '-mmacosx-version-min=10.14',
+        '-mmacosx-version-min=11.1',
         language: 'cpp',
     )
     add_project_link_arguments(
@@ -22,7 +22,7 @@ elif host_machine.system() == 'darwin'
         '-arch',
         'arm64',
         '-flto',
-        '-mmacosx-version-min=10.14',
+        '-mmacosx-version-min=11.1',
         language: 'cpp',
     )
 endif
@@ -72,6 +72,7 @@ test_files = [
     ('test' / 'qmatrix' / 'constructor.cpp'),
     ('test' / 'qmatrix' / 'sum.cpp'),
     ('test' / 'details' / 'select.cpp'),
+    ('test' / 'details' / 'threading.cpp'),
 ]
 
 foreach test_file : test_files

@@ -1,6 +1,10 @@
 
 
+#include <algorithm>
+#include <atomic>
+#include <cassert>
 #include <concepts>
+#include <iostream>
 #include <thread>
 #include <vector>
 
@@ -49,10 +53,10 @@ namespace quspin {
         std::vector<std::thread> workers;
         for (std::size_t nt = 0; nt < num_threads; nt++) {
           auto res = this->get_schedule(schedule, nt, num_threads);
-          const std::size_t start = std::get<0>(res);
-          const std::size_t end = std::get<1>(res);
-          const std::size_t step = std::get<2>(res);
-          workers.emplace_back(std::thread([start, end, step, this, nt]() {
+          workers.emplace_back(std::thread([res, this, nt]() {
+            const std::size_t start = std::get<0>(res);
+            const std::size_t end = std::get<1>(res);
+            const std::size_t step = std::get<2>(res);
             for (std::size_t i = start; i < end; i += step) {
               this->work_tasks.do_work(i, nt);
             }
@@ -63,40 +67,81 @@ namespace quspin {
           f.join();
         }
       }
+    };
 
-      void run_dynamic(const std::size_t num_threads, const std::size_t chunk_size) {
-        if (num_threads <= 0) {
-          for (std::size_t i = 0; i < work_tasks.size(); i++) {
-            work_tasks.do_work(i);
+    template <std::size_t batch_size = 100, typename Iterator, typename Function>
+    void async_for_each(Iterator &&begin, Iterator &&end, Function &&f) {
+      using task_t = std::decay_t<decltype(*begin)>;
+      using batch_t = std::array<task_t, batch_size>;
+
+      std::vector<std::thread> workers;
+      std::vector<std::atomic_bool> thread_done(std::thread::hardware_concurrency());
+      std::vector<std::atomic_bool> thread_empty(std::thread::hardware_concurrency());
+      std::vector<std::atomic_bool> thread_end_loop(std::thread::hardware_concurrency());
+      std::vector<std::atomic_size_t> thread_batch_n(std::thread::hardware_concurrency());
+      std::vector<batch_t> thread_queues(std::thread::hardware_concurrency());
+
+      auto worker = [&f, &thread_queues](std::atomic_bool &done, std::atomic_bool &empty,
+                                         std::atomic_bool &end_loop, std::atomic_size_t &batch_n,
+                                         const std::size_t id) {
+        auto &queue = thread_queues.at(id);
+
+        while (!end_loop.load()) {
+          // wait for main thread to fill up queue
+          empty.wait(true);
+
+          const std::size_t n_copy = batch_n.load();
+          if (n_copy > 0) {
+            assert(n_copy <= queue.size());
+            std::for_each_n(queue.begin(), n_copy, f);
           }
-          return;
-        }
 
-        std::size_t processed = 0;
-        const std::size_t num_tasks = work_tasks.size();
-        while (processed < num_tasks) {
-          std::vector<std::thread> workers;
-          for (std::size_t nt = 0; nt < num_threads; nt++) {
-            const std::size_t start = processed;
-            const std::size_t end = std::min(num_tasks, processed + chunk_size);
-            if (start >= end) {
-              break;
+          // tell main thread that we are done
+          empty.store(true);
+        }
+        done.store(true);
+      };
+
+      for (std::size_t id = 0; id < std::thread::hardware_concurrency(); id++) {
+        thread_done.at(id).store(false);
+        thread_empty.at(id).store(true);
+        thread_end_loop.at(id).store(false);
+        thread_batch_n.at(id).store(0);
+
+        workers.emplace_back(worker, std::ref(thread_done.at(id)), std::ref(thread_empty.at(id)),
+                             std::ref(thread_end_loop.at(id)), std::ref(thread_batch_n.at(id)), id);
+      }
+
+      while (begin != end) {
+        for (std::size_t id = 0; id < std::thread::hardware_concurrency(); id++) {
+          if (thread_empty.at(id).load()) {
+            std::size_t batch_n = 0;
+
+            for (; batch_n < thread_queues.at(id).size() && begin != end; batch_n++, begin++) {
+              thread_queues.at(id).at(batch_n) = *begin;
             }
 
-            workers.emplace_back(std::thread([start, end, this]() {
-              for (std::size_t i = start; i < end; i++) {
-                this->work_tasks.do_work(i);
-              }
-            }));
-            processed = end;
-          }
-          // wait for all threads to finish
-          for (auto &f : workers) {
-            f.join();
+            thread_batch_n.at(id).store(batch_n);
+            thread_empty.at(id).store(false);
+            thread_empty.at(id).notify_one();
           }
         }
       }
-    };
 
+      for (std::size_t id = 0; id < std::thread::hardware_concurrency(); id++) {
+        thread_batch_n.at(id).store(0);
+        thread_end_loop.at(id).store(true);
+        thread_empty.at(id).store(false);
+        thread_empty.at(id).notify_one();
+      }
+
+      // wait for all threads to finish
+      for (std::size_t id = 0; id < workers.size(); id++) {
+        while (!thread_done.at(id).load()) {
+          std::this_thread::yield();
+        }
+        workers.at(id).join();
+      }
+    }
   }  // namespace details
 }  // namespace quspin
