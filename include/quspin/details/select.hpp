@@ -13,7 +13,7 @@ namespace quspin {
       using select_variant_t = std::variant<Types...>;
       using dtype_object_t = DTypeObject<select_variant_t>;
       return visit_or_error<dtype_object_t>(
-          [&name](auto &&arg) {
+          [&name](const auto &arg) {
             using arg_t = std::decay_t<decltype(arg)>;
             if constexpr ((std::is_same_v<arg_t, Types> || ...)) {
               select_variant_t select_variant(arg);
