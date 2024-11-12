@@ -27,53 +27,31 @@ namespace quspin {
       void do_work(const std::size_t row_index, const std::size_t) {
         I sum_size = 0;
 
-        I lhs_row_start = lhs.indptr_at(row_index);
-        const I lhs_row_end = lhs.indptr_at(row_index + 1);
+        iterator<T, I, J> lhs_row_begin = lhs.row_begin(row_index);
+        iterator<T, I, J> lhs_row_end = lhs.row_end(row_index);
 
-        I rhs_row_start = rhs.indptr_at(row_index);
-        const I rhs_row_end = rhs.indptr_at(row_index + 1);
+        iterator<T, I, J> rhs_row_begin = rhs.row_begin(row_index);
+        iterator<T, I, J> rhs_row_end = rhs.row_end(row_index);
 
-        while (lhs_row_start != lhs_row_end && rhs_row_start != rhs_row_end) {
-          const I lhs_col = lhs.indices_at(lhs_row_start);
-          const J lhs_cindex = lhs.cindices_at(lhs_row_start);
-
-          const I rhs_col = rhs.indices_at(rhs_row_start);
-          const J rhs_cindex = rhs.cindices_at(rhs_row_start);
-
-          if (lhs_col < rhs_col) {
-            ++lhs_row_start;
+        while (lhs_row_begin != lhs_row_end && rhs_row_begin != rhs_row_end) {
+          if (*lhs_row_begin < *rhs_row_begin) {
+            ++lhs_row_begin;
             ++sum_size;
-          } else if (lhs_col > rhs_col) {
-            ++rhs_row_start;
-            ++sum_size;
-          } else if (lhs_cindex > rhs_cindex) {
-            ++lhs_row_start;
-            ++sum_size;
-          } else if (lhs_cindex < rhs_cindex) {
-            ++rhs_row_start;
+          } else if (*lhs_row_begin > *rhs_row_begin) {
+            ++rhs_row_begin;
             ++sum_size;
           } else {
-            const T result = op(lhs.data_at(lhs_row_start), rhs.data_at(rhs_row_start));
+            const T result = op(lhs_row_begin.value(), rhs_row_begin.value());
 
             if (result != T()) {
               ++sum_size;
             }
-            ++lhs_row_start;
-            ++rhs_row_start;
+            ++lhs_row_begin;
+            ++rhs_row_begin;
           }
         }
-
-        while (lhs_row_start != lhs_row_end) {
-          ++lhs_row_start;
-          ++sum_size;
-        }
-
-        while (rhs_row_start != rhs_row_end) {
-          ++rhs_row_start;
-          ++sum_size;
-        }
-
-        indptr[row_index + 1] = sum_size;
+        indptr[row_index + 1]
+            = sum_size + (lhs_row_end - lhs_row_begin) + (rhs_row_end - rhs_row_begin);
       }
     };
 
@@ -110,64 +88,43 @@ namespace quspin {
       std::size_t size() const { return lhs.dim(); }
 
       void do_work(const std::size_t row_index, const std::size_t) {
-        I lhs_row_start = lhs.indptr_at(row_index);
-        const I lhs_row_end = lhs.indptr_at(row_index + 1);
+        auto lhs_row_begin = lhs.row_begin(row_index);
+        auto lhs_row_end = lhs.row_end(row_index);
+        auto rhs_row_begin = rhs.row_begin(row_index);
+        auto rhs_row_end = rhs.row_end(row_index);
 
-        I rhs_row_start = rhs.indptr_at(row_index);
-        const I rhs_row_end = rhs.indptr_at(row_index + 1);
+        auto out_indices = out.indices_ptr();
+        auto out_cindices = out.cindices_ptr();
+        auto out_data = out.data_ptr();
 
-        I out_row_start = out.indptr_at(row_index);
+        std::size_t out_row_offset = out.indptr_at(row_index);
 
-        I *out_indices = out.indices_ptr();
-        J *out_cindices = out.cindices_ptr();
-        T *out_data = out.data_ptr();
+        while (lhs_row_begin != lhs_row_end && rhs_row_begin != rhs_row_end) {
+          if (*lhs_row_begin < *rhs_row_begin) {
+            out_indices[out_row_offset] = lhs_row_begin.index();
+            out_cindices[out_row_offset] = lhs_row_begin.cindex();
+            out_data[out_row_offset] = lhs_row_begin.value();
+            ++lhs_row_begin;
+            ++out_row_offset;
 
-        while (lhs_row_start != lhs_row_end && rhs_row_start != rhs_row_end) {
-          const I lhs_col = lhs.indices_at(lhs_row_start);
-          const J lhs_cindex = lhs.cindices_at(lhs_row_start);
-
-          const I rhs_col = rhs.indices_at(rhs_row_start);
-          const J rhs_cindex = rhs.cindices_at(rhs_row_start);
-
-          if (lhs_col < rhs_col) {
-            out_indices[out_row_start] = lhs_col;
-            out_cindices[out_row_start] = lhs_cindex;
-            out_data[out_row_start] = lhs.data_at(lhs_row_start);
-            ++lhs_row_start;
-            ++out_row_start;
-
-          } else if (lhs_col > rhs_col) {
-            out_indices[out_row_start] = rhs_col;
-            out_cindices[out_row_start] = rhs_cindex;
-            out_data[out_row_start] = rhs.data_at(rhs_row_start);
-            ++rhs_row_start;
-            ++out_row_start;
-
-          } else if (lhs_cindex > rhs_cindex) {
-            out_indices[out_row_start] = lhs_col;
-            out_cindices[out_row_start] = lhs_cindex;
-            out_data[out_row_start] = lhs.data_at(lhs_row_start);
-            ++lhs_row_start;
-            ++out_row_start;
-
-          } else if (lhs_cindex < rhs_cindex) {
-            out_indices[out_row_start] = rhs_col;
-            out_cindices[out_row_start] = rhs_cindex;
-            out_data[out_row_start] = rhs.data_at(rhs_row_start);
-            ++rhs_row_start;
-            ++out_row_start;
+          } else if (*lhs_row_begin > *rhs_row_begin) {
+            out_indices[out_row_offset] = rhs_row_begin.index();
+            out_cindices[out_row_offset] = rhs_row_begin.cindex();
+            out_data[out_row_offset] = rhs_row_begin.value();
+            ++rhs_row_begin;
+            ++out_row_offset;
 
           } else {
-            const T result = op(lhs.data_at(lhs_row_start), rhs.data_at(rhs_row_start));
+            const T result = op(lhs_row_begin.value(), rhs_row_begin.value());
 
             if (result != T()) {
-              out_indices[out_row_start] = lhs_col;
-              out_cindices[out_row_start] = lhs_cindex;
-              out_data[out_row_start] = result;
-              ++out_row_start;
+              out_indices[out_row_offset] = lhs_row_begin.index();
+              out_cindices[out_row_offset] = lhs_row_begin.cindex();
+              out_data[out_row_offset] = result;
+              ++out_row_offset;
             }
-            ++lhs_row_start;
-            ++rhs_row_start;
+            ++lhs_row_begin;
+            ++rhs_row_begin;
           }
         }
       }

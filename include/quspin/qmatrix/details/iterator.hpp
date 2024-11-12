@@ -53,10 +53,15 @@ namespace quspin {
       using reference_type = row_info<T, I, J>;
       using difference_type = std::ptrdiff_t;
       using iterator_category = std::random_access_iterator_tag;
+      using pointer_type = row_info<T, I, J> *;
 
       iterator() {};
       iterator(T *data, I *indices, J *cindices)
           : data_(data), indices_(indices), cindices_(cindices) {}
+
+      T value() const;
+      I index() const;
+      J cindex() const;
 
       bool operator<(const iterator &other) const;
       bool operator>(const iterator &other) const;

@@ -63,6 +63,24 @@ namespace quspin {
 
     template <typename T, typename I, typename J>
       requires QuantumOperatorTypes<T, I, J>
+    T iterator<T, I, J>::value() const {
+      return *data_;
+    }
+
+    template <typename T, typename I, typename J>
+      requires QuantumOperatorTypes<T, I, J>
+    I iterator<T, I, J>::index() const {
+      return *indices_;
+    }
+
+    template <typename T, typename I, typename J>
+      requires QuantumOperatorTypes<T, I, J>
+    J iterator<T, I, J>::cindex() const {
+      return *cindices_;
+    }
+
+    template <typename T, typename I, typename J>
+      requires QuantumOperatorTypes<T, I, J>
     bool iterator<T, I, J>::operator==(const iterator<T, I, J> &other) const {
       return data_ == other.data_ && indices_ == other.indices_ && cindices_ == other.cindices_;
     }
