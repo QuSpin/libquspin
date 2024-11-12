@@ -32,6 +32,8 @@ namespace quspin {
       qmatrix() = default;
       qmatrix(const std::size_t dim, array<T> &data, array<I> &indptr, array<I> &indices,
               array<J> &cindices);
+      qmatrix(const std::size_t dim, array<T> &data, array<I> &indptr, array<I> &indices,
+              const J &cindex);
 
       void sort_indices();
       bool has_sorted_indices() const;

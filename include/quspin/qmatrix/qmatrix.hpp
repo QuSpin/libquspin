@@ -19,6 +19,9 @@ namespace quspin {
     template <PrimativeTypes T, PrimativeTypes I, PrimativeTypes J>
     QuantumOperator(const details::qmatrix<T, I, J> &op);
     QuantumOperator(Array data, Array indptr, Array indices, Array cindices);
+    template <typename J>
+      requires std::same_as<J, uint8_t> || std::same_as<J, uint16_t>
+    QuantumOperator(Array data, Array indptr, Array indices, const J cindex);
 
     std::size_t dim() const;
 

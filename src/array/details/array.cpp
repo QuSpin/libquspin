@@ -118,13 +118,13 @@ namespace quspin {
     template <PrimativeTypes T> const T *array<T>::data() const { return data_.get(); }
     template <PrimativeTypes T> T *array<T>::mut_data() { return data_.get(); }
 
-    template <PrimativeTypes T> const_array_iterator<T> array<T>::begin() const {
-      const_array_iterator<T> iter(data(), shape_, stride_, 0);
+    template <PrimativeTypes T> array_iterator<T> array<T>::begin() const {
+      array_iterator<T> iter(const_cast<T *>(data()), shape_, stride_, 0);
       return iter;
     }
 
-    template <PrimativeTypes T> const_array_iterator<T> array<T>::end() const {
-      const_array_iterator<T> iter(data(), shape_, stride_, size());
+    template <PrimativeTypes T> array_iterator<T> array<T>::end() const {
+      array_iterator<T> iter(const_cast<T *>(data()), shape_, stride_, size());
       return iter;
     }
 

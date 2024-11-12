@@ -79,6 +79,20 @@ namespace quspin {
 
     template <typename T, typename I, typename J>
       requires QuantumOperatorTypes<T, I, J>
+    qmatrix<T, I, J>::qmatrix(const std::size_t dim, array<T> &data, array<I> &indptr,
+                              array<I> &indices, const J &cindex)
+        : dim_(dim), data_(data), indptr_(indptr), indices_(indices) {
+      cindices_ = array<J>(indices.shape());
+      std::fill(cindices_.begin(), cindices_.end(), cindex);
+
+      check_fields(dim, data, indptr, indices, cindices_);
+      if (!has_sorted_indices()) {
+        sort_indices();
+      }
+    }
+
+    template <typename T, typename I, typename J>
+      requires QuantumOperatorTypes<T, I, J>
     void qmatrix<T, I, J>::sort_indices() {
       auto range_iter = std::ranges::iota_view{std::size_t(0), dim_};
       std::ranges::for_each(range_iter,

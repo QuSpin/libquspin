@@ -38,8 +38,8 @@ namespace quspin {
       const T *data() const;
       T *mut_data();
 
-      const_array_iterator<T> begin() const;
-      const_array_iterator<T> end() const;
+      array_iterator<T> begin() const;
+      array_iterator<T> end() const;
       array_iterator<T> begin();
       array_iterator<T> end();
 

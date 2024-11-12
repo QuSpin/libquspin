@@ -23,6 +23,7 @@ int main() {
   Array data({6}, {sizeof(int8_t)}, Int8, reinterpret_cast<void *>(data_ptr));
 
   QuantumOperator op(data, indptr, indices, cindices);
+  QuantumOperator op2(data, indptr, indices, static_cast<uint8_t>(0));
 
   try {
     QuantumOperator op(data, indptr, indices, cindices2);
