@@ -25,6 +25,8 @@ elif host_machine.system() == 'darwin'
         '-mmacosx-version-min=11.1',
         language: 'cpp',
     )
+elif host_machine.system() == 'linux'
+    add_project_link_arguments('-lpthread', language: 'cpp')
 endif
 
 add_global_arguments(

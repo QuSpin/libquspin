@@ -1,6 +1,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <numeric>
 #include <quspin/array/details/array.hpp>
 #include <quspin/details/type_concepts.hpp>
 #include <vector>
@@ -86,7 +87,7 @@ namespace quspin {
           shape_({}),
           size_(0),
           ndim_(0),
-          is_contiguous_(true){};
+          is_contiguous_(true) {}
 
     template <PrimativeTypes T> array<T>::array(const std::vector<std::size_t> &shape)
         : data_(reference_counted_ptr<T>(get_size(shape))),

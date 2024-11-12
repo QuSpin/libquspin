@@ -4,13 +4,18 @@
 #include <ranges>
 
 int main() {
-  std::vector<int> vec = std::ranges::iota_view(1, 10000) | std::ranges::to<std::vector<int>>();
+  std::vector<int> vec(10000);
   std::vector<int> out(vec.size());
 
-  out.reserve(vec.size());
+  std::fill(vec.begin(), vec.end(), 10);
 
-  quspin::details::async_for_each<100>(vec.begin(), vec.end(),
-                                       [&out](int &i) { out.at(i - 1) = i + 1; });
+  auto range_iter = std::ranges::iota_view(std::size_t(), vec.size());
+
+  quspin::details::async_for_each<100>(std::begin(range_iter), std::end(range_iter),
+                                       [&out, &vec](auto &&i) { 
+                                        const auto ele = vec.at(i);
+                                        out.at(i) = ele * ele; 
+                                      });
 
   return 0;
 }

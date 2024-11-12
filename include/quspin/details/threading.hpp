@@ -69,26 +69,41 @@ namespace quspin {
       }
     };
 
+    class atomic_flag {
+      std::atomic_flag flag = ATOMIC_FLAG_INIT;
+
+    public:
+      void clear() { std::atomic_flag_clear(&flag); }
+      void test_and_set() { std::atomic_flag_test_and_set(&flag); }
+      bool test() { return std::atomic_flag_test_and_set(&flag); }
+      void notify_one() { std::atomic_flag_clear(&flag); }
+      void wait() {
+        while (std::atomic_flag_test_and_set(&flag)) {
+          std::this_thread::yield();
+        }
+      }
+    };
+
     template <std::size_t batch_size = 100, typename Iterator, typename Function>
     void async_for_each(Iterator &&begin, Iterator &&end, Function &&f) {
       using task_t = std::decay_t<decltype(*begin)>;
       using batch_t = std::array<task_t, batch_size>;
 
       std::vector<std::thread> workers;
-      std::vector<std::atomic_bool> thread_done(std::thread::hardware_concurrency());
-      std::vector<std::atomic_bool> thread_empty(std::thread::hardware_concurrency());
-      std::vector<std::atomic_bool> thread_end_loop(std::thread::hardware_concurrency());
+      std::vector<atomic_flag> thread_done(std::thread::hardware_concurrency());
+      std::vector<atomic_flag> thread_empty(std::thread::hardware_concurrency());
+      std::vector<atomic_flag> thread_end_loop(std::thread::hardware_concurrency());
       std::vector<std::atomic_size_t> thread_batch_n(std::thread::hardware_concurrency());
       std::vector<batch_t> thread_queues(std::thread::hardware_concurrency());
 
-      auto worker = [&f, &thread_queues](std::atomic_bool &done, std::atomic_bool &empty,
-                                         std::atomic_bool &end_loop, std::atomic_size_t &batch_n,
+      auto worker = [&f, &thread_queues](atomic_flag &done, atomic_flag &empty,
+                                         atomic_flag &end_loop, std::atomic_size_t &batch_n,
                                          const std::size_t id) {
         auto &queue = thread_queues.at(id);
 
-        while (!end_loop.load()) {
+        while (!end_loop.test()) {
           // wait for main thread to fill up queue
-          empty.wait(true);
+          empty.wait();
 
           const std::size_t n_copy = batch_n.load();
           if (n_copy > 0) {
@@ -97,15 +112,15 @@ namespace quspin {
           }
 
           // tell main thread that we are done
-          empty.store(true);
+          empty.test_and_set();
         }
-        done.store(true);
+        done.test_and_set();
       };
 
       for (std::size_t id = 0; id < std::thread::hardware_concurrency(); id++) {
-        thread_done.at(id).store(false);
-        thread_empty.at(id).store(true);
-        thread_end_loop.at(id).store(false);
+        thread_done.at(id).clear();
+        thread_empty.at(id).test_and_set();
+        thread_end_loop.at(id).clear();
         thread_batch_n.at(id).store(0);
 
         workers.emplace_back(worker, std::ref(thread_done.at(id)), std::ref(thread_empty.at(id)),
@@ -114,7 +129,7 @@ namespace quspin {
 
       while (begin != end) {
         for (std::size_t id = 0; id < std::thread::hardware_concurrency(); id++) {
-          if (thread_empty.at(id).load()) {
+          if (thread_empty.at(id).test()) {
             std::size_t batch_n = 0;
 
             for (; batch_n < thread_queues.at(id).size() && begin != end; batch_n++, begin++) {
@@ -122,7 +137,7 @@ namespace quspin {
             }
 
             thread_batch_n.at(id).store(batch_n);
-            thread_empty.at(id).store(false);
+            thread_empty.at(id).clear();
             thread_empty.at(id).notify_one();
           }
         }
@@ -130,14 +145,14 @@ namespace quspin {
 
       for (std::size_t id = 0; id < std::thread::hardware_concurrency(); id++) {
         thread_batch_n.at(id).store(0);
-        thread_end_loop.at(id).store(true);
-        thread_empty.at(id).store(false);
+        thread_end_loop.at(id).test_and_set();
+        thread_empty.at(id).clear();
         thread_empty.at(id).notify_one();
       }
 
       // wait for all threads to finish
       for (std::size_t id = 0; id < workers.size(); id++) {
-        while (!thread_done.at(id).load()) {
+        while (!thread_done.at(id).test()) {
           std::this_thread::yield();
         }
         workers.at(id).join();
