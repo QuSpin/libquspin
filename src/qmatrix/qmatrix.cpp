@@ -31,7 +31,7 @@ namespace quspin {
     return select<array<uint8_t>, array<uint16_t>>(cindices, "cindices");
   }
 
-  QuantumOperator::QuantumOperator(Array data, Array indptr, Array indices, Array cindices) {
+  QMatrix::QMatrix(Array data, Array indptr, Array indices, Array cindices) {
     using namespace details;
 
     const std::size_t dim = indptr.size() - 1;
@@ -64,7 +64,7 @@ namespace quspin {
 
   template <typename J>
     requires std::same_as<J, uint8_t> || std::same_as<J, uint16_t>
-  QuantumOperator::QuantumOperator(Array data, Array indptr, Array indices, const J cindex) {
+  QMatrix::QMatrix(Array data, Array indptr, Array indices, const J cindex) {
     using namespace details;
 
     const std::size_t dim = indptr.size() - 1;
@@ -94,32 +94,30 @@ namespace quspin {
         indices_select.get_variant_obj());
   }
 
-  template QuantumOperator::QuantumOperator(Array data, Array indptr, Array indices,
-                                            const uint8_t cindex);
-  template QuantumOperator::QuantumOperator(Array data, Array indptr, Array indices,
-                                            const uint16_t cindex);
+  template QMatrix::QMatrix(Array data, Array indptr, Array indices, const uint8_t cindex);
+  template QMatrix::QMatrix(Array data, Array indptr, Array indices, const uint16_t cindex);
 
-  std::size_t QuantumOperator::dim() const {
+  std::size_t QMatrix::dim() const {
     return std::visit([](auto &&arg) { return arg.dim(); },
                       DTypeObject<details::qmatrices>::internals_);
   }
 
-  Array QuantumOperator::indptr() const {
+  Array QMatrix::indptr() const {
     return std::visit([](auto &&arg) { return Array(arg.indptr()); },
                       DTypeObject<details::qmatrices>::internals_);
   }
 
-  Array QuantumOperator::indices() const {
+  Array QMatrix::indices() const {
     return std::visit([](auto &&arg) { return Array(arg.indices()); },
                       DTypeObject<details::qmatrices>::internals_);
   }
 
-  Array QuantumOperator::data() const {
+  Array QMatrix::data() const {
     return std::visit([](auto &&arg) { return Array(arg.data()); },
                       DTypeObject<details::qmatrices>::internals_);
   }
 
-  Array QuantumOperator::cindices() const {
+  Array QMatrix::cindices() const {
     return std::visit([](auto &&arg) { return Array(arg.cindices()); },
                       DTypeObject<details::qmatrices>::internals_);
   }

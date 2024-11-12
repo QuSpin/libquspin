@@ -14,7 +14,7 @@ void test_1() {
   Array cindices = Array({0, 1, 1, 1, 0, 0}).astype(UInt8);
   Array data({1.0, 2.0, 3.0, -3.0, -2.0, -1.0});
 
-  QuantumOperator op(data, indptr, indices, cindices);
+  QMatrix op(data, indptr, indices, cindices);
   auto res = sum(op, op);
 
   assert(res.data().shape() == data.shape());

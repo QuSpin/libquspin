@@ -22,8 +22,7 @@ namespace quspin {
   concept PrimativeTypes = RealTypes<T> || ComplexTypes<T>;
 
   template <typename T, typename I, typename J>
-  concept QuantumOperatorTypes
-      = PrimativeTypes<T> && (std::same_as<I, int32_t> || std::same_as<I, int64_t>)
-        && (std::same_as<J, uint8_t> || std::same_as<J, uint16_t>);
+  concept QMatrixTypes = PrimativeTypes<T> && (std::same_as<I, int32_t> || std::same_as<I, int64_t>)
+                         && (std::same_as<J, uint8_t> || std::same_as<J, uint16_t>);
 
 }  // namespace quspin

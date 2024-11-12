@@ -52,8 +52,7 @@ namespace quspin {
     }
   };
 
-  QuantumOperator sum(const QuantumOperator lhs, const QuantumOperator rhs,
-                      const std::size_t num_threads /* = 0 */) {
+  QMatrix sum(const QMatrix lhs, const QMatrix rhs, const std::size_t num_threads /* = 0 */) {
     using namespace details;
 
     auto static_check_inputs = [](const auto &lhs, const auto &rhs) {
@@ -155,7 +154,7 @@ namespace quspin {
     Array cindices({nnz}, lhs.cindices().dtype());
     Array data({nnz}, lhs.dtype());
 
-    QuantumOperator result(data, indptr, indices, cindices);
+    QMatrix result(data, indptr, indices, cindices);
 
     details::dispatch(calc_qmatrix, static_checks_operator, dynamic_checks_operator, lhs, rhs,
                       result);

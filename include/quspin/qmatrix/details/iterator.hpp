@@ -7,7 +7,7 @@ namespace quspin {
   namespace details {
 
     template <typename T, typename I, typename J>
-      requires QuantumOperatorTypes<T, I, J>
+      requires QMatrixTypes<T, I, J>
     struct row_info {
     public:
       T &value;
@@ -41,7 +41,7 @@ namespace quspin {
     }
 
     template <typename T, typename I, typename J>
-      requires QuantumOperatorTypes<T, I, J>
+      requires QMatrixTypes<T, I, J>
     struct iterator {
     private:
       T *data_ = nullptr;
@@ -91,7 +91,7 @@ namespace quspin {
     };
 
     template <typename T, typename I, typename J>
-      requires QuantumOperatorTypes<T, I, J>
+      requires QMatrixTypes<T, I, J>
     iterator<T, I, J> operator+(const typename iterator<T, I, J>::difference_type &n,
                                 iterator<T, I, J> &other) {
       iterator<T, I, J> temp(n + other.data_, n + other.indices_, n + other.cindices_);
@@ -99,7 +99,7 @@ namespace quspin {
     }
 
     template <typename T, typename I, typename J>
-      requires QuantumOperatorTypes<T, I, J>
+      requires QMatrixTypes<T, I, J>
     iterator<T, I, J> operator-(const typename iterator<T, I, J>::difference_type &n,
                                 iterator<T, I, J> &other) {
       iterator<T, I, J> temp(n - other.data_, n - other.indices_, n - other.cindices_);
@@ -107,7 +107,7 @@ namespace quspin {
     }
 
     template <typename T, typename I, typename J>
-      requires QuantumOperatorTypes<T, I, J>
+      requires QMatrixTypes<T, I, J>
     iterator<T, I, J> operator+(const typename iterator<T, I, J>::difference_type &n,
                                 const iterator<T, I, J> &other) {
       iterator<T, I, J> temp(n + other.data_, n + other.indices_, n + other.cindices_);
@@ -115,7 +115,7 @@ namespace quspin {
     }
 
     template <typename T, typename I, typename J>
-      requires QuantumOperatorTypes<T, I, J>
+      requires QMatrixTypes<T, I, J>
     iterator<T, I, J> operator-(const typename iterator<T, I, J>::difference_type &n,
                                 const iterator<T, I, J> &other) {
       iterator<T, I, J> temp(n - other.data_, n - other.indices_, n - other.cindices_);

@@ -14,7 +14,7 @@ namespace quspin {
   namespace details {
 
     template <typename T, typename I, typename J>
-      requires QuantumOperatorTypes<T, I, J>
+      requires QMatrixTypes<T, I, J>
     struct qmatrix : public typed_object<T> {
     private:
       std::size_t dim_;
@@ -71,7 +71,7 @@ namespace quspin {
     };
 
     template <typename T, typename I, typename J>
-      requires QuantumOperatorTypes<T, I, J>
+      requires QMatrixTypes<T, I, J>
     struct value_type<qmatrix<T, I, J>> {
       using type = T;
     };
