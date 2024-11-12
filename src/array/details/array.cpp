@@ -55,8 +55,8 @@ namespace quspin {
       if (ndim == 1) {
         return true;
       }
-      for (std::size_t i = ndim - 2; i >= 0; i--) {
-        if (stride[i] != last_stride * shape[i + 1]) {
+      for (std::size_t i = ndim - 1; i > 0; i--) {
+        if (stride[i - 1] != last_stride * shape[i]) {
           return false;
         }
         last_stride = stride[i];

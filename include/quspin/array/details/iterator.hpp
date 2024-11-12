@@ -23,12 +23,12 @@ namespace quspin {
 
       array_iterator() = default;
       array_iterator(const array_iterator<T> &other) = default;
-      array_iterator(const array_iterator<T> &&other) = default;
+      array_iterator(array_iterator<T> &&other) = default;
       array_iterator(T *data, const std::vector<std::size_t> &shape,
                      const std::vector<std::size_t> &strides, std::size_t start);
 
       array_iterator &operator=(const array_iterator<T> &other) = default;
-      array_iterator &operator=(const array_iterator<T> &&other) = default;
+      array_iterator &operator=(array_iterator<T> &&other) = default;
 
       bool operator==(const array_iterator<T> &other) const;
       array_iterator<T> &operator++();
