@@ -10,13 +10,15 @@ namespace quspin {
 
     template <typename... Types, typename Variants>
     DTypeObject<std::variant<Types...>> select(DTypeObject<Variants> obj, std::string name = "") {
-      using select_variant_t = DTypeObject<std::variant<Types...>>;
-      return visit_or_error<select_variant_t>(
+      using select_variant_t = std::variant<Types...>;
+      using dtype_object_t = DTypeObject<select_variant_t>;
+      return visit_or_error<dtype_object_t>(
           [&name](auto &&arg) {
             using arg_t = std::decay_t<decltype(arg)>;
             if constexpr ((std::is_same_v<arg_t, Types> || ...)) {
               select_variant_t select_variant(arg);
-              return ErrorOr<select_variant_t>(select_variant);
+              dtype_object_t select_obj(select_variant);
+              return ErrorOr<dtype_object_t>(select_obj);
             } else {
               std::stringstream error_msg;
 
@@ -32,7 +34,7 @@ namespace quspin {
                 error_msg << dtype.name() << ", ";
               }
               Error error = Error(ErrorType::ValueError, error_msg.str());
-              return ErrorOr<select_variant_t>(error);
+              return ErrorOr<dtype_object_t>(error);
             }
           },
           obj.get_variant_obj());
