@@ -33,7 +33,6 @@ namespace quspin {
       bool operator==(const array_iterator<T> &other) const;
       array_iterator<T> &operator++();
       array_iterator<T> operator++(int);
-      reference_type operator*();
       reference_type operator*() const;
     };
 

@@ -40,6 +40,8 @@ namespace quspin {
             return {start, end, 1};
           }
         }
+
+        throw std::runtime_error("Invalid schedule");
       }
 
       void run(const Schedule schedule, const std::size_t num_threads) {

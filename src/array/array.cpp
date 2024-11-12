@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <initializer_list>
 #include <iostream>
 #include <numeric>
@@ -123,11 +124,13 @@ namespace quspin {
     Array out(shape(), dtype);
 
     std::visit(
-        [](auto &&from, auto &&to) {
+        [](auto &&from, auto &&to) -> void {
           using to_t = std::decay_t<decltype(to)>::value_type;
 
           auto func = [](auto &&value) { return details::cast<to_t>(value); };
           std::transform(from.begin(), from.end(), to.begin(), func);
+          
+          return;
         },
         get_variant_obj(), out.get_variant_obj());
 

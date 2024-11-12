@@ -63,7 +63,7 @@ namespace quspin {
       return temp;
     }
 
-    template <PrimativeTypes T> T &array_iterator<T>::operator*() { return data_[index_]; }
+    template <PrimativeTypes T> T &array_iterator<T>::operator*() const { return const_cast<T&>(data_[index_]); }
 
     template struct array_iterator<int8_t>;
     template struct array_iterator<uint8_t>;
