@@ -52,6 +52,8 @@ namespace quspin {
 
   public:
     DTypeObject() = default;
+    DTypeObject(const DTypeObject &obj) = default;
+    DTypeObject(DTypeObject &&obj) = default;
     DTypeObject(const Variant &internals) : details::VariantContainer<Variant>(internals) {}
     DType dtype() const {
       return std::visit([](const auto &obj) { return DType::of<decltype(obj)>(); }, internals_);
