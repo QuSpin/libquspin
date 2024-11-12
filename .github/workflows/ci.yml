@@ -51,6 +51,12 @@ jobs:
       uses: bus1/cabuild/action/msdevshell@v1
       with:
         architecture: x64
+    - name: Install boost
+      uses: MarkusJx/install-boost@v2.4.5
+      id: install-boost
+      with:
+        boost_version: 1.86.0
+        boost_install_dir: ${{github.workspace}}/boost
     - name: Prepare Build
       run: meson setup build
     - name: Run Build
