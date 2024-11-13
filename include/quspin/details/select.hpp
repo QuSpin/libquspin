@@ -8,19 +8,25 @@
 namespace quspin {
   namespace details {
 
+    template <typename Type, typename... Types> struct is_one_of
+        : std::disjunction<std::is_same<Types, Type>...> {};
+
+    template <typename Type, typename... Types> inline constexpr bool is_one_of_v
+        = is_one_of<Type, Types...>::value;
+
     template <typename... Types, typename Variants>
     DTypeObject<std::variant<Types...>> select(DTypeObject<Variants> &obj, std::string name = "") {
+      static_assert(sizeof...(Types) > 0, "No types specified for select");
       using select_variant_t = std::variant<Types...>;
       using dtype_object_t = DTypeObject<select_variant_t>;
+
       return visit_or_error<dtype_object_t>(
           [&name](auto &&arg) -> ErrorOr<dtype_object_t> {
             using arg_t = std::remove_reference_t<decltype(arg)>;
-            static_assert(!std::is_const_v<arg_t>,
-                          "Cannot select from const object, use a non-const object");
 
-            if constexpr ((std::is_same_v<arg_t, Types> || ...)) {
-              select_variant_t select_variant(arg);
-              dtype_object_t select_obj(select_variant);
+            if constexpr (is_one_of_v<arg_t, Types...>) {
+              select_variant_t select_arg = arg;
+              dtype_object_t select_obj(select_arg);
               return ErrorOr<dtype_object_t>(select_obj);
             } else {
               std::stringstream error_msg;
