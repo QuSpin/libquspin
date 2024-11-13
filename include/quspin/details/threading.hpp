@@ -73,14 +73,15 @@ namespace quspin {
 
     class atomic_flag {
       std::atomic_flag flag = ATOMIC_FLAG_INIT;
+      std::memory_order order = std::memory_order::relaxed;
 
     public:
-      void clear() { std::atomic_flag_clear(&flag); }
-      void test_and_set() { std::atomic_flag_test_and_set(&flag); }
-      bool test() { return std::atomic_flag_test_and_set(&flag); }
-      void notify_one() { std::atomic_flag_clear(&flag); }
+      void clear() { std::atomic_flag_clear_explicit(&flag, order); }
+      bool test_and_set() { return std::atomic_flag_test_and_set_explicit(&flag, order); }
+      bool test() { return std::atomic_flag_test_and_set_explicit(&flag, order); }
+      void notify_one() { std::atomic_flag_clear_explicit(&flag, order); }
       void wait() {
-        while (std::atomic_flag_test_and_set(&flag)) {
+        while (std::atomic_flag_test_and_set_explicit(&flag, order)) {
           std::this_thread::yield();
         }
       }
@@ -98,26 +99,26 @@ namespace quspin {
       std::vector<std::atomic_size_t> thread_batch_n(std::thread::hardware_concurrency());
       std::vector<batch_t> thread_queues(std::thread::hardware_concurrency());
 
-      auto worker = [&f, &thread_queues](atomic_flag &done, atomic_flag &empty,
-                                         atomic_flag &end_loop, std::atomic_size_t &batch_n,
-                                         const std::size_t id) {
-        auto &queue = thread_queues.at(id);
+      auto worker
+          = [&f, &thread_queues](atomic_flag &done, atomic_flag &empty, atomic_flag &end_loop,
+                                 std::atomic_size_t &batch_n, const std::size_t id) {
+              auto &queue = thread_queues.at(id);
 
-        while (!end_loop.test()) {
-          // wait for main thread to fill up queue
-          empty.wait();
+              while (!end_loop.test_and_set()) {
+                // wait for main thread to fill up queue
+                empty.wait();
 
-          const std::size_t n_copy = batch_n.load();
-          if (n_copy > 0) {
-            assert(n_copy <= queue.size());
-            std::for_each_n(queue.begin(), n_copy, f);
-          }
+                const std::size_t n_copy = batch_n.load();
+                if (n_copy > 0) {
+                  assert(n_copy <= queue.size());
+                  std::for_each_n(queue.begin(), n_copy, f);
+                }
 
-          // tell main thread that we are done
-          empty.test_and_set();
-        }
-        done.test_and_set();
-      };
+                // tell main thread that we are done
+                empty.test_and_set();
+              }
+              done.test_and_set();
+            };
 
       for (std::size_t id = 0; id < std::thread::hardware_concurrency(); id++) {
         thread_done.at(id).clear();
