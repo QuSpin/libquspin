@@ -51,7 +51,7 @@ namespace quspin {
           }
         }
         indptr[row_index + 1]
-            = sum_size + (lhs_row_end - lhs_row_begin) + (rhs_row_end - rhs_row_begin);
+            = cast<I>(sum_size + (lhs_row_end - lhs_row_begin) + (rhs_row_end - rhs_row_begin));
       }
     };
 

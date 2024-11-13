@@ -10,23 +10,23 @@
 
 namespace quspin {
 
-  decltype(auto) select_data_variants(const Array &data) {
+  decltype(auto) select_data_variants(Array &data) {
     using namespace details;
     return select<array<int8_t>, array<int16_t>, array<float>, array<double>, array<cfloat>,
                   array<cdouble>>(data, "data");
   }
 
-  decltype(auto) select_indptr_variants(const Array &indptr) {
+  decltype(auto) select_indptr_variants(Array &indptr) {
     using namespace details;
     return select<array<int32_t>, array<int64_t>>(indptr, "indptr");
   }
 
-  decltype(auto) select_indices_variants(const Array &indptr) {
+  decltype(auto) select_indices_variants(Array &indptr) {
     using namespace details;
     return select<array<int32_t>, array<int64_t>>(indptr, "indices");
   }
 
-  decltype(auto) select_cindex_variants(const Array &cindices) {
+  decltype(auto) select_cindex_variants(Array &cindices) {
     using namespace details;
     return select<array<uint8_t>, array<uint16_t>>(cindices, "cindices");
   }
