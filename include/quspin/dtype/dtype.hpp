@@ -53,6 +53,7 @@ namespace quspin {
   public:
     DTypeObject() = default;
     DTypeObject(const DTypeObject &obj) = default;
+    DTypeObject(DTypeObject &obj) = default;
     DTypeObject(DTypeObject &&obj) = default;
     DTypeObject(const Variant &internals) : details::VariantContainer<Variant>(internals) {}
     DType dtype() const {
