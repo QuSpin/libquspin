@@ -22,16 +22,27 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: psf/black@stable
-  clang-format-checking:
+  cpp-linting:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
       - uses: RafikFarhad/clang-format-github-action@v3
         with:
           sources: "libquspin/include/**/*.hpp,libquspin/src/**/*.cpp"
+      - uses: cpp-linter/cpp-linter-action@v2
+        id: linter
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          style: 'file'  # Use .clang-format config file
+          tidy-checks: '' # Use .clang-tidy config file
+          # only 'update' a single comment in a pull request thread.
+          thread-comments: ${{ github.event_name == 'pull_request' && 'update' }}
+      - name: Fail fast?!
+        if: steps.linter.outputs.checks-failed > 0
+        run: exit 1
 
   build:
-    needs: [ruff, black, clang-format-checking]
+    needs: [ruff, black, cpp-linting]
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
