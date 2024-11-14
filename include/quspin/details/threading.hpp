@@ -76,11 +76,11 @@ namespace quspin {
       std::memory_order order = std::memory_order::relaxed;
 
     public:
-      void clear() { std::atomic_flag_clear_explicit(&flag, order); }
-      bool test_and_set() { return std::atomic_flag_test_and_set_explicit(&flag, order); }
-      bool test() { return std::atomic_flag_test_and_set_explicit(&flag, order); }
-      void notify_one() { std::atomic_flag_clear_explicit(&flag, order); }
-      void wait() {
+      inline void clear() { std::atomic_flag_clear_explicit(&flag, order); }
+      inline bool test_and_set() { return std::atomic_flag_test_and_set_explicit(&flag, order); }
+      inline bool test() { return std::atomic_flag_test_and_set_explicit(&flag, order); }
+      inline void notify_one() { std::atomic_flag_clear_explicit(&flag, order); }
+      inline void wait() {
         while (std::atomic_flag_test_and_set_explicit(&flag, order)) {
           std::this_thread::yield();
         }
@@ -109,9 +109,8 @@ namespace quspin {
                 empty.wait();
 
                 const std::size_t n_copy = batch_n.load();
-                if (n_copy > 0) {
-                  assert(n_copy <= queue.size());
-                  std::for_each_n(queue.begin(), n_copy, f);
+                for (std::size_t i = 0; i < n_copy; i++) {
+                  f(queue.at(i));
                 }
 
                 // tell main thread that we are done
