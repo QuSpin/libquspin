@@ -89,7 +89,7 @@ namespace quspin {
 
     template <std::size_t batch_size = 100, typename Iterator, typename Function>
     void async_for_each(Iterator &&begin, Iterator &&end, Function &&f) {
-      using task_t = std::decay_t<decltype(*begin)>;
+      using task_t = decltype(*begin);
       using batch_t = std::array<task_t, batch_size>;
 
       std::vector<std::thread> workers;
