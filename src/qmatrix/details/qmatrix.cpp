@@ -95,17 +95,21 @@ namespace quspin {
       requires QMatrixTypes<T, I, J>
     void qmatrix<T, I, J>::sort_indices() {
       auto range_iter = std::ranges::iota_view{std::size_t(0), dim_};
-      std::ranges::for_each(range_iter,
-                            [this](auto &&i) { std::sort(this->row_begin(i), this->row_end(i)); });
+      for (auto &&i : range_iter) {
+        std::sort(row_begin(i), row_end(i));
+      }
     }
 
     template <typename T, typename I, typename J>
       requires QMatrixTypes<T, I, J>
     bool qmatrix<T, I, J>::has_sorted_indices() const {
       auto range_iter = std::ranges::iota_view{std::size_t(0), dim_};
-      return std::ranges::all_of(range_iter, [this](auto &&i) {
-        return std::is_sorted(this->row_begin(i), this->row_end(i));
-      });
+      for (auto &&i : range_iter) {
+        if (!std::is_sorted(row_begin(i), row_end(i))) {
+          return false;
+        }
+      }
+      return true;
     }
 
     template <typename T, typename I, typename J>
