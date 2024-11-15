@@ -55,9 +55,20 @@ src_files = files(
 )
 
 if host_machine.system() == 'windows'
-    libquspin = static_library('quspin', src_files, include_directories: include, name_suffix: 'lib', dependencies: boost)
+    libquspin = static_library(
+        'quspin',
+        src_files,
+        include_directories: include,
+        name_suffix: 'lib',
+        dependencies: boost,
+    )
 else
-    libquspin = shared_library('quspin', src_files, include_directories: include, dependencies: boost)
+    libquspin = shared_library(
+        'quspin',
+        src_files,
+        include_directories: include,
+        dependencies: boost,
+    )
 endif
 
 libquspin_dep = declare_dependency(
@@ -65,9 +76,8 @@ libquspin_dep = declare_dependency(
     link_with: libquspin,
 )
 
-
 test_files = [
-    ( 'test' / 'array' / 'iterator.cpp'),
+    ('test' / 'array' / 'iterator.cpp'),
     ('test' / 'array' / 'constructor.cpp'),
     ('test' / 'array' / 'kernels.cpp'),
     ('test' / 'dtype.cpp'),

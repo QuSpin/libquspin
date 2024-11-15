@@ -1,7 +1,5 @@
-Checks: 'clang-diagnostic-*,clang-analyzer-*,cppcoreguidelines-*,modernize-*,-modernize-use-trailing-return-type'
+Checks: 'clang-diagnostic-*,clang-analyzer-*,cppcoreguidelines-*,modernize-*,-modernize-use-trailing-return-type,portability-*,performance-*'
 WarningsAsErrors: true
-HeaderFilterRegex: ''
-AnalyzeTemporaryDtors: false
 FormatStyle: google
 CheckOptions:
   - key:             cert-dcl16-c.NewSuffixes
