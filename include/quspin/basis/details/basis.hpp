@@ -4,8 +4,8 @@
 #include <cmath>
 #include <memory>
 #include <queue>
-#include <quspin/basis/space.hpp>
-#include <quspin/basis/symmetry.hpp>
+#include <quspin/basis/details/space.hpp>
+#include <quspin/basis/details/symmetry.hpp>
 #include <quspin/operator.hpp>
 #include <quspin/utils/functions.hpp>
 #include <unordered_map>

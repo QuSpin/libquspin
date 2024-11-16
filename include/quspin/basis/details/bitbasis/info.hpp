@@ -1,7 +1,7 @@
 #pragma once
 
 #include <iostream>
-#include <quspin/basis/types.hpp>
+#include <quspin/basis/details/types.hpp>
 
 namespace quspin::basis {
 

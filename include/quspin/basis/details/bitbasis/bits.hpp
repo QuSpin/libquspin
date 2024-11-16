@@ -2,7 +2,7 @@
 
 #include <array>
 #include <quspin/basis/details/bitbasis/info.hpp>
-#include <quspin/basis/types.hpp>
+#include <quspin/basis/details/types.hpp>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -112,7 +112,7 @@ namespace quspin::basis {  // explicit instantiation for code coverage
   template bit_set<uint8_t> set_sub_bitstring<uint8_t, 3>(const bit_set<uint8_t>& s, const int,
                                                           const std::array<int, 3>&);
 
-  template bool operator< <uint8_t>(const bit_set<uint8_t>&, const bit_set<uint8_t>&);
+  template bool operator<< uint8_t>(const bit_set<uint8_t>&, const bit_set<uint8_t>&);
   template bool operator><uint8_t>(const bit_set<uint8_t>&, const bit_set<uint8_t>&);
   template bool operator== <uint8_t>(const bit_set<uint8_t>&, const bit_set<uint8_t>&);
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <quspin/details/error.hpp>
+#include <quspin/dtype/dtype.hpp>
 #include <sstream>
 #include <type_traits>
 #include <variant>

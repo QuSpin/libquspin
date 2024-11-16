@@ -6,7 +6,7 @@
 #include <quspin/basis/details/bitbasis/bits.hpp>
 #include <quspin/basis/details/bitbasis/dits.hpp>
 #include <quspin/basis/details/bitbasis/utils.hpp>
-#include <quspin/basis/types.hpp>
+#include <quspin/basis/details/types.hpp>
 #include <quspin/utils/functions.hpp>
 #include <vector>
 

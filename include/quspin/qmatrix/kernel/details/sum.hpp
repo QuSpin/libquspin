@@ -65,7 +65,9 @@ namespace quspin {
       indptr[0] = 0;
 
       row_sum_tasks<Op, T, I, J> tasks(op, lhs, rhs, indptr);
-      WorkQueue(tasks).run(Schedule::SequentialBlocks, num_threads);
+      WorkQueue task_runner(tasks);
+
+      task_runner.run(Schedule::SequentialBlocks, num_threads);
 
       // cumulaive sum
       for (std::size_t row_index = 1; row_index <= lhs.dim(); ++row_index) {
@@ -141,7 +143,8 @@ namespace quspin {
       assert(lhs.dim() == out.dim());
 
       populate_row_tasks<Op, T, I, J> tasks(op, lhs, rhs, out);
-      WorkQueue(tasks).run(Schedule::SequentialBlocks, num_threads);
+      WorkQueue task_runner(tasks);
+      task_runner.run(Schedule::SequentialBlocks, num_threads);
     }
   }  // namespace details
 }  // namespace quspin
