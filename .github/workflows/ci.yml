@@ -47,8 +47,12 @@ jobs:
         run: pip install meson ninja clang-tidy
       - name: Prepare Build
         run: meson setup build --buildtype=debug
+        env:
+          BOOST_ROOT: ${{ steps.install-boost.outputs.BOOST_ROOT }}
       - name: Run Clang-Tidy
         run: meson compile tidy -C build
+        env:
+          BOOST_ROOT: ${{ steps.install-boost.outputs.BOOST_ROOT }}
 
   build:
     needs: [ruff, black, clang-format-checking, clang-tidy-checking]
