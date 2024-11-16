@@ -32,24 +32,25 @@ jobs:
   clang-tidy-checking:
     runs-on: ubuntu-latest
     steps:
+      - name: Fetch Sources
+        uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Install Python Dependencies
+        run: pip install meson ninja
       - name: Install boost
         uses: MarkusJx/install-boost@v2.4.5
         id: install-boost
         with:
           boost_version: 1.86.0
           boost_install_dir: ${{github.workspace}}/boost
-      - uses: actions/checkout@v4
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
-      - name: Install Python Dependencies
-        run: pip install meson ninja clang-tidy
       - name: Prepare Build
         run: meson setup build --buildtype=debug
         env:
           BOOST_ROOT: ${{ steps.install-boost.outputs.BOOST_ROOT }}
-      - name: Run Clang-Tidy
+      - name: Run Build
         run: meson compile tidy -C build
         env:
           BOOST_ROOT: ${{ steps.install-boost.outputs.BOOST_ROOT }}
