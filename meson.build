@@ -103,8 +103,10 @@ clang_format_prog = find_program('clang-format', required: false)
 run_clang_format_prog = find_program('scripts/run-clang-format.sh')
 
 
-if find_prog.found() and run_find_prog.found()
-    all_files = run_command(run_find_prog, check: true, capture: true).stdout().split('\n')
+if host_machine.system() != 'windows' and find_prog.found() and run_find_prog.found()
+    all_files = run_command(run_find_prog, check: true, capture: true).stdout().split(
+        '\n',
+    )
 
     if clang_format_prog.found() and all_files.length() > 0
         format_deps = []
