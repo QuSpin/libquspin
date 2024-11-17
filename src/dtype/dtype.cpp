@@ -10,6 +10,19 @@
 
 namespace quspin {
 
+  template DType::DType(const details::dtype<int8_t> &);
+  template DType::DType(const details::dtype<uint8_t> &);
+  template DType::DType(const details::dtype<int16_t> &);
+  template DType::DType(const details::dtype<uint16_t> &);
+  template DType::DType(const details::dtype<int32_t> &);
+  template DType::DType(const details::dtype<uint32_t> &);
+  template DType::DType(const details::dtype<int64_t> &);
+  template DType::DType(const details::dtype<uint64_t> &);
+  template DType::DType(const details::dtype<float> &);
+  template DType::DType(const details::dtype<double> &);
+  template DType::DType(const details::dtype<details::cfloat> &);
+  template DType::DType(const details::dtype<details::cdouble> &);
+
   bool DType::operator==(const DType &dtype) const {
     return std::visit(
         [](auto &&lhs, auto &&rhs) {

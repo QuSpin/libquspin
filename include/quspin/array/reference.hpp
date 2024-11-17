@@ -19,13 +19,17 @@ namespace quspin {
   public:
     Reference() : DTypeObject<details::references>(default_value()) {}
     Reference(details::references &reference) : DTypeObject<details::references>(reference) {}
-    template <typename T> Reference(T &ref)
+    template <PrimativeTypes T> Reference(T &ref)
         : DTypeObject<details::references>(details::references(details::reference<T>(ref))) {}
-    template <typename T> operator T() const {
-      return std::visit([](auto &&internals) { return details::cast<T>(internals.get()); },
-                        internals_);
+    template <ScalarTypes T> operator T() const {
+      if constexpr (std::is_same_v<T, Scalar>) {
+        return std::visit([](auto &&internals) { return Scalar(internals.get()); }, internals_);
+      } else {
+        return std::visit([](auto &&internals) { return details::cast<T>(internals.get()); },
+                          internals_);
+      }
     }
-    template <typename T> Reference &operator=(const T &scalar) {
+    template <ScalarTypes T> Reference &operator=(const T &scalar) {
       if constexpr (std::is_same_v<T, Scalar>) {
         std::visit(
             [](auto &&internals, auto &&scalar) {
@@ -44,53 +48,18 @@ namespace quspin {
       return *this;
     }
 
-    template <typename T> Scalar &operator+(const T &other) const;
-    template <typename T> Scalar &operator-(const T &other) const;
-    template <typename T> Scalar &operator*(const T &other) const;
-    template <typename T> Scalar &operator/(const T &other) const;
+    template <typename Op>
+    static Scalar binary_op(const Reference &lhs, const Scalar &rhs, Op &&op);
+    template <ScalarTypes T> Scalar operator+(const T &other) const;
+    Scalar operator+(const Reference &other) const;
+    template <ScalarTypes T> Scalar operator-(const T &other) const;
+    Scalar operator-(const Reference &other) const;
+    template <ScalarTypes T> Scalar operator*(const T &other) const;
+    Scalar operator*(const Reference &other) const;
+    template <ScalarTypes T> Scalar operator/(const T &other) const;
+    Scalar operator/(const Reference &other) const;
     bool operator==(const Scalar &other) const;
     bool operator!=(const Scalar &other) const;
   };
-
-  template Reference::Reference(int8_t &);
-  template Reference::Reference(int16_t &);
-  template Reference::Reference(int32_t &);
-  template Reference::Reference(int64_t &);
-  template Reference::Reference(uint8_t &);
-  template Reference::Reference(uint16_t &);
-  template Reference::Reference(uint32_t &);
-  template Reference::Reference(uint64_t &);
-  template Reference::Reference(float &);
-  template Reference::Reference(double &);
-  template Reference::Reference(details::cfloat &);
-  template Reference::Reference(details::cdouble &);
-
-  template Reference::operator int8_t() const;
-  template Reference::operator int16_t() const;
-  template Reference::operator int32_t() const;
-  template Reference::operator int64_t() const;
-  template Reference::operator uint8_t() const;
-  template Reference::operator uint16_t() const;
-  template Reference::operator uint32_t() const;
-  template Reference::operator uint64_t() const;
-  template Reference::operator float() const;
-  template Reference::operator double() const;
-  template Reference::operator details::cfloat() const;
-  template Reference::operator details::cdouble() const;
-  template Reference::operator Scalar() const;
-
-  template Reference &Reference::operator=(const int8_t &);
-  template Reference &Reference::operator=(const int16_t &);
-  template Reference &Reference::operator=(const int32_t &);
-  template Reference &Reference::operator=(const int64_t &);
-  template Reference &Reference::operator=(const uint8_t &);
-  template Reference &Reference::operator=(const uint16_t &);
-  template Reference &Reference::operator=(const uint32_t &);
-  template Reference &Reference::operator=(const uint64_t &);
-  template Reference &Reference::operator=(const float &);
-  template Reference &Reference::operator=(const double &);
-  template Reference &Reference::operator=(const details::cfloat &);
-  template Reference &Reference::operator=(const details::cdouble &);
-  template Reference &Reference::operator=(const Scalar &);
 
 }  // namespace quspin

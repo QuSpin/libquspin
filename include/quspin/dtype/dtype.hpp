@@ -28,19 +28,6 @@ namespace quspin {
     bool operator==(const DType &dtype) const;
   };
 
-  template DType::DType(const details::dtype<int8_t> &);
-  template DType::DType(const details::dtype<uint8_t> &);
-  template DType::DType(const details::dtype<int16_t> &);
-  template DType::DType(const details::dtype<uint16_t> &);
-  template DType::DType(const details::dtype<int32_t> &);
-  template DType::DType(const details::dtype<uint32_t> &);
-  template DType::DType(const details::dtype<int64_t> &);
-  template DType::DType(const details::dtype<uint64_t> &);
-  template DType::DType(const details::dtype<float> &);
-  template DType::DType(const details::dtype<double> &);
-  template DType::DType(const details::dtype<details::cfloat> &);
-  template DType::DType(const details::dtype<details::cdouble> &);
-
   DType result_dtype(std::vector<DType> &);
   bool int_dtype(const DType &);
   bool float_dtype(const DType &);
@@ -65,6 +52,9 @@ namespace quspin {
 
   public:
     DTypeObject() = default;
+    DTypeObject(const DTypeObject &obj) = default;
+    DTypeObject(DTypeObject &obj) = default;
+    DTypeObject(DTypeObject &&obj) = default;
     DTypeObject(const Variant &internals) : details::VariantContainer<Variant>(internals) {}
     DType dtype() const {
       return std::visit([](const auto &obj) { return DType::of<decltype(obj)>(); }, internals_);

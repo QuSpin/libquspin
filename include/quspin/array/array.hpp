@@ -20,13 +20,19 @@ namespace quspin {
 
   public:
     Array() : DTypeObject<details::arrays>(default_value()) {}
-    Array(std::initializer_list<std::size_t> shape, std::initializer_list<std::size_t> stride,
-          const DType &dtype, void *data);
     Array(const std::vector<std::size_t> &shape, const std::vector<std::size_t> &stride,
           const DType &dtype, void *data);
-    Array(std::initializer_list<std::size_t> shape, const DType &dtype = DType());
     Array(const std::vector<std::size_t> &shape, const DType &dtype = DType());
-
+    Array(std::initializer_list<std::size_t> shape, std::initializer_list<std::size_t> stride,
+          const DType &dtype, void *data)
+        : Array(std::vector<std::size_t>(shape), std::vector<std::size_t>(stride), dtype, data) {}
+    Array(std::initializer_list<std::size_t> shape, const DType &dtype = DType())
+        : Array(std::vector<std::size_t>(shape), dtype) {}
+    template <PrimativeTypes T> Array(const details::array<T> &array)
+        : DTypeObject<details::arrays>(details::arrays(array)) {}
+    template <PrimativeTypes T> Array(std::initializer_list<T> values)
+        : DTypeObject<details::arrays>(details::arrays(details::array<T>(values))) {}
+    bool is_contiguous() const;
     std::vector<std::size_t> shape() const;
     std::size_t shape(const std::size_t &) const;
     std::vector<std::size_t> strides() const;
@@ -38,6 +44,7 @@ namespace quspin {
     Reference operator[](std::vector<std::size_t> &index);
     const Scalar operator[](std::initializer_list<std::size_t> index) const;
     Reference operator[](std::initializer_list<std::size_t> index);
+    Array copy() const;
+    Array astype(const DType &) const;
   };
-
 }  // namespace quspin
