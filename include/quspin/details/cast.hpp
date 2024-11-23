@@ -14,23 +14,27 @@ namespace quspin {
 
     template <PrimativeTypes T> struct is_complex : std::false_type {};
 
-    template <Floating T> struct is_complex<std::complex<T>> : std::true_type {};
+    template <Floating T> struct is_complex<std::complex<T>> : std::true_type {
+    };
 
-    template <PrimativeTypes T> inline constexpr bool is_complex_v = is_complex<T>::value;
+    template <PrimativeTypes T> inline constexpr bool is_complex_v
+        = is_complex<T>::value;
 
     template <PrimativeTypes... Ts> using upcast_t = std::common_type_t<Ts...>;
 
-    template <PrimativeTypes from, PrimativeTypes to> struct can_safe_cast : std::false_type {};
+    template <PrimativeTypes from, PrimativeTypes to> struct can_safe_cast
+        : std::false_type {};
 
-    template <PrimativeTypes from, PrimativeTypes to> inline constexpr bool can_safe_cast_v
-        = can_safe_cast<from, to>::value;
+    template <PrimativeTypes from, PrimativeTypes to>
+    inline constexpr bool can_safe_cast_v = can_safe_cast<from, to>::value;
 
 #ifdef _MSC_VER
 #  pragma warning(push)
 #  pragma warning(disable : 4244)
 #endif
 
-    template <PrimativeTypes To, PrimativeTypes From> inline To cast(const From &value) {
+    template <PrimativeTypes To, PrimativeTypes From>
+    inline To cast(const From &value) {
       if constexpr (is_complex_v<From> && !is_complex_v<To>) {
         return static_cast<To>(value.real());
       } else {

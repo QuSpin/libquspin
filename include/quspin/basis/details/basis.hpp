@@ -24,18 +24,21 @@ namespace quspin::basis {
     ~symmetric_basis() {}
 
     template <typename Container, typename Map, typename J>
-    void ref_states_conj(const J i, const Container& col_states, Map& columns) const {
+    void ref_states_conj(const J i, const Container& col_states,
+                         Map& columns) const {
       const typename space_t::bitset_t init_state = space->get_state(i);
 
       for (const auto& [state, raw_mat_ele] : col_states) {
         if (state == init_state) {
-          columns[i] = (columns.count(i) != 0 ? columns[i] + raw_mat_ele : raw_mat_ele);
+          columns[i] = (columns.count(i) != 0 ? columns[i] + raw_mat_ele
+                                              : raw_mat_ele);
         } else {
           const auto& [ref_state, charater] = symmetry.get_refstate(state);
           const J j = space->get_index(ref_state);
           const auto norm_j = space->get_norm(j);
           const auto norm_i = space->get_norm(i);
-          const auto mat_ele = raw_mat_ele * conj(charater) * std::sqrt(double(norm_j) / norm_i);
+          const auto mat_ele = raw_mat_ele * conj(charater)
+                               * std::sqrt(double(norm_j) / norm_i);
           columns[j] = (columns.count(j) != 0 ? columns[j] + mat_ele : mat_ele);
         }
       }
@@ -53,7 +56,8 @@ namespace quspin::basis {
           J j = space->get_index(ref_state);
           const auto norm_j = space->get_norm(j);
           const auto norm_i = space->get_norm(i);
-          const auto mat_ele = raw_mat_ele * charater * std::sqrt(double(norm_j) / norm_i);
+          const auto mat_ele
+              = raw_mat_ele * charater * std::sqrt(double(norm_j) / norm_i);
           rows[j] = (rows.count(j) != 0 ? rows[j] + mat_ele : mat_ele);
         }
       }
@@ -95,9 +99,10 @@ namespace quspin::basis {
       rowptr[n_row + 1] = nnz;
     }
 
-    template <typename Term, typename J> void calc_matrix(const Term* terms, const int nterms,
-                                                          typename Term::value_type values[],
-                                                          J rowptr[], J indices[]) const {
+    template <typename Term, typename J>
+    void calc_matrix(const Term* terms, const int nterms,
+                     typename Term::value_type values[], J rowptr[],
+                     J indices[]) const {
       using value_type = typename Term::value_type;
 
       std::vector<std::pair<typename space_t::bitset_t, value_type>> col_states;
@@ -125,7 +130,8 @@ namespace quspin::basis {
         this->ref_states_conj(row, col_states, columns);
 
         // sort columns
-        sorted_columns.insert(sorted_columns.end(), columns.begin(), columns.end());
+        sorted_columns.insert(sorted_columns.end(), columns.begin(),
+                              columns.end());
         std::sort(sorted_columns.begin(), sorted_columns.end(),
                   [](std::pair<J, typename Term::value_type> lhs,
                      std::pair<J, typename Term::value_type> rhs) -> bool {
@@ -142,13 +148,14 @@ namespace quspin::basis {
     }
 
     template <typename Term, typename X, typename Y>
-    void on_the_fly(const Term* terms, const int nterms, const Y a, const X* x, const Y b,
-                    Y* y) const {
+    void on_the_fly(const Term* terms, const int nterms, const Y a, const X* x,
+                    const Y b, Y* y) const {
       if (b == Y(0.0)) {
         std::fill(y, y + space->size(), 0);
       } else {
         if (b != Y(1))
-          std::transform(y, y + space->size(), y, [b](const Y value) -> Y { return b * value; });
+          std::transform(y, y + space->size(), y,
+                         [b](const Y value) -> Y { return b * value; });
       }
 
       using index_t = typename space_t::index_t;
@@ -181,7 +188,8 @@ namespace quspin::basis {
       }
     }
 
-    template <typename Iterator> void build_subspace(Iterator begin, Iterator end) {
+    template <typename Iterator>
+    void build_subspace(Iterator begin, Iterator end) {
       for (auto it = begin; it != end; it++) {
         const auto norm = symmetry.check_refstate(*it);
         if (!std::isnan(norm)) {
@@ -190,8 +198,9 @@ namespace quspin::basis {
       }
     }
 
-    template <typename Term> void build_subspace(const Term* terms, const int nterms,
-                                                 const std::vector<int>& seed_vec, const int lhss) {
+    template <typename Term>
+    void build_subspace(const Term* terms, const int nterms,
+                        const std::vector<int>& seed_vec, const int lhss) {
       using value_type = typename Term::value_type;
 
       std::vector<std::pair<typename space_t::bitset_t, value_type>> row_states;
@@ -237,12 +246,13 @@ namespace quspin::basis {
     ~basis() {}
 
     template <typename Container, typename Map, typename J>
-    void ref_states_conj(const J i, const Container& col_states, Map& columns) const {
+    void ref_states_conj(const J i, const Container& col_states,
+                         Map& columns) const {
       for (const auto& [state, mat_ele] : col_states) {
         const J state_index = space->get_index(state);
-        columns[state_index]
-            = (columns.count(state_index) != 0 ? columns[state_index] + conj(mat_ele)
-                                               : conj(mat_ele));
+        columns[state_index] = (columns.count(state_index) != 0
+                                    ? columns[state_index] + conj(mat_ele)
+                                    : conj(mat_ele));
       }
     }
 
@@ -250,7 +260,9 @@ namespace quspin::basis {
     void ref_states(const J i, const Container& row_states, Map& rows) const {
       for (const auto& [state, mat_ele] : row_states) {
         const J state_index = space->get_index(state);
-        rows[state_index] = (rows.count(state_index) != 0 ? rows[state_index] + mat_ele : mat_ele);
+        rows[state_index]
+            = (rows.count(state_index) != 0 ? rows[state_index] + mat_ele
+                                            : mat_ele);
       }
     }
 
@@ -288,9 +300,10 @@ namespace quspin::basis {
       rowptr[n_row + 1] = nnz;
     }
 
-    template <typename Term, typename J> void calc_matrix(const Term* terms, const int nterms,
-                                                          typename Term::value_type values[],
-                                                          J rowptr[], J indices[]) const {
+    template <typename Term, typename J>
+    void calc_matrix(const Term* terms, const int nterms,
+                     typename Term::value_type values[], J rowptr[],
+                     J indices[]) const {
       using value_type = typename Term::value_type;
 
       std::vector<std::pair<typename space_t::bitset_t, value_type>> col_states;
@@ -318,7 +331,8 @@ namespace quspin::basis {
         this->ref_states_conj(row, col_states, columns);
 
         // sort columns
-        sorted_columns.insert(sorted_columns.end(), columns.begin(), columns.end());
+        sorted_columns.insert(sorted_columns.end(), columns.begin(),
+                              columns.end());
         std::sort(sorted_columns.begin(), sorted_columns.end(),
                   [](std::pair<J, typename Term::value_type> lhs,
                      std::pair<J, typename Term::value_type> rhs) -> bool {
@@ -335,13 +349,14 @@ namespace quspin::basis {
     }
 
     template <typename Term, typename X, typename Y>
-    void on_the_fly(const Term* terms, const int nterms, const Y a, const X* x, const Y b,
-                    Y* y) const {
+    void on_the_fly(const Term* terms, const int nterms, const Y a, const X* x,
+                    const Y b, Y* y) const {
       if (b == Y(0.0)) {
         std::fill(y, y + space->size(), 0);
       } else {
         if (b != Y(1))
-          std::transform(y, y + space->size(), y, [b](const Y value) -> Y { return b * value; });
+          std::transform(y, y + space->size(), y,
+                         [b](const Y value) -> Y { return b * value; });
       }
 
       using value_type = typename Term::value_type;
@@ -374,16 +389,17 @@ namespace quspin::basis {
       }
     }
 
-    template <typename Iterator> void build_subspace(Iterator begin, Iterator end) {
+    template <typename Iterator>
+    void build_subspace(Iterator begin, Iterator end) {
       // generate basis states by looping over iterator
       for (auto it = begin; it != end; it++) {
         space->append(*it, static_cast<typename space_t::norm_t>(1));
       }
     }
 
-    template <typename Term> void build_subspace(const Term* terms, const int nterms,
-                                                 const std::vector<int>& seed_state,
-                                                 const int lhss) {
+    template <typename Term>
+    void build_subspace(const Term* terms, const int nterms,
+                        const std::vector<int>& seed_state, const int lhss) {
       // use list of operators to generate all the possible basis states
       using value_type = typename Term::value_type;
 
@@ -394,7 +410,8 @@ namespace quspin::basis {
         const auto input_state = stack.front();
         stack.pop();
 
-        std::vector<std::pair<typename space_t::bitset_t, value_type>> row_states;
+        std::vector<std::pair<typename space_t::bitset_t, value_type>>
+            row_states;
         for (int i = 0; i < nterms; ++i) {
           const auto& term = terms[i];
           term.op(input_state, row_states);
@@ -438,60 +455,66 @@ namespace quspin::basis {
   typedef std::unordered_map<J, T> Map_dits;
 
   template class symmetric_basis<bit_space_t, bit_symm>;
-  template void symmetric_basis<bit_space_t, bit_symm>::ref_states_conj<Container_bits, Map_bits,
-                                                                        J>(const J,
-                                                                           const Container_bits&,
-                                                                           Map_bits&) const;
-  template void symmetric_basis<bit_space_t, bit_symm>::ref_states<Container_bits, Map_bits, J>(
-      const J, const Container_bits&, Map_bits&) const;
-  template void symmetric_basis<bit_space_t, bit_symm>::calc_rowptr<Term, J>(const Term*, const int,
-                                                                             J[]) const;
-  template void symmetric_basis<bit_space_t, bit_symm>::calc_matrix<Term, J>(const Term*, const int,
-                                                                             T[], J[], J[]) const;
-  template void symmetric_basis<bit_space_t, bit_symm>::on_the_fly<Term, T, T>(const Term* terms,
-                                                                               const int nterms,
-                                                                               const T, const T[],
-                                                                               const T, T[]) const;
+  template void symmetric_basis<bit_space_t, bit_symm>::ref_states_conj<
+      Container_bits, Map_bits, J>(const J, const Container_bits&,
+                                   Map_bits&) const;
+  template void symmetric_basis<bit_space_t, bit_symm>::ref_states<
+      Container_bits, Map_bits, J>(const J, const Container_bits&,
+                                   Map_bits&) const;
+  template void symmetric_basis<bit_space_t, bit_symm>::calc_rowptr<Term, J>(
+      const Term*, const int, J[]) const;
+  template void symmetric_basis<bit_space_t, bit_symm>::calc_matrix<Term, J>(
+      const Term*, const int, T[], J[], J[]) const;
+  template void symmetric_basis<bit_space_t, bit_symm>::on_the_fly<Term, T, T>(
+      const Term* terms, const int nterms, const T, const T[], const T,
+      T[]) const;
 
   template class basis<bit_space_t>;
-  template void basis<bit_space_t>::ref_states_conj<Container_bits, Map_bits, J>(
+  template void basis<bit_space_t>::ref_states_conj<Container_bits, Map_bits,
+                                                    J>(const J,
+                                                       const Container_bits&,
+                                                       Map_bits&) const;
+  template void basis<bit_space_t>::ref_states<Container_bits, Map_bits, J>(
       const J, const Container_bits&, Map_bits&) const;
-  template void basis<bit_space_t>::ref_states<Container_bits, Map_bits, J>(const J,
-                                                                            const Container_bits&,
-                                                                            Map_bits&) const;
-  template void basis<bit_space_t>::calc_rowptr<Term, J>(const Term*, const int, J[]) const;
-  template void basis<bit_space_t>::calc_matrix<Term, J>(const Term*, const int, T[], J[],
+  template void basis<bit_space_t>::calc_rowptr<Term, J>(const Term*, const int,
                                                          J[]) const;
-  template void basis<bit_space_t>::on_the_fly<Term, T, T>(const Term* terms, const int nterms,
-                                                           const T, const T[], const T, T[]) const;
+  template void basis<bit_space_t>::calc_matrix<Term, J>(const Term*, const int,
+                                                         T[], J[], J[]) const;
+  template void basis<bit_space_t>::on_the_fly<Term, T, T>(const Term* terms,
+                                                           const int nterms,
+                                                           const T, const T[],
+                                                           const T, T[]) const;
 
   template class symmetric_basis<dit_space_t, dit_symm>;
-  template void symmetric_basis<dit_space_t, dit_symm>::ref_states_conj<Container_dits, Map_dits,
-                                                                        J>(const J,
-                                                                           const Container_dits&,
-                                                                           Map_dits&) const;
-  template void symmetric_basis<dit_space_t, dit_symm>::ref_states<Container_dits, Map_dits, J>(
-      const J, const Container_dits&, Map_dits&) const;
-  template void symmetric_basis<dit_space_t, dit_symm>::calc_rowptr<Term, J>(const Term*, const int,
-                                                                             J[]) const;
-  template void symmetric_basis<dit_space_t, dit_symm>::calc_matrix<Term, J>(const Term*, const int,
-                                                                             T[], J[], J[]) const;
-  template void symmetric_basis<dit_space_t, dit_symm>::on_the_fly<Term, T, T>(const Term* terms,
-                                                                               const int nterms,
-                                                                               const T, const T[],
-                                                                               const T, T[]) const;
+  template void symmetric_basis<dit_space_t, dit_symm>::ref_states_conj<
+      Container_dits, Map_dits, J>(const J, const Container_dits&,
+                                   Map_dits&) const;
+  template void symmetric_basis<dit_space_t, dit_symm>::ref_states<
+      Container_dits, Map_dits, J>(const J, const Container_dits&,
+                                   Map_dits&) const;
+  template void symmetric_basis<dit_space_t, dit_symm>::calc_rowptr<Term, J>(
+      const Term*, const int, J[]) const;
+  template void symmetric_basis<dit_space_t, dit_symm>::calc_matrix<Term, J>(
+      const Term*, const int, T[], J[], J[]) const;
+  template void symmetric_basis<dit_space_t, dit_symm>::on_the_fly<Term, T, T>(
+      const Term* terms, const int nterms, const T, const T[], const T,
+      T[]) const;
 
   template class basis<dit_space_t>;
-  template void basis<dit_space_t>::ref_states_conj<Container_dits, Map_dits, J>(
+  template void basis<dit_space_t>::ref_states_conj<Container_dits, Map_dits,
+                                                    J>(const J,
+                                                       const Container_dits&,
+                                                       Map_dits&) const;
+  template void basis<dit_space_t>::ref_states<Container_dits, Map_dits, J>(
       const J, const Container_dits&, Map_dits&) const;
-  template void basis<dit_space_t>::ref_states<Container_dits, Map_dits, J>(const J,
-                                                                            const Container_dits&,
-                                                                            Map_dits&) const;
-  template void basis<dit_space_t>::calc_rowptr<Term, J>(const Term*, const int, J[]) const;
-  template void basis<dit_space_t>::calc_matrix<Term, J>(const Term*, const int, T[], J[],
+  template void basis<dit_space_t>::calc_rowptr<Term, J>(const Term*, const int,
                                                          J[]) const;
-  template void basis<dit_space_t>::on_the_fly<Term, T, T>(const Term* terms, const int nterms,
-                                                           const T, const T[], const T, T[]) const;
+  template void basis<dit_space_t>::calc_matrix<Term, J>(const Term*, const int,
+                                                         T[], J[], J[]) const;
+  template void basis<dit_space_t>::on_the_fly<Term, T, T>(const Term* terms,
+                                                           const int nterms,
+                                                           const T, const T[],
+                                                           const T, T[]) const;
 
 }  // namespace quspin::basis
 

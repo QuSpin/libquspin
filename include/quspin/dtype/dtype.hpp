@@ -11,7 +11,9 @@ namespace quspin {
   class DType : public details::VariantContainer<details::dtypes> {
     using details::VariantContainer<details::dtypes>::internals_;
 
-    static details::dtypes default_value() { return details::dtypes(details::dtype<double>()); }
+    static details::dtypes default_value() {
+      return details::dtypes(details::dtype<double>());
+    }
 
   public:
     DType() : details::VariantContainer<details::dtypes>(default_value()) {};
@@ -46,7 +48,8 @@ namespace quspin {
   static const DType CFloat = DType(details::dtype<details::cfloat>());
   static const DType CDouble = DType(details::dtype<details::cdouble>());
 
-  template <typename Variant> class DTypeObject : public details::VariantContainer<Variant> {
+  template <typename Variant> class DTypeObject
+      : public details::VariantContainer<Variant> {
   protected:
     using details::VariantContainer<Variant>::internals_;
 
@@ -55,9 +58,12 @@ namespace quspin {
     DTypeObject(const DTypeObject &obj) = default;
     DTypeObject(DTypeObject &obj) = default;
     DTypeObject(DTypeObject &&obj) = default;
-    DTypeObject(const Variant &internals) : details::VariantContainer<Variant>(internals) {}
+    DTypeObject(const Variant &internals)
+        : details::VariantContainer<Variant>(internals) {}
     DType dtype() const {
-      return std::visit([](const auto &obj) { return DType::of<decltype(obj)>(); }, internals_);
+      return std::visit(
+          [](const auto &obj) { return DType::of<decltype(obj)>(); },
+          internals_);
     }
   };
 

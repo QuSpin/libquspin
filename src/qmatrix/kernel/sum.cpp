@@ -11,7 +11,8 @@ namespace quspin {
   struct MismatchInputIndexTypes {
     static constexpr bool has_error() { return true; }
     static details::Error get_error() {
-      return details::Error(details::ErrorType::ValueError, "mismatch input index dtypes.");
+      return details::Error(details::ErrorType::ValueError,
+                            "mismatch input index dtypes.");
     }
   };
 
@@ -26,14 +27,16 @@ namespace quspin {
   struct MismatchInputDataTypes {
     static constexpr bool has_error() { return true; }
     static details::Error get_error() {
-      return details::Error(details::ErrorType::ValueError, "mismatch in input data dtypes.");
+      return details::Error(details::ErrorType::ValueError,
+                            "mismatch in input data dtypes.");
     }
   };
 
   struct MismatchOutputIndexTypes {
     static constexpr bool has_error() { return true; }
     static details::Error get_error() {
-      return details::Error(details::ErrorType::ValueError, "mismatch in output index dtypes.");
+      return details::Error(details::ErrorType::ValueError,
+                            "mismatch in output index dtypes.");
     }
   };
 
@@ -48,11 +51,13 @@ namespace quspin {
   struct MismatchOutputDataTypes {
     static constexpr bool has_error() { return true; }
     static details::Error get_error() {
-      return details::Error(details::ErrorType::ValueError, "mismatch in output data dtype.");
+      return details::Error(details::ErrorType::ValueError,
+                            "mismatch in output data dtype.");
     }
   };
 
-  QMatrix sum(const QMatrix lhs, const QMatrix rhs, const std::size_t num_threads /* = 0 */) {
+  QMatrix sum(const QMatrix lhs, const QMatrix rhs,
+              const std::size_t num_threads /* = 0 */) {
     using namespace details;
 
     auto static_check_inputs = [](const auto &lhs, const auto &rhs) {
@@ -76,22 +81,23 @@ namespace quspin {
       }
     };
 
-    auto static_checks_nonzero
-        = [&static_check_inputs](const auto &lhs, const auto &rhs, auto &out) {
-            using lhs_index_t = typename std::decay_t<decltype(lhs)>::index_type;
-            using out_t = typename std::decay_t<decltype(out)>::value_type;
+    auto static_checks_nonzero =
+        [&static_check_inputs](const auto &lhs, const auto &rhs, auto &out) {
+          using lhs_index_t = typename std::decay_t<decltype(lhs)>::index_type;
+          using out_t = typename std::decay_t<decltype(out)>::value_type;
 
-            if constexpr (!std::is_same_v<lhs_index_t, out_t>) {
-              return MismatchOutputIndexTypes();
-            } else {
-              return static_check_inputs(lhs, rhs);
-            }
-          };
+          if constexpr (!std::is_same_v<lhs_index_t, out_t>) {
+            return MismatchOutputIndexTypes();
+          } else {
+            return static_check_inputs(lhs, rhs);
+          }
+        };
 
-    auto dynamic_checks_nonzero = [](const auto &lhs, const auto &rhs, auto &out) {
+    auto dynamic_checks_nonzero = [](const auto &lhs, const auto &rhs,
+                                     auto &out) {
       if (lhs.dim() != rhs.dim() || lhs.indptr().shape(0) != out.shape(0)) {
-        return details::ReturnVoidError(
-            details::Error(details::ErrorType::ValueError, "Incompatible shapes"));
+        return details::ReturnVoidError(details::Error(
+            details::ErrorType::ValueError, "Incompatible shapes"));
       }
       return details::ReturnVoidError();
     };
@@ -107,47 +113,52 @@ namespace quspin {
       return static_cast<lhs_t>(lhs + rhs);
     };
 
-    auto calc_nonzeros = [&op, &num_threads](const auto &lhs, const auto &rhs, auto &out) {
-      elementwise_binop_size(op, lhs, rhs, out, num_threads);
-      return details::ReturnVoidError();
-    };
-
-    details::dispatch(calc_nonzeros, static_checks_nonzero, dynamic_checks_nonzero, lhs, rhs, out);
-
-    auto static_checks_operator
-        = [&static_check_inputs](const auto &lhs, const auto &rhs, auto &res) {
-            using lhs_index_t = typename std::decay_t<decltype(lhs)>::index_type;
-            using res_index_t = typename std::decay_t<decltype(res)>::index_type;
-
-            using lhs_cindex_t = typename std::decay_t<decltype(lhs)>::cindex_type;
-            using res_cindex_t = typename std::decay_t<decltype(res)>::cindex_type;
-
-            using lhs_data_t = typename std::decay_t<decltype(lhs)>::value_type;
-            using res_data_t = typename std::decay_t<decltype(res)>::value_type;
-
-            if constexpr (!std::is_same_v<lhs_index_t, res_index_t>) {
-              return MismatchOutputIndexTypes();
-            } else if constexpr (!std::is_same_v<lhs_cindex_t, res_cindex_t>) {
-              return MismatchOutputCoeffIndexTypes();
-            } else if constexpr (!std::is_same_v<lhs_data_t, res_data_t>) {
-              return MismatchOutputDataTypes();
-            } else {
-              return static_check_inputs(lhs, rhs);
-            }
+    auto calc_nonzeros
+        = [&op, &num_threads](const auto &lhs, const auto &rhs, auto &out) {
+            elementwise_binop_size(op, lhs, rhs, out, num_threads);
+            return details::ReturnVoidError();
           };
 
-    auto dynamic_checks_operator = [](const auto &lhs, const auto &rhs, auto &res) {
-      if (lhs.dim() != rhs.dim() || lhs.dim() != res.dim()) {
-        return details::ReturnVoidError(
-            details::Error(details::ErrorType::ValueError, "Incompatible shapes"));
+    details::dispatch(calc_nonzeros, static_checks_nonzero,
+                      dynamic_checks_nonzero, lhs, rhs, out);
+
+    auto static_checks_operator = [&static_check_inputs](const auto &lhs,
+                                                         const auto &rhs,
+                                                         auto &res) {
+      using lhs_index_t = typename std::decay_t<decltype(lhs)>::index_type;
+      using res_index_t = typename std::decay_t<decltype(res)>::index_type;
+
+      using lhs_cindex_t = typename std::decay_t<decltype(lhs)>::cindex_type;
+      using res_cindex_t = typename std::decay_t<decltype(res)>::cindex_type;
+
+      using lhs_data_t = typename std::decay_t<decltype(lhs)>::value_type;
+      using res_data_t = typename std::decay_t<decltype(res)>::value_type;
+
+      if constexpr (!std::is_same_v<lhs_index_t, res_index_t>) {
+        return MismatchOutputIndexTypes();
+      } else if constexpr (!std::is_same_v<lhs_cindex_t, res_cindex_t>) {
+        return MismatchOutputCoeffIndexTypes();
+      } else if constexpr (!std::is_same_v<lhs_data_t, res_data_t>) {
+        return MismatchOutputDataTypes();
+      } else {
+        return static_check_inputs(lhs, rhs);
       }
-      return details::ReturnVoidError();
     };
 
-    auto calc_qmatrix = [&op, &num_threads](const auto &lhs, const auto &rhs, auto &result) {
-      elementwise_binary_operation(op, lhs, rhs, result, num_threads);
-      return details::ReturnVoidError();
-    };
+    auto dynamic_checks_operator
+        = [](const auto &lhs, const auto &rhs, auto &res) {
+            if (lhs.dim() != rhs.dim() || lhs.dim() != res.dim()) {
+              return details::ReturnVoidError(details::Error(
+                  details::ErrorType::ValueError, "Incompatible shapes"));
+            }
+            return details::ReturnVoidError();
+          };
+
+    auto calc_qmatrix
+        = [&op, &num_threads](const auto &lhs, const auto &rhs, auto &result) {
+            elementwise_binary_operation(op, lhs, rhs, result, num_threads);
+            return details::ReturnVoidError();
+          };
 
     const std::size_t nnz = indptr[{indptr.size() - 1}];
     Array indices({nnz}, lhs.indices().dtype());
@@ -156,8 +167,8 @@ namespace quspin {
 
     QMatrix result(data, indptr, indices, cindices);
 
-    details::dispatch(calc_qmatrix, static_checks_operator, dynamic_checks_operator, lhs, rhs,
-                      result);
+    details::dispatch(calc_qmatrix, static_checks_operator,
+                      dynamic_checks_operator, lhs, rhs, result);
 
     return result;
   }

@@ -13,14 +13,16 @@ namespace quspin {
 
     template <typename T, typename I, typename J>
       requires QMatrixTypes<T, I, J>
-    void check_fields(const std::size_t dim, const array<T> &data, const array<I> &indptr,
-                      const array<I> &indices, const array<J> &cindices) {
+    void check_fields(const std::size_t dim, const array<T> &data,
+                      const array<I> &indptr, const array<I> &indices,
+                      const array<J> &cindices) {
       if (dim + 1 != indptr.size()) {
         throw std::invalid_argument("Invalid number of rows");
       }
 
       if (indices.size() != cindices.size()) {
-        throw std::invalid_argument("misaligned size of indices and coefficients");
+        throw std::invalid_argument(
+            "misaligned size of indices and coefficients");
       }
 
       if (data.size() != indices.size()) {
@@ -68,9 +70,14 @@ namespace quspin {
 
     template <typename T, typename I, typename J>
       requires QMatrixTypes<T, I, J>
-    qmatrix<T, I, J>::qmatrix(const std::size_t dim, array<T> &data, array<I> &indptr,
-                              array<I> &indices, array<J> &cindices)
-        : dim_(dim), data_(data), indptr_(indptr), indices_(indices), cindices_(cindices) {
+    qmatrix<T, I, J>::qmatrix(const std::size_t dim, array<T> &data,
+                              array<I> &indptr, array<I> &indices,
+                              array<J> &cindices)
+        : dim_(dim),
+          data_(data),
+          indptr_(indptr),
+          indices_(indices),
+          cindices_(cindices) {
       check_fields(dim, data, indptr, indices, cindices);
       if (!has_sorted_indices()) {
         sort_indices();
@@ -79,8 +86,9 @@ namespace quspin {
 
     template <typename T, typename I, typename J>
       requires QMatrixTypes<T, I, J>
-    qmatrix<T, I, J>::qmatrix(const std::size_t dim, array<T> &data, array<I> &indptr,
-                              array<I> &indices, const J &cindex)
+    qmatrix<T, I, J>::qmatrix(const std::size_t dim, array<T> &data,
+                              array<I> &indptr, array<I> &indices,
+                              const J &cindex)
         : dim_(dim), data_(data), indptr_(indptr), indices_(indices) {
       cindices_ = array<J>(indices.shape());
       std::fill(cindices_.begin(), cindices_.end(), cindex);
@@ -239,7 +247,8 @@ namespace quspin {
 
     template <typename T, typename I, typename J>
       requires QMatrixTypes<T, I, J>
-    const iterator<T, I, J> qmatrix<T, I, J>::row_begin(const std::size_t &row) const {
+    const iterator<T, I, J> qmatrix<T, I, J>::row_begin(
+        const std::size_t &row) const {
       const std::size_t offset = indptr_at(row);
       T *data = const_cast<T *>(data_ptr() + offset);
       I *indices = const_cast<I *>(indices_ptr() + offset);
@@ -252,7 +261,8 @@ namespace quspin {
 
     template <typename T, typename I, typename J>
       requires QMatrixTypes<T, I, J>
-    const iterator<T, I, J> qmatrix<T, I, J>::row_end(const std::size_t &row) const {
+    const iterator<T, I, J> qmatrix<T, I, J>::row_end(
+        const std::size_t &row) const {
       const std::size_t offset = indptr_at(row + 1);
       T *data = const_cast<T *>(data_ptr() + offset);
       I *indices = const_cast<I *>(indices_ptr() + offset);

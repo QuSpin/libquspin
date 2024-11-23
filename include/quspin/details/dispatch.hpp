@@ -19,21 +19,24 @@ namespace quspin {
       static constexpr bool has_error() { return false; }
     };
 
-    template <typename Kernel, typename StaticArgsCheck, typename DynamicArgsCheck,
-              typename... Args>
+    template <typename Kernel, typename StaticArgsCheck,
+              typename DynamicArgsCheck, typename... Args>
     void dispatch(Kernel &&kernel, StaticArgsCheck &&static_args_check,
                   DynamicArgsCheck &&dynamic_args_check, Args... args) {
       visit_or_error<std::monostate>(
           [&kernel, &dynamic_args_check](auto &...args) {
-            using static_args_check_return_t = decltype(static_args_check(args...));
+            using static_args_check_return_t
+                = decltype(static_args_check(args...));
 
             if constexpr (static_args_check_return_t::has_error()) {
               return ReturnVoidError(static_args_check_return_t::get_error());
             } else {
               using kernel_return_t = decltype(kernel(args...));
-              using dynamic_args_check_return_t = decltype(dynamic_args_check(args...));
-              static_assert(std::is_same_v<dynamic_args_check_return_t, ReturnVoidError>,
-                            "Dynamic args check must return ReturnVoidError");
+              using dynamic_args_check_return_t
+                  = decltype(dynamic_args_check(args...));
+              static_assert(
+                  std::is_same_v<dynamic_args_check_return_t, ReturnVoidError>,
+                  "Dynamic args check must return ReturnVoidError");
               static_assert(std::is_same_v<kernel_return_t, ReturnVoidError>,
                             "Kernel must return ReturnVoidError");
 
@@ -48,16 +51,19 @@ namespace quspin {
           args.get_variant_obj()...);
     }
 
-    template <typename Kernel, typename ResultShape, typename ResultDType, typename StaticArgsCheck,
-              class DynamicArgsCheck, typename... Args>
+    template <typename Kernel, typename ResultShape, typename ResultDType,
+              typename StaticArgsCheck, class DynamicArgsCheck,
+              typename... Args>
     Array dispatch_array(Kernel &&kernel, ResultShape &&result_shape_func,
-                         ResultDType &&result_dtype_func, StaticArgsCheck &&static_args_check,
-                         DynamicArgsCheck &&dynamic_args_check, Optional<Array> out_option,
-                         Args... args) {
+                         ResultDType &&result_dtype_func,
+                         StaticArgsCheck &&static_args_check,
+                         DynamicArgsCheck &&dynamic_args_check,
+                         Optional<Array> out_option, Args... args) {
       std::vector<std::size_t> shape = result_shape_func(args...);
       DType output_dtype = result_dtype_func(args...);
 
-      auto default_result = [&shape, &output_dtype]() { return Array(shape, output_dtype); };
+      auto default_result
+          = [&shape, &output_dtype]() { return Array(shape, output_dtype); };
 
       Array out = out_option.get(default_result);
 
@@ -66,14 +72,18 @@ namespace quspin {
       return out;
     }
 
-    template <typename Kernel> Array dispatch_elementwise(Kernel &&kernel, Optional<Array> out,
-                                                          const Array &lhs, const Array &rhs) {
+    template <typename Kernel>
+    Array dispatch_elementwise(Kernel &&kernel, Optional<Array> out,
+                               const Array &lhs, const Array &rhs) {
       struct InvalidDtype {
         static constexpr bool has_error() { return true; }
-        static Error get_error() { return Error(ErrorType::ValueError, "Incompatible out type"); }
+        static Error get_error() {
+          return Error(ErrorType::ValueError, "Incompatible out type");
+        }
       };
 
-      auto result_shape = [](const Array &lhs, const Array &) { return lhs.shape(); };
+      auto result_shape
+          = [](const Array &lhs, const Array &) { return lhs.shape(); };
 
       auto result_dtype_func = [](const Array &lhs, const Array &rhs) {
         std::vector<DType> dtypes = {lhs.dtype(), rhs.dtype()};
@@ -93,32 +103,39 @@ namespace quspin {
         }
       };
 
-      auto dynamic_args_check = [](auto &out, const auto &lhs, const auto &rhs) {
-        if (lhs.shape() != rhs.shape() || lhs.shape() != out.shape()) {
-          return ReturnVoidError(Error(ErrorType::ValueError, "Incompatible shapes"));
-        }
-        return ReturnVoidError();
-      };
+      auto dynamic_args_check
+          = [](auto &out, const auto &lhs, const auto &rhs) {
+              if (lhs.shape() != rhs.shape() || lhs.shape() != out.shape()) {
+                return ReturnVoidError(
+                    Error(ErrorType::ValueError, "Incompatible shapes"));
+              }
+              return ReturnVoidError();
+            };
 
-      return dispatch_array(kernel, result_shape, result_dtype_func, static_args_check,
-                            dynamic_args_check, out, lhs, rhs);
+      return dispatch_array(kernel, result_shape, result_dtype_func,
+                            static_args_check, dynamic_args_check, out, lhs,
+                            rhs);
     }
 
-    template <typename Kernel, typename StaticArgsCheck, typename DynamicArgsCheck,
-              typename... Args>
+    template <typename Kernel, typename StaticArgsCheck,
+              typename DynamicArgsCheck, typename... Args>
     Scalar dispatch_scalar(Kernel &&kernel, StaticArgsCheck &&static_args_check,
-                           DynamicArgsCheck &&dynamic_args_check, const Args &...args) {
+                           DynamicArgsCheck &&dynamic_args_check,
+                           const Args &...args) {
       return visit_or_error<Scalar>(
           [&kernel, &dynamic_args_check](const auto &...args) {
-            using static_args_check_return_t = decltype(static_args_check(args...));
+            using static_args_check_return_t
+                = decltype(static_args_check(args...));
 
             if constexpr (static_args_check_return_t::has_error()) {
               return ErrorOr<Scalar>(static_args_check_return_t::get_error());
             } else {
               using kernel_return_t = decltype(kernel(args...));
-              using dynamic_args_check_return_t = decltype(dynamic_args_check(args...));
-              static_assert(std::is_same_v<dynamic_args_check_return_t, ReturnVoidError>,
-                            "Dynamic args check must return Scalar");
+              using dynamic_args_check_return_t
+                  = decltype(dynamic_args_check(args...));
+              static_assert(
+                  std::is_same_v<dynamic_args_check_return_t, ReturnVoidError>,
+                  "Dynamic args check must return Scalar");
               static_assert(std::is_same_v<kernel_return_t, ErrorOr<Scalar>>,
                             "Kernel must return Scalar");
 

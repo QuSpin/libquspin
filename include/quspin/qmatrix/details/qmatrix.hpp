@@ -30,10 +30,10 @@ namespace quspin {
       using cindex_type = J;
 
       qmatrix() = default;
-      qmatrix(const std::size_t dim, array<T> &data, array<I> &indptr, array<I> &indices,
-              array<J> &cindices);
-      qmatrix(const std::size_t dim, array<T> &data, array<I> &indptr, array<I> &indices,
-              const J &cindex);
+      qmatrix(const std::size_t dim, array<T> &data, array<I> &indptr,
+              array<I> &indices, array<J> &cindices);
+      qmatrix(const std::size_t dim, array<T> &data, array<I> &indptr,
+              array<I> &indices, const J &cindex);
 
       void sort_indices();
       bool has_sorted_indices() const;
@@ -76,19 +76,20 @@ namespace quspin {
       using type = T;
     };
 
-    using qmatrices
-        = std::variant<qmatrix<int8_t, int32_t, uint8_t>, qmatrix<int16_t, int32_t, uint8_t>,
-                       qmatrix<float, int32_t, uint8_t>, qmatrix<double, int32_t, uint8_t>,
-                       qmatrix<cfloat, int32_t, uint8_t>, qmatrix<cdouble, int32_t, uint8_t>,
-                       qmatrix<int8_t, int64_t, uint8_t>, qmatrix<int16_t, int64_t, uint8_t>,
-                       qmatrix<float, int64_t, uint8_t>, qmatrix<double, int64_t, uint8_t>,
-                       qmatrix<cfloat, int64_t, uint8_t>, qmatrix<cdouble, int64_t, uint8_t>,
-                       qmatrix<int8_t, int32_t, uint16_t>, qmatrix<int16_t, int32_t, uint16_t>,
-                       qmatrix<float, int32_t, uint16_t>, qmatrix<double, int32_t, uint16_t>,
-                       qmatrix<cfloat, int32_t, uint16_t>, qmatrix<cdouble, int32_t, uint16_t>,
-                       qmatrix<int8_t, int64_t, uint16_t>, qmatrix<int16_t, int64_t, uint16_t>,
-                       qmatrix<float, int64_t, uint16_t>, qmatrix<double, int64_t, uint16_t>,
-                       qmatrix<cfloat, int64_t, uint16_t>, qmatrix<cdouble, int64_t, uint16_t>>;
+    using qmatrices = std::variant<
+        qmatrix<int8_t, int32_t, uint8_t>, qmatrix<int16_t, int32_t, uint8_t>,
+        qmatrix<float, int32_t, uint8_t>, qmatrix<double, int32_t, uint8_t>,
+        qmatrix<cfloat, int32_t, uint8_t>, qmatrix<cdouble, int32_t, uint8_t>,
+        qmatrix<int8_t, int64_t, uint8_t>, qmatrix<int16_t, int64_t, uint8_t>,
+        qmatrix<float, int64_t, uint8_t>, qmatrix<double, int64_t, uint8_t>,
+        qmatrix<cfloat, int64_t, uint8_t>, qmatrix<cdouble, int64_t, uint8_t>,
+        qmatrix<int8_t, int32_t, uint16_t>, qmatrix<int16_t, int32_t, uint16_t>,
+        qmatrix<float, int32_t, uint16_t>, qmatrix<double, int32_t, uint16_t>,
+        qmatrix<cfloat, int32_t, uint16_t>, qmatrix<cdouble, int32_t, uint16_t>,
+        qmatrix<int8_t, int64_t, uint16_t>, qmatrix<int16_t, int64_t, uint16_t>,
+        qmatrix<float, int64_t, uint16_t>, qmatrix<double, int64_t, uint16_t>,
+        qmatrix<cfloat, int64_t, uint16_t>,
+        qmatrix<cdouble, int64_t, uint16_t>>;
 
   }  // namespace details
 }  // namespace quspin

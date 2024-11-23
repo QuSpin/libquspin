@@ -4,8 +4,8 @@
 
 namespace quspin::basis {
 
-  template <class T>
-  typename bit_info<T>::bit_index_type bit_pos(T x, typename bit_info<T>::bit_index_type *idx) {
+  template <class T> typename bit_info<T>::bit_index_type bit_pos(
+      T x, typename bit_info<T>::bit_index_type *idx) {
     typename bit_info<T>::bit_index_type *idx0 = idx;
     typename bit_info<T>::bit_index_type n = 0;
     typename bit_info<T>::bit_index_type p = 0;
@@ -20,10 +20,11 @@ namespace quspin::basis {
     // v = v & (((~(T)0) >> 1) >> (bit_info<T>::bits - 1 - l));
     const T m = (~T(0));
     v = v & (m >> (bit_info<T>::bits - l));
-    v = v - ((v >> 1) & (T) ~(T)0 / 3);                                    // temp
-    v = (v & (T) ~(T)0 / 15 * 3) + ((v >> 2) & (T) ~(T)0 / 15 * 3);        // temp
-    v = (v + (v >> 4)) & (T) ~(T)0 / 255 * 15;                             // temp
-    T res = (T)(v * ((T) ~(T)0 / 255)) >> ((bit_info<T>::bytes - 1) * 8);  // count
+    v = v - ((v >> 1) & (T) ~(T)0 / 3);                              // temp
+    v = (v & (T) ~(T)0 / 15 * 3) + ((v >> 2) & (T) ~(T)0 / 15 * 3);  // temp
+    v = (v + (v >> 4)) & (T) ~(T)0 / 255 * 15;                       // temp
+    T res = (T)(v * ((T) ~(T)0 / 255))
+            >> ((bit_info<T>::bytes - 1) * 8);  // count
     return (int)res;
   }
 

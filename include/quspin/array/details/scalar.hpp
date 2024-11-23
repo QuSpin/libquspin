@@ -26,9 +26,10 @@ namespace quspin {
     };
 
     using scalars
-        = std::variant<scalar<int8_t>, scalar<uint8_t>, scalar<int16_t>, scalar<uint16_t>,
-                       scalar<uint32_t>, scalar<int32_t>, scalar<uint64_t>, scalar<int64_t>,
-                       scalar<float>, scalar<double>, scalar<cfloat>, scalar<cdouble>>;
+        = std::variant<scalar<int8_t>, scalar<uint8_t>, scalar<int16_t>,
+                       scalar<uint16_t>, scalar<uint32_t>, scalar<int32_t>,
+                       scalar<uint64_t>, scalar<int64_t>, scalar<float>,
+                       scalar<double>, scalar<cfloat>, scalar<cdouble>>;
 
   }  // namespace details
 }  // namespace quspin

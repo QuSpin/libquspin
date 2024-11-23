@@ -16,10 +16,14 @@ int main() {
 
   int8_t data_ptr[6] = {1, 2, 3, -3, -2, -1};
 
-  Array indptr({4}, {sizeof(int32_t)}, Int32, reinterpret_cast<void *>(indptr_ptr));
-  Array indices({6}, {sizeof(int32_t)}, Int32, reinterpret_cast<void *>(indices_ptr));
-  Array cindices({6}, {sizeof(int8_t)}, UInt8, reinterpret_cast<void *>(cindices_ptr));
-  Array cindices2({6}, {sizeof(int8_t)}, Int8, reinterpret_cast<void *>(cindices_ptr2));
+  Array indptr({4}, {sizeof(int32_t)}, Int32,
+               reinterpret_cast<void *>(indptr_ptr));
+  Array indices({6}, {sizeof(int32_t)}, Int32,
+                reinterpret_cast<void *>(indices_ptr));
+  Array cindices({6}, {sizeof(int8_t)}, UInt8,
+                 reinterpret_cast<void *>(cindices_ptr));
+  Array cindices2({6}, {sizeof(int8_t)}, Int8,
+                  reinterpret_cast<void *>(cindices_ptr2));
   Array data({6}, {sizeof(int8_t)}, Int8, reinterpret_cast<void *>(data_ptr));
 
   QMatrix op(data, indptr, indices, cindices);

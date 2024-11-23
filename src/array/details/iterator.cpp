@@ -6,8 +6,10 @@ namespace quspin {
   namespace details {
 
     template <PrimativeTypes T>
-    array_iterator<T>::array_iterator(T *data, const std::vector<std::size_t> &shape,
-                                      const std::vector<std::size_t> &strides, std::size_t start)
+    array_iterator<T>::array_iterator(T *data,
+                                      const std::vector<std::size_t> &shape,
+                                      const std::vector<std::size_t> &strides,
+                                      std::size_t start)
         : data_(data), index_(start), ndim_(shape.size()) {
       step_size_index_.fill(std::size_t());
 
@@ -29,7 +31,8 @@ namespace quspin {
       return (data_ == other.data_) && (index_ == other.index_);
     }
 
-    template <PrimativeTypes T> array_iterator<T> &array_iterator<T>::operator++() {
+    template <PrimativeTypes T>
+    array_iterator<T> &array_iterator<T>::operator++() {
       std::size_t dim = ndim_;
       for (; dim > 1; --dim) {
         const std::size_t dim_id = dim - 1;
@@ -57,13 +60,16 @@ namespace quspin {
       return *this;
     }
 
-    template <PrimativeTypes T> array_iterator<T> array_iterator<T>::operator++(int) {
+    template <PrimativeTypes T>
+    array_iterator<T> array_iterator<T>::operator++(int) {
       array_iterator<T> temp = *this;
       ++(*this);
       return temp;
     }
 
-    template <PrimativeTypes T> T &array_iterator<T>::operator*() const { return const_cast<T&>(data_[index_]); }
+    template <PrimativeTypes T> T &array_iterator<T>::operator*() const {
+      return const_cast<T &>(data_[index_]);
+    }
 
     template struct array_iterator<int8_t>;
     template struct array_iterator<uint8_t>;

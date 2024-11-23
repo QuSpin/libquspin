@@ -7,7 +7,8 @@
 
 using namespace quspin::details;
 
-template <typename Func, typename... Args> decltype(auto) time_func(Func func, Args... args) {
+template <typename Func, typename... Args>
+decltype(auto) time_func(Func func, Args... args) {
   auto start = std::chrono::high_resolution_clock::now();
   auto res = func(args...);
   auto stop = std::chrono::high_resolution_clock::now();

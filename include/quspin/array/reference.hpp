@@ -18,29 +18,36 @@ namespace quspin {
 
   public:
     Reference() : DTypeObject<details::references>(default_value()) {}
-    Reference(details::references &reference) : DTypeObject<details::references>(reference) {}
+    Reference(details::references &reference)
+        : DTypeObject<details::references>(reference) {}
     template <PrimativeTypes T> Reference(T &ref)
-        : DTypeObject<details::references>(details::references(details::reference<T>(ref))) {}
+        : DTypeObject<details::references>(
+              details::references(details::reference<T>(ref))) {}
     template <ScalarTypes T> operator T() const {
       if constexpr (std::is_same_v<T, Scalar>) {
-        return std::visit([](auto &&internals) { return Scalar(internals.get()); }, internals_);
+        return std::visit(
+            [](auto &&internals) { return Scalar(internals.get()); },
+            internals_);
       } else {
-        return std::visit([](auto &&internals) { return details::cast<T>(internals.get()); },
-                          internals_);
+        return std::visit(
+            [](auto &&internals) { return details::cast<T>(internals.get()); },
+            internals_);
       }
     }
     template <ScalarTypes T> Reference &operator=(const T &scalar) {
       if constexpr (std::is_same_v<T, Scalar>) {
         std::visit(
             [](auto &&internals, auto &&scalar) {
-              using ref_t = typename std::decay_t<decltype(internals)>::value_type;
+              using ref_t =
+                  typename std::decay_t<decltype(internals)>::value_type;
               internals = details::cast<ref_t>(scalar.get());
             },
             internals_, scalar.get_variant_obj());
       } else {
         std::visit(
             [&scalar](auto &&internals) {
-              using ref_t = typename std::decay_t<decltype(internals)>::value_type;
+              using ref_t =
+                  typename std::decay_t<decltype(internals)>::value_type;
               internals = details::cast<ref_t>(scalar);
             },
             internals_);

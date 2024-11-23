@@ -22,20 +22,20 @@ namespace quspin::basis {
   typedef boost::multiprecision::uint512_t uint512_t;
   typedef boost::multiprecision::uint1024_t uint1024_t;
   typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<
-      2048UL, 2048UL, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked,
-      void> >
+      2048UL, 2048UL, boost::multiprecision::unsigned_magnitude,
+      boost::multiprecision::unchecked, void> >
       uint2048_t;
   typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<
-      4096UL, 4096UL, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked,
-      void> >
+      4096UL, 4096UL, boost::multiprecision::unsigned_magnitude,
+      boost::multiprecision::unchecked, void> >
       uint4096_t;
   typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<
-      8192UL, 8192UL, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked,
-      void> >
+      8192UL, 8192UL, boost::multiprecision::unsigned_magnitude,
+      boost::multiprecision::unchecked, void> >
       uint8192_t;
   typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<
-      16384UL, 16384UL, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked,
-      void> >
+      16384UL, 16384UL, boost::multiprecision::unsigned_magnitude,
+      boost::multiprecision::unchecked, void> >
       uint16384_t;
 #endif
 

@@ -49,7 +49,8 @@ namespace quspin::basis {
     }
   };
 
-  template <typename I> int get_sub_bitstring(const bit_set<I>& s, const int i) {
+  template <typename I>
+  int get_sub_bitstring(const bit_set<I>& s, const int i) {
     return integer<int, I>::cast((s.content >> i) & I(1));
   }
 
@@ -67,11 +68,13 @@ namespace quspin::basis {
 
   template <typename I>
   bit_set<I> set_sub_bitstring(const bit_set<I>& s, const int in, const int i) {
-    return bit_set<I>(s.content ^ (((I(in & 1) << i) ^ s.content) & (I(1) << i)));
+    return bit_set<I>(s.content
+                      ^ (((I(in & 1) << i) ^ s.content) & (I(1) << i)));
   }
 
   template <typename I, std::size_t N>
-  bit_set<I> set_sub_bitstring(const bit_set<I>& s, const int in, const std::array<int, N>& locs) {
+  bit_set<I> set_sub_bitstring(const bit_set<I>& s, const int in,
+                               const std::array<int, N>& locs) {
     I out = s.content;
     I in_I = I(in);
     for (const int loc : locs) {
@@ -83,15 +86,18 @@ namespace quspin::basis {
     return bit_set<I>(out);
   }
 
-  template <typename I> inline bool operator<(const bit_set<I>& lhs, const bit_set<I>& rhs) {
+  template <typename I>
+  inline bool operator<(const bit_set<I>& lhs, const bit_set<I>& rhs) {
     return lhs.content < rhs.content;
   }
 
-  template <typename I> inline bool operator>(const bit_set<I>& lhs, const bit_set<I>& rhs) {
+  template <typename I>
+  inline bool operator>(const bit_set<I>& lhs, const bit_set<I>& rhs) {
     return lhs.content > rhs.content;
   }
 
-  template <typename I> inline bool operator==(const bit_set<I>& lhs, const bit_set<I>& rhs) {
+  template <typename I>
+  inline bool operator==(const bit_set<I>& lhs, const bit_set<I>& rhs) {
     return lhs.content == rhs.content;
   }
 
@@ -104,17 +110,22 @@ namespace quspin::basis {  // explicit instantiation for code coverage
   template struct bit_set<uint8_t>;
 
   template int get_sub_bitstring<uint8_t>(const bit_set<uint8_t>&, const int);
-  template int get_sub_bitstring<uint8_t, 2>(const bit_set<uint8_t>&, const std::array<int, 2>&);
-  template int get_sub_bitstring<uint8_t, 4>(const bit_set<uint8_t>&, const std::array<int, 4>&);
+  template int get_sub_bitstring<uint8_t, 2>(const bit_set<uint8_t>&,
+                                             const std::array<int, 2>&);
+  template int get_sub_bitstring<uint8_t, 4>(const bit_set<uint8_t>&,
+                                             const std::array<int, 4>&);
 
-  template bit_set<uint8_t> set_sub_bitstring<uint8_t>(const bit_set<uint8_t>&, const int,
-                                                       const int);
-  template bit_set<uint8_t> set_sub_bitstring<uint8_t, 3>(const bit_set<uint8_t>& s, const int,
-                                                          const std::array<int, 3>&);
+  template bit_set<uint8_t> set_sub_bitstring<uint8_t>(const bit_set<uint8_t>&,
+                                                       const int, const int);
+  template bit_set<uint8_t> set_sub_bitstring<uint8_t, 3>(
+      const bit_set<uint8_t>& s, const int, const std::array<int, 3>&);
 
-  template bool operator<< uint8_t>(const bit_set<uint8_t>&, const bit_set<uint8_t>&);
-  template bool operator><uint8_t>(const bit_set<uint8_t>&, const bit_set<uint8_t>&);
-  template bool operator== <uint8_t>(const bit_set<uint8_t>&, const bit_set<uint8_t>&);
+  template bool operator<< uint8_t>(const bit_set<uint8_t>&,
+                                    const bit_set<uint8_t>&);
+  template bool operator><uint8_t>(const bit_set<uint8_t>&,
+                                   const bit_set<uint8_t>&);
+  template bool operator== <uint8_t>(const bit_set<uint8_t>&,
+                                     const bit_set<uint8_t>&);
 
 }  // namespace quspin::basis
 

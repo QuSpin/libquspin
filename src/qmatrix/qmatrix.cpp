@@ -12,8 +12,8 @@ namespace quspin {
 
   decltype(auto) select_data_variants(Array &data) {
     using namespace details;
-    return select<array<int8_t>, array<int16_t>, array<float>, array<double>, array<cfloat>,
-                  array<cdouble>>(data, "data");
+    return select<array<int8_t>, array<int16_t>, array<float>, array<double>,
+                  array<cfloat>, array<cdouble>>(data, "data");
   }
 
   decltype(auto) select_indptr_variants(Array &indptr) {
@@ -41,10 +41,12 @@ namespace quspin {
     auto indices_select = select_indices_variants(indices);
     auto cindices_select = select_cindex_variants(cindices);
 
-    auto constructor = [&dim](auto &&data, auto &&indptr, auto &&indices, auto &&cindices) {
+    auto constructor = [&dim](auto &&data, auto &&indptr, auto &&indices,
+                              auto &&cindices) {
       if constexpr (!std::is_same_v<decltype(indptr), decltype(indices)>) {
         return ErrorOr<qmatrices>(
-            Error(ErrorType::ValueError, "indptr and indices must have the same dtype"));
+            Error(ErrorType::ValueError,
+                  "indptr and indices must have the same dtype"));
       } else {
         try {
           qmatrices op = qmatrix(dim, data, indptr, indices, cindices);
@@ -52,14 +54,16 @@ namespace quspin {
         } catch (const std::invalid_argument &e) {
           return ErrorOr<qmatrices>(Error(ErrorType::ValueError, e.what()));
         } catch (...) {
-          return ErrorOr<qmatrices>(Error(ErrorType::RuntimeError, "Unknown error"));
+          return ErrorOr<qmatrices>(
+              Error(ErrorType::RuntimeError, "Unknown error"));
         }
       }
     };
 
     DTypeObject<details::qmatrices>::internals_ = visit_or_error<qmatrices>(
-        constructor, data_select.get_variant_obj(), indptr_select.get_variant_obj(),
-        indices_select.get_variant_obj(), cindices_select.get_variant_obj());
+        constructor, data_select.get_variant_obj(),
+        indptr_select.get_variant_obj(), indices_select.get_variant_obj(),
+        cindices_select.get_variant_obj());
   }
 
   template <typename J>
@@ -73,10 +77,12 @@ namespace quspin {
     auto indptr_select = select_indptr_variants(indptr);
     auto indices_select = select_indices_variants(indices);
 
-    auto constructor = [&dim, &cindex](auto &&data, auto &&indptr, auto &&indices) {
+    auto constructor = [&dim, &cindex](auto &&data, auto &&indptr,
+                                       auto &&indices) {
       if constexpr (!std::is_same_v<decltype(indptr), decltype(indices)>) {
         return ErrorOr<qmatrices>(
-            Error(ErrorType::ValueError, "indptr and indices must have the same dtype"));
+            Error(ErrorType::ValueError,
+                  "indptr and indices must have the same dtype"));
       } else {
         try {
           qmatrices op = qmatrix(dim, data, indptr, indices, cindex);
@@ -84,18 +90,21 @@ namespace quspin {
         } catch (const std::invalid_argument &e) {
           return ErrorOr<qmatrices>(Error(ErrorType::ValueError, e.what()));
         } catch (...) {
-          return ErrorOr<qmatrices>(Error(ErrorType::RuntimeError, "Unknown error"));
+          return ErrorOr<qmatrices>(
+              Error(ErrorType::RuntimeError, "Unknown error"));
         }
       }
     };
 
     DTypeObject<details::qmatrices>::internals_ = visit_or_error<qmatrices>(
-        constructor, data_select.get_variant_obj(), indptr_select.get_variant_obj(),
-        indices_select.get_variant_obj());
+        constructor, data_select.get_variant_obj(),
+        indptr_select.get_variant_obj(), indices_select.get_variant_obj());
   }
 
-  template QMatrix::QMatrix(Array data, Array indptr, Array indices, const uint8_t cindex);
-  template QMatrix::QMatrix(Array data, Array indptr, Array indices, const uint16_t cindex);
+  template QMatrix::QMatrix(Array data, Array indptr, Array indices,
+                            const uint8_t cindex);
+  template QMatrix::QMatrix(Array data, Array indptr, Array indices,
+                            const uint16_t cindex);
 
   std::size_t QMatrix::dim() const {
     return std::visit([](auto &&arg) { return arg.dim(); },

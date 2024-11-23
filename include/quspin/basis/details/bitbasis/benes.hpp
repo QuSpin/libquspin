@@ -20,7 +20,8 @@ namespace quspin::basis::benes {
     // Remove the name suffix  for all methods.
     // If you want to cache the configuration, add here:
     //   kind: the generator kind
-    //     enum (initialized, frot, vrot, ce_right, ce_left, cef_right, cef_left)
+    //     enum (initialized, frot, vrot, ce_right, ce_left, cef_right,
+    //     cef_left)
     //   sw: the used subword size (t_subword)
     // Add an initializer/constructor which sets kind to initialized.
     // The generator routines must set the keys (kind, mask, sw).
@@ -56,7 +57,8 @@ namespace quspin::basis::benes {
   //////
   // aux functions
 
-  template <typename I> void invert_perm(const ta_index<I>& src, ta_index<I>& tgt) {
+  template <typename I>
+  void invert_perm(const ta_index<I>& src, ta_index<I>& tgt) {
     int i;
 
     for (i = 0; i <= bit_info<I>::bits - 1; ++i) {
@@ -127,7 +129,8 @@ namespace quspin::basis::benes {
   //////
   // Permutations via benes_perm network
 
-  template <typename t_bit_index> void exchange_bit_index(t_bit_index* a, t_bit_index* b) {
+  template <typename t_bit_index>
+  void exchange_bit_index(t_bit_index* a, t_bit_index* b) {
     // INLINE
 
     t_bit_index q;
@@ -137,15 +140,17 @@ namespace quspin::basis::benes {
     *b = q;
   }
 
-  template <typename I>
-  void gen_benes_ex(tr_benes<I>* self, const ta_index<I>& c_tgt, const ta_subword<I>& a_stage) {
-    // Generate a configuration for the benes_perm network with variable stage order.
-    // Use benes_fwd_ex and benes_bwd_ex.
-    // Algorithm as sketched by Donal E. Knuth,
+  template <typename I> void gen_benes_ex(tr_benes<I>* self,
+                                          const ta_index<I>& c_tgt,
+                                          const ta_subword<I>& a_stage) {
+    // Generate a configuration for the benes_perm network with variable stage
+    // order. Use benes_fwd_ex and benes_bwd_ex. Algorithm as sketched by Donal
+    // E. Knuth,
     //   The art of computer programming, vol. 4, pre-fascicle 1a
     // Implemented 2011-12-02 by Jasper L. Neumann
     // Modified 2012-08-31 to allow for "don't care" entries.
-    // Modified 2018-05-22 to allow for templated types only for benes'/butterfly networks.
+    // Modified 2018-05-22 to allow for templated types only for
+    // benes'/butterfly networks.
 
     ta_index<I> src, inv_src;
     ta_index<I> tgt, inv_tgt;
@@ -233,7 +238,7 @@ namespace quspin::basis::benes {
                     break;  // open end
                   }
                   if (((lo_bit << src_idx) & src_set) != 0) {  // yet unhandled
-                    break;                                     // already handled
+                    break;  // already handled
                   }
                 } while (true);
               }
@@ -249,7 +254,8 @@ namespace quspin::basis::benes {
     // self->b1.cfg[0] = 0;
   }
 
-  template <typename I> void gen_benes(tr_benes<I>* self, const ta_index<I>& c_tgt) {
+  template <typename I>
+  void gen_benes(tr_benes<I>* self, const ta_index<I>& c_tgt) {
     // INLINE
     // Generate a configuration for the standard benes_perm network.
     ta_subword<I> a_stage_bwd;
@@ -283,14 +289,17 @@ namespace quspin::basis::benes {  // explicit instantiation for code coverage
   template struct ta_index<uint8_t>;
   template struct ta_subword<uint8_t>;
 
-  template void invert_perm<uint8_t>(const ta_index<uint8_t>&, ta_index<uint8_t>&);
+  template void invert_perm<uint8_t>(const ta_index<uint8_t>&,
+                                     ta_index<uint8_t>&);
   template uint8_t bit_permute_step<uint8_t>(uint8_t, uint8_t, int);
   template uint8_t bfly<uint8_t>(const tr_bfly<uint8_t>*, uint8_t);
   template uint8_t ibfly<uint8_t>(const tr_bfly<uint8_t>*, uint8_t);
   template void exchange_bit_index<uint8_t>(uint8_t* a, uint8_t* b);
-  template void gen_benes_ex<uint8_t>(tr_benes<uint8_t>*, const ta_index<uint8_t>&,
+  template void gen_benes_ex<uint8_t>(tr_benes<uint8_t>*,
+                                      const ta_index<uint8_t>&,
                                       const ta_subword<uint8_t>&);
-  template void gen_benes<uint8_t>(tr_benes<uint8_t>*, const ta_index<uint8_t>&);
+  template void gen_benes<uint8_t>(tr_benes<uint8_t>*,
+                                   const ta_index<uint8_t>&);
   template uint8_t benes_fwd<uint8_t>(const tr_benes<uint8_t>*, uint8_t);
   template uint8_t benes_bwd<uint8_t>(const tr_benes<uint8_t>*, uint8_t);
 

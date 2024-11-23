@@ -82,25 +82,29 @@ namespace quspin {
     template <typename T, typename I, typename J>
       requires QMatrixTypes<T, I, J>
     bool iterator<T, I, J>::operator==(const iterator<T, I, J> &other) const {
-      return data_ == other.data_ && indices_ == other.indices_ && cindices_ == other.cindices_;
+      return data_ == other.data_ && indices_ == other.indices_
+             && cindices_ == other.cindices_;
     }
 
     template <typename T, typename I, typename J>
       requires QMatrixTypes<T, I, J>
     bool iterator<T, I, J>::operator!=(const iterator<T, I, J> &other) const {
-      return data_ != other.data_ || indices_ != other.indices_ || cindices_ != other.cindices_;
+      return data_ != other.data_ || indices_ != other.indices_
+             || cindices_ != other.cindices_;
     }
 
     template <typename T, typename I, typename J>
       requires QMatrixTypes<T, I, J>
     bool iterator<T, I, J>::operator<(const iterator<T, I, J> &other) const {
-      return data_ < other.data_ && indices_ < other.indices_ && cindices_ < other.cindices_;
+      return data_ < other.data_ && indices_ < other.indices_
+             && cindices_ < other.cindices_;
     }
 
     template <typename T, typename I, typename J>
       requires QMatrixTypes<T, I, J>
     bool iterator<T, I, J>::operator>(const iterator<T, I, J> &other) const {
-      return data_ > other.data_ && indices_ > other.indices_ && cindices_ > other.cindices_;
+      return data_ > other.data_ && indices_ > other.indices_
+             && cindices_ > other.cindices_;
     }
 
     template <typename T, typename I, typename J>
@@ -151,7 +155,8 @@ namespace quspin {
 
     template <typename T, typename I, typename J>
       requires QMatrixTypes<T, I, J>
-    iterator<T, I, J> &iterator<T, I, J>::operator+=(const iterator<T, I, J>::difference_type &n) {
+    iterator<T, I, J> &iterator<T, I, J>::operator+=(
+        const iterator<T, I, J>::difference_type &n) {
       data_ += n;
       indices_ += n;
       cindices_ += n;
@@ -160,7 +165,8 @@ namespace quspin {
 
     template <typename T, typename I, typename J>
       requires QMatrixTypes<T, I, J>
-    iterator<T, I, J> &iterator<T, I, J>::operator-=(const iterator<T, I, J>::difference_type &n) {
+    iterator<T, I, J> &iterator<T, I, J>::operator-=(
+        const iterator<T, I, J>::difference_type &n) {
       data_ -= n;
       indices_ -= n;
       cindices_ -= n;
@@ -169,14 +175,16 @@ namespace quspin {
 
     template <typename T, typename I, typename J>
       requires QMatrixTypes<T, I, J>
-    iterator<T, I, J> iterator<T, I, J>::operator+(const iterator<T, I, J>::difference_type &n) {
+    iterator<T, I, J> iterator<T, I, J>::operator+(
+        const iterator<T, I, J>::difference_type &n) {
       iterator temp(this->data_ + n, this->indices_ + n, this->cindices_ + n);
       return temp;
     }
 
     template <typename T, typename I, typename J>
       requires QMatrixTypes<T, I, J>
-    iterator<T, I, J> iterator<T, I, J>::operator-(const iterator<T, I, J>::difference_type &n) {
+    iterator<T, I, J> iterator<T, I, J>::operator-(
+        const iterator<T, I, J>::difference_type &n) {
       iterator temp(this->data_ - n, this->indices_ - n, this->cindices_ - n);
       return temp;
     }
@@ -220,7 +228,8 @@ namespace quspin {
     template <typename T, typename I, typename J>
       requires QMatrixTypes<T, I, J>
     iterator<T, I, J>::reference_type iterator<T, I, J>::operator*() const {
-      return row_info<T, I, J>(const_cast<T &>(*data_), const_cast<I &>(*indices_),
+      return row_info<T, I, J>(const_cast<T &>(*data_),
+                               const_cast<I &>(*indices_),
                                const_cast<J &>(*cindices_));
     }
 

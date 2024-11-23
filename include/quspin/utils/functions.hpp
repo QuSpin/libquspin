@@ -6,7 +6,9 @@
 namespace quspin {
 
   template <size_t base, size_t N> struct integer_pow {
-    enum pow : size_t { value = base * static_cast<size_t>(integer_pow<base, N - 1>::value) };
+    enum pow : size_t {
+      value = base * static_cast<size_t>(integer_pow<base, N - 1>::value)
+    };
   };
 
   template <size_t base> struct integer_pow<base, 0u> {
@@ -20,7 +22,9 @@ namespace quspin {
 #  include <complex>
 
 namespace quspin {
-  template <class T> std::complex<T> conj(const std::complex<T>& A) { return std::conj(A); }
+  template <class T> std::complex<T> conj(const std::complex<T>& A) {
+    return std::conj(A);
+  }
 
   template <class T> T conj(const T& A) { return A; }
 

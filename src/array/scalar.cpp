@@ -18,8 +18,9 @@ namespace quspin {
   template Scalar::Scalar(const details::cdouble &);
 
   template <PrimativeTypes T> Scalar::operator T() const {
-    return std::visit([](const auto &internals) { return details::cast<T>(internals.get()); },
-                      internals_);
+    return std::visit(
+        [](const auto &internals) { return details::cast<T>(internals.get()); },
+        internals_);
   }
   template Scalar::operator int8_t() const;
   template Scalar::operator uint8_t() const;
@@ -52,13 +53,18 @@ namespace quspin {
   template Scalar &Scalar::operator=(const details::cfloat &);
   template Scalar &Scalar::operator=(const details::cdouble &);
 
-  template <typename Op> Scalar Scalar::binary_op(const Scalar &lhs, const Scalar &rhs, Op &&op) {
-    return std::visit([&op](auto &&lhs, auto &&rhs) { return Scalar(op(lhs.get(), rhs.get())); },
-                      lhs.get_variant_obj(), rhs.get_variant_obj());
+  template <typename Op>
+  Scalar Scalar::binary_op(const Scalar &lhs, const Scalar &rhs, Op &&op) {
+    return std::visit(
+        [&op](auto &&lhs, auto &&rhs) {
+          return Scalar(op(lhs.get(), rhs.get()));
+        },
+        lhs.get_variant_obj(), rhs.get_variant_obj());
   }
 
   Scalar Scalar::operator+(const Scalar &other) const {
-    return Scalar::binary_op(*this, other, [](auto &&lhs, auto &&rhs) { return lhs + rhs; });
+    return Scalar::binary_op(*this, other,
+                             [](auto &&lhs, auto &&rhs) { return lhs + rhs; });
   }
   template <PrimativeTypes T> Scalar Scalar::operator+(const T &other) const {
     return Scalar::binary_op(*this, Scalar(other),
@@ -78,7 +84,8 @@ namespace quspin {
   template Scalar Scalar::operator+(const details::cdouble &) const;
 
   Scalar Scalar::operator-(const Scalar &other) const {
-    return Scalar::binary_op(*this, other, [](auto &&lhs, auto &&rhs) { return lhs - rhs; });
+    return Scalar::binary_op(*this, other,
+                             [](auto &&lhs, auto &&rhs) { return lhs - rhs; });
   }
   template <PrimativeTypes T> Scalar Scalar::operator-(const T &other) const {
     return Scalar::binary_op(*this, Scalar(other),
@@ -98,7 +105,8 @@ namespace quspin {
   template Scalar Scalar::operator-(const details::cdouble &) const;
 
   Scalar Scalar::operator*(const Scalar &other) const {
-    return Scalar::binary_op(*this, other, [](auto &&lhs, auto &&rhs) { return lhs * rhs; });
+    return Scalar::binary_op(*this, other,
+                             [](auto &&lhs, auto &&rhs) { return lhs * rhs; });
   }
   template <PrimativeTypes T> Scalar Scalar::operator*(const T &other) const {
     return Scalar::binary_op(*this, Scalar(other),
@@ -118,7 +126,8 @@ namespace quspin {
   template Scalar Scalar::operator*(const details::cdouble &) const;
 
   Scalar Scalar::operator/(const Scalar &other) const {
-    return Scalar::binary_op(*this, other, [](auto &&lhs, auto &&rhs) { return lhs / rhs; });
+    return Scalar::binary_op(*this, other,
+                             [](auto &&lhs, auto &&rhs) { return lhs / rhs; });
   }
   template <PrimativeTypes T> Scalar Scalar::operator/(const T &other) const {
     return Scalar::binary_op(*this, Scalar(other),

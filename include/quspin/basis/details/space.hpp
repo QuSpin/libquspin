@@ -28,9 +28,13 @@ namespace quspin::basis {
     typedef int norm_t;
 
     dit_fullspace(const int _lhss, const J _Ns)
-        : lhss(_lhss), Ns(_Ns), mask(constants::mask[_lhss]), bits(constants::bits[_lhss]) {}
+        : lhss(_lhss),
+          Ns(_Ns),
+          mask(constants::mask[_lhss]),
+          bits(constants::bits[_lhss]) {}
 
-    dit_fullspace(dit_fullspace<I, J>& other) : dit_fullspace(other.lhss, other.Ns) {}
+    dit_fullspace(dit_fullspace<I, J>& other)
+        : dit_fullspace(other.lhss, other.Ns) {}
 
     ~dit_fullspace() {}
 
@@ -70,7 +74,9 @@ namespace quspin::basis {
     typedef K norm_t;
 
     dit_subspace(const int _lhss, const J Ns_est)
-        : lhss(_lhss), mask(constants::mask[_lhss]), bits(constants::bits[_lhss]) {
+        : lhss(_lhss),
+          mask(constants::mask[_lhss]),
+          bits(constants::bits[_lhss]) {
       states.reserve(Ns_est);
       index_map.reserve(Ns_est * 2);
     }
@@ -78,7 +84,9 @@ namespace quspin::basis {
 
     inline J size() const { return states.size(); }
     inline J get_Ns() const { return states.size(); }
-    inline size_t nbytes() const { return states.size() * sizeof(std::pair<I, K>); }
+    inline size_t nbytes() const {
+      return states.size() * sizeof(std::pair<I, K>);
+    }
 
     inline bitset_t get_state(const size_t index) const {
       return bitset_t(std::get<0>(states[index]), lhss, mask, bits);
@@ -89,11 +97,17 @@ namespace quspin::basis {
       return (contains(state) ? get_index(state) : -1);
     }
 
-    inline J get_index(const bitset_t& state) const { return index_map.at(state.content); }
+    inline J get_index(const bitset_t& state) const {
+      return index_map.at(state.content);
+    }
 
-    inline K get_norm(const bitset_t& state) const { return get_norm(get_index(state)); }
+    inline K get_norm(const bitset_t& state) const {
+      return get_norm(get_index(state));
+    }
 
-    inline K get_norm(const J index) const { return std::get<1>(states[index]); }
+    inline K get_norm(const J index) const {
+      return std::get<1>(states[index]);
+    }
 
     inline bool contains(const bitset_t& state) const {
       return index_map.count(state.content) != 0;
@@ -113,17 +127,18 @@ namespace quspin::basis {
     }
 
     void sort_states() {
-      const bool is_sorted
-          = std::is_sorted(states.begin(), states.end(),
-                           [](const std::pair<I, K>& lhs, const std::pair<I, K>& rhs) -> bool {
-                             return lhs.first < rhs.first;
-                           });
+      const bool is_sorted = std::is_sorted(
+          states.begin(), states.end(),
+          [](const std::pair<I, K>& lhs, const std::pair<I, K>& rhs) -> bool {
+            return lhs.first < rhs.first;
+          });
 
       if (!is_sorted) {
-        std::sort(states.begin(), states.end(),
-                  [](const std::pair<I, K>& lhs, const std::pair<I, K>& rhs) -> bool {
-                    return lhs.first < rhs.first;
-                  });
+        std::sort(
+            states.begin(), states.end(),
+            [](const std::pair<I, K>& lhs, const std::pair<I, K>& rhs) -> bool {
+              return lhs.first < rhs.first;
+            });
 
         index_map.clear();
         J index = 0;
@@ -171,7 +186,9 @@ namespace quspin::basis {
     inline J size() const { return Ns; }
     inline size_t get_Ns() const { return Ns; }
 
-    inline bitset_t get_state(const J index) const { return bitset_t(I(Ns - index - 1)); }
+    inline bitset_t get_state(const J index) const {
+      return bitset_t(I(Ns - index - 1));
+    }
 
     inline J get_index(const bitset_t& state) const {
       return Ns - integer<J, I>::cast(state.content) - 1;
@@ -186,12 +203,14 @@ namespace quspin::basis {
     static int get_norm(const J index) { return 1; }
   };
 
-  template <typename I, typename J, typename K>  // tem[plate argument to turn off hash mapping]
-  class bit_subspace                             // sps = 2
+  template <typename I, typename J,
+            typename K>  // tem[plate argument to turn off hash mapping]
+  class bit_subspace     // sps = 2
   {
   private:
     std::vector<std::pair<I, K>> states;
-    std::unordered_map<I, J> index_map;  // create ABI to switch on and off the index_map;
+    std::unordered_map<I, J>
+        index_map;  // create ABI to switch on and off the index_map;
 
   public:
     typedef bit_set<I> bitset_t;
@@ -206,7 +225,9 @@ namespace quspin::basis {
 
     inline J size() const { return states.size(); }
     inline J get_Ns() const { return states.size(); }
-    inline size_t nbytes() const { return states.size() * sizeof(std::pair<I, K>); }
+    inline size_t nbytes() const {
+      return states.size() * sizeof(std::pair<I, K>);
+    }
 
     inline bitset_t get_state(const size_t index) const {
       return bitset_t(std::get<0>(states[index]));
@@ -217,11 +238,17 @@ namespace quspin::basis {
       return (contains(state) ? get_index(state) : -1);
     }
 
-    inline J get_index(const bitset_t& state) const { return index_map.at(state.content); }
+    inline J get_index(const bitset_t& state) const {
+      return index_map.at(state.content);
+    }
 
-    inline K get_norm(const bitset_t& state) const { return get_norm(get_index(state)); }
+    inline K get_norm(const bitset_t& state) const {
+      return get_norm(get_index(state));
+    }
 
-    inline K get_norm(const J index) const { return std::get<1>(states[index]); }
+    inline K get_norm(const J index) const {
+      return std::get<1>(states[index]);
+    }
 
     inline bool contains(const bitset_t& state) const {
       return index_map.count(state.content) != 0;
@@ -241,17 +268,18 @@ namespace quspin::basis {
     }
 
     void sort_states() {
-      const bool is_sorted
-          = std::is_sorted(states.begin(), states.end(),
-                           [](const std::pair<I, K>& lhs, const std::pair<I, K>& rhs) -> bool {
-                             return lhs.first < rhs.first;
-                           });
+      const bool is_sorted = std::is_sorted(
+          states.begin(), states.end(),
+          [](const std::pair<I, K>& lhs, const std::pair<I, K>& rhs) -> bool {
+            return lhs.first < rhs.first;
+          });
 
       if (!is_sorted) {
-        std::sort(states.begin(), states.end(),
-                  [](const std::pair<I, K>& lhs, const std::pair<I, K>& rhs) -> bool {
-                    return lhs.first < rhs.first;
-                  });
+        std::sort(
+            states.begin(), states.end(),
+            [](const std::pair<I, K>& lhs, const std::pair<I, K>& rhs) -> bool {
+              return lhs.first < rhs.first;
+            });
 
         index_map.clear();
         J index = 0;

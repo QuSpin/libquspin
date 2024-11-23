@@ -25,7 +25,8 @@ int main() {
   for (std::size_t i = 0; i < a.shape(0); i++) {
     for (std::size_t j = 0; j < a.shape(1); j++) {
       for (std::size_t k = 0; k < a.shape(2); k++) {
-        assert(static_cast<float>(a[{i, j, k}]) == static_cast<float>(i + j + k));
+        assert(static_cast<float>(a[{i, j, k}])
+               == static_cast<float>(i + j + k));
       }
     }
   }

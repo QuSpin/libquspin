@@ -6,10 +6,12 @@
 namespace quspin {
   namespace details {
 
-    template <PrimativeTypes T> struct reference_counted_ptr : public typed_object<T> {
+    template <PrimativeTypes T> struct reference_counted_ptr
+        : public typed_object<T> {
       T *ptr;
       std::size_t *ref_count_;
-      bool owns_pointer;  // if true, the pointer can be deleted when ref_count_ == 1
+      bool owns_pointer;  // if true, the pointer can be deleted when ref_count_
+                          // == 1
 
       void inc();
       void dec();

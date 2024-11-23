@@ -20,7 +20,8 @@ namespace quspin {
 
       static std::size_t get_ndim(const std::vector<std::size_t> &shape);
       static std::size_t get_size(const std::vector<std::size_t> &shape);
-      static std::vector<std::size_t> get_strides(const std::vector<std::size_t> &shape);
+      static std::vector<std::size_t> get_strides(
+          const std::vector<std::size_t> &shape);
 
       static bool check_contiguous(const std::vector<std::size_t> &stride,
                                    const std::vector<std::size_t> &shape);
@@ -32,7 +33,8 @@ namespace quspin {
 
       array();
       array(const std::vector<std::size_t> &shape);
-      array(const std::vector<std::size_t> &shape, const std::vector<std::size_t> &stride, T *data);
+      array(const std::vector<std::size_t> &shape,
+            const std::vector<std::size_t> &stride, T *data);
       array(std::initializer_list<T> values);
 
       const T *data() const;
@@ -73,24 +75,29 @@ namespace quspin {
         = std::is_floating_point_v<typename array<T>::value_type>;
 
     template <typename T> constexpr bool is_complex_array_v
-        = std::conjunction_v<std::is_same<typename array<T>::value_type, cfloat>,
-                             std::is_same<typename array<T>::value_type, cdouble>,
-                             std::is_same<typename array<T>::value_type, cldouble>>;
+        = std::conjunction_v<
+            std::is_same<typename array<T>::value_type, cfloat>,
+            std::is_same<typename array<T>::value_type, cdouble>,
+            std::is_same<typename array<T>::value_type, cldouble>>;
 
     template <typename U, typename T> constexpr bool is_array_type_v
         = std::is_same_v<U, typename array<T>::value_type>;
 
-    using arrays = std::variant<array<int8_t>, array<uint8_t>, array<int16_t>, array<uint16_t>,
-                                array<uint32_t>, array<int32_t>, array<uint64_t>, array<int64_t>,
-                                array<float>, array<double>, array<cfloat>, array<cdouble>>;
+    using arrays
+        = std::variant<array<int8_t>, array<uint8_t>, array<int16_t>,
+                       array<uint16_t>, array<uint32_t>, array<int32_t>,
+                       array<uint64_t>, array<int64_t>, array<float>,
+                       array<double>, array<cfloat>, array<cdouble>>;
 
     using index_arrays = std::variant<array<int32_t>, array<int64_t>>;
     using matrix_arrays
-        = std::variant<array<int8_t>, array<float>, array<double>, array<cfloat>, array<cdouble>>;
+        = std::variant<array<int8_t>, array<float>, array<double>,
+                       array<cfloat>, array<cdouble>>;
     using state_arrays = std::variant<array<double>, array<cdouble>>;
 
     template <typename T> constexpr bool is_index_type_v
-        = std::conjunction_v<std::is_same<T, int32_t>, std::is_same<T, int64_t>>;
+        = std::conjunction_v<std::is_same<T, int32_t>,
+                             std::is_same<T, int64_t>>;
 
     template <typename T> constexpr bool is_matrix_type_v
         = std::conjunction_v<std::is_same<T, int8_t>, std::is_same<T, float>,

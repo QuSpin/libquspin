@@ -4,7 +4,9 @@
 namespace quspin {
   namespace details {
 
-    template <PrimativeTypes T> void reference_counted_ptr<T>::inc() { (*ref_count_)++; }
+    template <PrimativeTypes T> void reference_counted_ptr<T>::inc() {
+      (*ref_count_)++;
+    }
 
     template <PrimativeTypes T> void reference_counted_ptr<T>::dec() {
       if (*ref_count_ == 1) {
@@ -17,19 +19,22 @@ namespace quspin {
       }
     }
 
-    template <PrimativeTypes T> reference_counted_ptr<T>::reference_counted_ptr()
+    template <PrimativeTypes T>
+    reference_counted_ptr<T>::reference_counted_ptr()
         : ptr(nullptr),
           ref_count_(new std::size_t(1)),
           owns_pointer(false)  // cannot delete nullptr
     {}
 
-    template <PrimativeTypes T> reference_counted_ptr<T>::reference_counted_ptr(T *ptr)
+    template <PrimativeTypes T>
+    reference_counted_ptr<T>::reference_counted_ptr(T *ptr)
         : ptr(ptr),
           ref_count_(new std::size_t(1)),
           owns_pointer(false)  // objects all own the memory, can delete
     {}
 
-    template <PrimativeTypes T> reference_counted_ptr<T>::reference_counted_ptr(std::size_t size)
+    template <PrimativeTypes T>
+    reference_counted_ptr<T>::reference_counted_ptr(std::size_t size)
         : ptr(new T[size]),
           ref_count_(new std::size_t(1)),
           owns_pointer(true)  // objects all own the memory, can delete
@@ -37,8 +42,8 @@ namespace quspin {
       std::fill(ptr, ptr + size, T());
     }
 
-    template <PrimativeTypes T>
-    reference_counted_ptr<T>::reference_counted_ptr(const reference_counted_ptr &other)
+    template <PrimativeTypes T> reference_counted_ptr<T>::reference_counted_ptr(
+        const reference_counted_ptr &other)
         : ptr(other.ptr),
           ref_count_(other.ref_count_),
           owns_pointer(other.owns_pointer)  // inherit ownership of memory
@@ -46,9 +51,13 @@ namespace quspin {
       inc();
     }
 
-    template <PrimativeTypes T> reference_counted_ptr<T>::~reference_counted_ptr() { dec(); }
+    template <PrimativeTypes T>
+    reference_counted_ptr<T>::~reference_counted_ptr() {
+      dec();
+    }
 
-    template <PrimativeTypes T> reference_counted_ptr<T> &reference_counted_ptr<T>::operator=(
+    template <PrimativeTypes T>
+    reference_counted_ptr<T> &reference_counted_ptr<T>::operator=(
         const reference_counted_ptr<T> &other) {
       dec();
       ptr = other.ptr;
@@ -59,11 +68,14 @@ namespace quspin {
       return *this;
     }
 
-    template <PrimativeTypes T> std::size_t reference_counted_ptr<T>::use_count() const {
+    template <PrimativeTypes T>
+    std::size_t reference_counted_ptr<T>::use_count() const {
       return *ref_count_;
     }
 
-    template <PrimativeTypes T> T *reference_counted_ptr<T>::get() { return ptr; }
+    template <PrimativeTypes T> T *reference_counted_ptr<T>::get() {
+      return ptr;
+    }
 
     template <PrimativeTypes T> const T *reference_counted_ptr<T>::get() const {
       return static_cast<const T *>(ptr);

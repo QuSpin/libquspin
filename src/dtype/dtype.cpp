@@ -109,7 +109,8 @@ namespace quspin {
     return std::visit(
         [](const auto &dtype) {
           using T = typename std::decay_t<decltype(dtype)>::value_type;
-          return std::is_same_v<T, details::cfloat> || std::is_same_v<T, details::cdouble>;
+          return std::is_same_v<T, details::cfloat>
+                 || std::is_same_v<T, details::cdouble>;
         },
         dtype.get_variant_obj());
   }

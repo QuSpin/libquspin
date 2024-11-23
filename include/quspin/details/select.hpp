@@ -12,11 +12,12 @@ namespace quspin {
     template <typename Type, typename... Types> struct is_one_of
         : std::disjunction<std::is_same<Types, Type>...> {};
 
-    template <typename Type, typename... Types> inline constexpr bool is_one_of_v
-        = is_one_of<Type, Types...>::value;
+    template <typename Type, typename... Types>
+    inline constexpr bool is_one_of_v = is_one_of<Type, Types...>::value;
 
     template <typename... Types, typename Variants>
-    DTypeObject<std::variant<Types...>> select(DTypeObject<Variants> &obj, std::string name = "") {
+    DTypeObject<std::variant<Types...>> select(DTypeObject<Variants> &obj,
+                                               std::string name = "") {
       static_assert(sizeof...(Types) > 0, "No types specified for select");
       using select_variant_t = std::variant<Types...>;
       using dtype_object_t = DTypeObject<select_variant_t>;

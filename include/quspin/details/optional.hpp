@@ -16,9 +16,12 @@ namespace quspin {
       Optional(const std::monostate value) : value(value) {}
       Optional(const Optional<T> &result) : value(result.value) {}
 
-      bool has_value() const noexcept { return std::holds_alternative<T>(value); }
+      bool has_value() const noexcept {
+        return std::holds_alternative<T>(value);
+      }
 
-      template <typename Callable> T get(Callable &&functor = []() { return T(); }) const noexcept {
+      template <typename Callable>
+      T get(Callable &&functor = []() { return T(); }) const noexcept {
         if (has_value()) {
           return std::get<T>(value);
         } else {
@@ -30,7 +33,8 @@ namespace quspin {
         if (has_value()) {
           return std::get<T>(value);
         } else {
-          throw std::runtime_error("Optional does not have a value, no value provided");
+          throw std::runtime_error(
+              "Optional does not have a value, no value provided");
         }
       }
     };

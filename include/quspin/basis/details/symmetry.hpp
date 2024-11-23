@@ -46,12 +46,16 @@ namespace quspin::basis {
 
     ~dit_perm() {}
 
-    template <typename T> inline dit_set<I> app(const dit_set<I>& s, T& coeff) const {
-      return dit_set<I>(benes::benes_fwd(&benes, s.content), s.lhss, s.mask, s.bits);
+    template <typename T>
+    inline dit_set<I> app(const dit_set<I>& s, T& coeff) const {
+      return dit_set<I>(benes::benes_fwd(&benes, s.content), s.lhss, s.mask,
+                        s.bits);
     }
 
-    template <typename T> inline dit_set<I> inv(const dit_set<I>& s, T& coeff) const {
-      return dit_set<I>(benes::benes_bwd(&benes, s.content), s.lhss, s.mask, s.bits);
+    template <typename T>
+    inline dit_set<I> inv(const dit_set<I>& s, T& coeff) const {
+      return dit_set<I>(benes::benes_bwd(&benes, s.content), s.lhss, s.mask,
+                        s.bits);
     }
   };
 
@@ -80,17 +84,20 @@ namespace quspin::basis {
 
     ~bit_perm() {}
 
-    template <typename T> inline bit_set<I> app(const bit_set<I>& s, T& coeff) const {
+    template <typename T>
+    inline bit_set<I> app(const bit_set<I>& s, T& coeff) const {
       return bit_set<I>(benes::benes_fwd(&benes, s.content));
     }
 
-    template <typename T> inline bit_set<I> inv(const bit_set<I>& s, T& coeff) const {
+    template <typename T>
+    inline bit_set<I> inv(const bit_set<I>& s, T& coeff) const {
       return bit_set<I>(benes::benes_bwd(&benes, s.content));
     }
   };
 
   // potentially change names
-  template <typename I> class perm_dit  // permutations of the dit states locally
+  template <typename I>
+  class perm_dit  // permutations of the dit states locally
   {
   private:
     const int lhss;
@@ -123,7 +130,8 @@ namespace quspin::basis {
     perm_dit(const perm_dit<I>& other) : lhss(other.lhss) {
       locs.insert(locs.end(), other.locs.begin(), other.locs.end());
       perm.insert(perm.end(), other.perm.begin(), other.perm.end());
-      inv_perm.insert(inv_perm.end(), other.inv_perm.begin(), other.inv_perm.end());
+      inv_perm.insert(inv_perm.end(), other.inv_perm.begin(),
+                      other.inv_perm.end());
     }
     ~perm_dit() {}
 
@@ -156,26 +164,31 @@ namespace quspin::basis {
     }
   };
 
-  template <typename I> class perm_bit  // permutations of the bit states locally
+  template <typename I>
+  class perm_bit  // permutations of the bit states locally
   {
   private:
     const I mask;  // which bits to flip
 
   public:
     perm_bit(const I _mask) : mask(_mask) {}
-    perm_bit(const std::vector<int>& mask_vec) : mask(bit_set<I>(mask_vec).content) {}
+    perm_bit(const std::vector<int>& mask_vec)
+        : mask(bit_set<I>(mask_vec).content) {}
     ~perm_bit() {}
 
-    template <typename T> inline bit_set<I> app(const bit_set<I>& s, T& coeff) const {
+    template <typename T>
+    inline bit_set<I> app(const bit_set<I>& s, T& coeff) const {
       return bit_set<I>(s.content ^ mask);
     }
 
-    template <typename T> inline bit_set<I> inv(const bit_set<I>& s, T& coeff) const {
+    template <typename T>
+    inline bit_set<I> inv(const bit_set<I>& s, T& coeff) const {
       return bit_set<I>(s.content ^ mask);
     }
   };
 
-  template <typename lat_perm_t, typename loc_perm_t, typename dits_or_bits, typename T>
+  template <typename lat_perm_t, typename loc_perm_t, typename dits_or_bits,
+            typename T>
   class symmetry {
   private:
     std::vector<lat_perm_t> lat_symm;
@@ -184,8 +197,10 @@ namespace quspin::basis {
     std::vector<T> loc_char;
 
   public:
-    symmetry(const std::vector<lat_perm_t>& _lat_symm, const std::vector<T>& _lat_char,
-             const std::vector<loc_perm_t>& _loc_symm, const std::vector<T>& _loc_char) {
+    symmetry(const std::vector<lat_perm_t>& _lat_symm,
+             const std::vector<T>& _lat_char,
+             const std::vector<loc_perm_t>& _loc_symm,
+             const std::vector<T>& _loc_char) {
       assert(_lat_symm.size() == _lat_char.size());
       assert(_loc_symm.size() == _loc_char.size());
 
@@ -198,7 +213,8 @@ namespace quspin::basis {
     }
 
     symmetry(const symmetry<lat_perm_t, loc_perm_t, dits_or_bits, T>& other)
-        : symmetry(other.lat_symm, other.lat_char, other.loc_symm, other.loc_char) {}
+        : symmetry(other.lat_symm, other.lat_char, other.loc_symm,
+                   other.loc_char) {}
     ~symmetry() {}
 
     size_t size() const { return lat_symm.size() * loc_symm.size(); }
@@ -270,22 +286,31 @@ namespace quspin::basis {
 namespace quspin::basis {  // test cases
 
   template class dit_perm<uint8_t>;
-  template dit_set<uint8_t> dit_perm<uint8_t>::app<double>(const dit_set<uint8_t>&, double&) const;
-  template dit_set<uint8_t> dit_perm<uint8_t>::inv<double>(const dit_set<uint8_t>&, double&) const;
+  template dit_set<uint8_t> dit_perm<uint8_t>::app<double>(
+      const dit_set<uint8_t>&, double&) const;
+  template dit_set<uint8_t> dit_perm<uint8_t>::inv<double>(
+      const dit_set<uint8_t>&, double&) const;
 
   template class perm_dit<uint8_t>;
-  template dit_set<uint8_t> perm_dit<uint8_t>::app<double>(const dit_set<uint8_t>&, double&) const;
-  template dit_set<uint8_t> perm_dit<uint8_t>::inv<double>(const dit_set<uint8_t>&, double&) const;
+  template dit_set<uint8_t> perm_dit<uint8_t>::app<double>(
+      const dit_set<uint8_t>&, double&) const;
+  template dit_set<uint8_t> perm_dit<uint8_t>::inv<double>(
+      const dit_set<uint8_t>&, double&) const;
 
   template class bit_perm<uint8_t>;
-  template bit_set<uint8_t> bit_perm<uint8_t>::app<double>(const bit_set<uint8_t>&, double&) const;
-  template bit_set<uint8_t> bit_perm<uint8_t>::inv<double>(const bit_set<uint8_t>&, double&) const;
+  template bit_set<uint8_t> bit_perm<uint8_t>::app<double>(
+      const bit_set<uint8_t>&, double&) const;
+  template bit_set<uint8_t> bit_perm<uint8_t>::inv<double>(
+      const bit_set<uint8_t>&, double&) const;
 
   template class perm_bit<uint8_t>;
-  template bit_set<uint8_t> perm_bit<uint8_t>::app<double>(const bit_set<uint8_t>&, double&) const;
-  template bit_set<uint8_t> perm_bit<uint8_t>::inv<double>(const bit_set<uint8_t>&, double&) const;
+  template bit_set<uint8_t> perm_bit<uint8_t>::app<double>(
+      const bit_set<uint8_t>&, double&) const;
+  template bit_set<uint8_t> perm_bit<uint8_t>::inv<double>(
+      const bit_set<uint8_t>&, double&) const;
 
-  template class symmetry<bit_perm<uint8_t>, perm_bit<uint8_t>, bit_set<uint8_t>, double>;
+  template class symmetry<bit_perm<uint8_t>, perm_bit<uint8_t>,
+                          bit_set<uint8_t>, double>;
 
 }  // namespace quspin::basis
 
@@ -343,7 +368,8 @@ TEST_SUITE("quspin/basis/symmetry.h") {
 
   TEST_CASE("perm_bit") {
     const uint8_t mask = 0b00110101;
-    std::unique_ptr<perm_bit<uint8_t>> pb = std::make_unique<perm_bit<uint8_t>>(mask);
+    std::unique_ptr<perm_bit<uint8_t>> pb
+        = std::make_unique<perm_bit<uint8_t>>(mask);
     bit_set<uint8_t> bit_state({0, 1, 0, 1, 1, 1, 0, 0});
     double coeff = 1.0;
 

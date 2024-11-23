@@ -43,19 +43,23 @@ namespace quspin {
   template Reference &Reference::operator=(const details::cfloat &);
   template Reference &Reference::operator=(const details::cdouble &);
 
-  template <typename Op>
-  Scalar Reference::binary_op(const Reference &lhs, const Scalar &rhs, Op &&op) {
-    return std::visit([&op](auto &&lhs, auto &&rhs) { return Scalar(op(lhs.get(), rhs.get())); },
-                      lhs.get_variant_obj(), rhs.get_variant_obj());
+  template <typename Op> Scalar Reference::binary_op(const Reference &lhs,
+                                                     const Scalar &rhs,
+                                                     Op &&op) {
+    return std::visit(
+        [&op](auto &&lhs, auto &&rhs) {
+          return Scalar(op(lhs.get(), rhs.get()));
+        },
+        lhs.get_variant_obj(), rhs.get_variant_obj());
   }
 
   Scalar Reference::operator+(const Reference &other) const {
-    return Reference::binary_op(*this, Scalar(other),
-                                [](auto &&lhs, auto &&rhs) { return lhs - rhs; });
+    return Reference::binary_op(
+        *this, Scalar(other), [](auto &&lhs, auto &&rhs) { return lhs - rhs; });
   }
   template <ScalarTypes T> Scalar Reference::operator+(const T &other) const {
-    return Reference::binary_op(*this, Scalar(other),
-                                [](auto &&lhs, auto &&rhs) { return lhs - rhs; });
+    return Reference::binary_op(
+        *this, Scalar(other), [](auto &&lhs, auto &&rhs) { return lhs - rhs; });
   }
   template Scalar Reference::operator+(const int8_t &) const;
   template Scalar Reference::operator+(const uint8_t &) const;
@@ -72,12 +76,12 @@ namespace quspin {
   template Scalar Reference::operator+(const Scalar &) const;
 
   Scalar Reference::operator-(const Reference &other) const {
-    return Reference::binary_op(*this, Scalar(other),
-                                [](auto &&lhs, auto &&rhs) { return lhs - rhs; });
+    return Reference::binary_op(
+        *this, Scalar(other), [](auto &&lhs, auto &&rhs) { return lhs - rhs; });
   }
   template <ScalarTypes T> Scalar Reference::operator-(const T &other) const {
-    return Reference::binary_op(*this, Scalar(other),
-                                [](auto &&lhs, auto &&rhs) { return lhs - rhs; });
+    return Reference::binary_op(
+        *this, Scalar(other), [](auto &&lhs, auto &&rhs) { return lhs - rhs; });
   }
   template Scalar Reference::operator-(const int8_t &) const;
   template Scalar Reference::operator-(const uint8_t &) const;
@@ -94,12 +98,12 @@ namespace quspin {
   template Scalar Reference::operator-(const Scalar &) const;
 
   Scalar Reference::operator*(const Reference &other) const {
-    return Reference::binary_op(*this, Scalar(other),
-                                [](auto &&lhs, auto &&rhs) { return lhs * rhs; });
+    return Reference::binary_op(
+        *this, Scalar(other), [](auto &&lhs, auto &&rhs) { return lhs * rhs; });
   }
   template <ScalarTypes T> Scalar Reference::operator*(const T &other) const {
-    return Reference::binary_op(*this, Scalar(other),
-                                [](auto &&lhs, auto &&rhs) { return lhs * rhs; });
+    return Reference::binary_op(
+        *this, Scalar(other), [](auto &&lhs, auto &&rhs) { return lhs * rhs; });
   }
   template Scalar Reference::operator*(const int8_t &) const;
   template Scalar Reference::operator*(const uint8_t &) const;
@@ -116,12 +120,12 @@ namespace quspin {
   template Scalar Reference::operator*(const Scalar &) const;
 
   Scalar Reference::operator/(const Reference &other) const {
-    return Reference::binary_op(*this, Scalar(other),
-                                [](auto &&lhs, auto &&rhs) { return lhs / rhs; });
+    return Reference::binary_op(
+        *this, Scalar(other), [](auto &&lhs, auto &&rhs) { return lhs / rhs; });
   }
   template <ScalarTypes T> Scalar Reference::operator/(const T &other) const {
-    return Reference::binary_op(*this, Scalar(other),
-                                [](auto &&lhs, auto &&rhs) { return lhs / rhs; });
+    return Reference::binary_op(
+        *this, Scalar(other), [](auto &&lhs, auto &&rhs) { return lhs / rhs; });
   }
   template Scalar Reference::operator/(const int8_t &) const;
   template Scalar Reference::operator/(const uint8_t &) const;

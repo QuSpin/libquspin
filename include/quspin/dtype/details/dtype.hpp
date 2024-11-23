@@ -18,7 +18,8 @@ namespace quspin {
       static T default_value() { return T(); }
     };
 
-    template <PrimativeTypes... Ts> dtype<std::common_type_t<Ts...>> result_dtype(dtype<Ts>...) {
+    template <PrimativeTypes... Ts>
+    dtype<std::common_type_t<Ts...>> result_dtype(dtype<Ts>...) {
       return dtype<std::common_type_t<Ts...>>();
     }
 
@@ -39,9 +40,11 @@ namespace quspin {
       using type = T;
     };
 
-    using dtypes = std::variant<dtype<int8_t>, dtype<uint8_t>, dtype<int16_t>, dtype<uint16_t>,
-                                dtype<uint32_t>, dtype<int32_t>, dtype<uint64_t>, dtype<int64_t>,
-                                dtype<float>, dtype<double>, dtype<cfloat>, dtype<cdouble>>;
+    using dtypes
+        = std::variant<dtype<int8_t>, dtype<uint8_t>, dtype<int16_t>,
+                       dtype<uint16_t>, dtype<uint32_t>, dtype<int32_t>,
+                       dtype<uint64_t>, dtype<int64_t>, dtype<float>,
+                       dtype<double>, dtype<cfloat>, dtype<cdouble>>;
 
   }  // namespace details
 }  // namespace quspin
