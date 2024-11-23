@@ -9,10 +9,9 @@
 #include <ranges>
 #include <type_traits>
 
-namespace quspin {
-namespace details {
+namespace quspin { namespace details {
 
-template <typename T, typename I, typename J>
+template<typename T, typename I, typename J>
   requires QMatrixTypes<T, I, J>
 void check_fields(const std::size_t dim, const array<T> &data,
                   const array<I> &indptr, const array<I> &indices,
@@ -68,7 +67,7 @@ void check_fields(const std::size_t dim, const array<T> &data,
   }
 }
 
-template <typename T, typename I, typename J>
+template<typename T, typename I, typename J>
   requires QMatrixTypes<T, I, J>
 qmatrix<T, I, J>::qmatrix(const std::size_t dim, array<T> &data,
                           array<I> &indptr, array<I> &indices,
@@ -84,7 +83,7 @@ qmatrix<T, I, J>::qmatrix(const std::size_t dim, array<T> &data,
   }
 }
 
-template <typename T, typename I, typename J>
+template<typename T, typename I, typename J>
   requires QMatrixTypes<T, I, J>
 qmatrix<T, I, J>::qmatrix(const std::size_t dim, array<T> &data,
                           array<I> &indptr, array<I> &indices, const J &cindex)
@@ -98,7 +97,7 @@ qmatrix<T, I, J>::qmatrix(const std::size_t dim, array<T> &data,
   }
 }
 
-template <typename T, typename I, typename J>
+template<typename T, typename I, typename J>
   requires QMatrixTypes<T, I, J>
 void qmatrix<T, I, J>::sort_indices() {
   auto range_iter = std::ranges::iota_view{std::size_t(0), dim_};
@@ -107,7 +106,7 @@ void qmatrix<T, I, J>::sort_indices() {
   }
 }
 
-template <typename T, typename I, typename J>
+template<typename T, typename I, typename J>
   requires QMatrixTypes<T, I, J>
 bool qmatrix<T, I, J>::has_sorted_indices() const {
   auto range_iter = std::ranges::iota_view{std::size_t(0), dim_};
@@ -119,132 +118,133 @@ bool qmatrix<T, I, J>::has_sorted_indices() const {
   return true;
 }
 
-template <typename T, typename I, typename J>
+template<typename T, typename I, typename J>
   requires QMatrixTypes<T, I, J>
 array<T> qmatrix<T, I, J>::data() const {
   return data_;
 }
 
-template <typename T, typename I, typename J>
+template<typename T, typename I, typename J>
   requires QMatrixTypes<T, I, J>
 T *qmatrix<T, I, J>::data_ptr() {
   return data_.mut_data();
 }
 
-template <typename T, typename I, typename J>
+template<typename T, typename I, typename J>
   requires QMatrixTypes<T, I, J>
 const T *qmatrix<T, I, J>::data_ptr() const {
   return data_.data();
 }
 
-template <typename T, typename I, typename J>
+template<typename T, typename I, typename J>
   requires QMatrixTypes<T, I, J>
 const T &qmatrix<T, I, J>::data_at(const std::size_t &i) const {
   return data_ptr()[i];
 }
-template <typename T, typename I, typename J>
+
+template<typename T, typename I, typename J>
   requires QMatrixTypes<T, I, J>
 T &qmatrix<T, I, J>::data_at(const std::size_t &i) {
   return data_ptr()[i];
 }
 
-template <typename T, typename I, typename J>
+template<typename T, typename I, typename J>
   requires QMatrixTypes<T, I, J>
 array<I> qmatrix<T, I, J>::indptr() const {
   return indptr_;
 }
 
-template <typename T, typename I, typename J>
+template<typename T, typename I, typename J>
   requires QMatrixTypes<T, I, J>
 I *qmatrix<T, I, J>::indptr_ptr() {
   return indptr_.mut_data();
 }
 
-template <typename T, typename I, typename J>
+template<typename T, typename I, typename J>
   requires QMatrixTypes<T, I, J>
 const I *qmatrix<T, I, J>::indptr_ptr() const {
   return indptr_.data();
 }
 
-template <typename T, typename I, typename J>
+template<typename T, typename I, typename J>
   requires QMatrixTypes<T, I, J>
 const I &qmatrix<T, I, J>::indptr_at(const std::size_t &i) const {
   return indptr_ptr()[i];
 }
 
-template <typename T, typename I, typename J>
+template<typename T, typename I, typename J>
   requires QMatrixTypes<T, I, J>
 I &qmatrix<T, I, J>::indptr_at(const std::size_t &i) {
   return indptr_ptr()[i];
 }
 
-template <typename T, typename I, typename J>
+template<typename T, typename I, typename J>
   requires QMatrixTypes<T, I, J>
 array<I> qmatrix<T, I, J>::indices() const {
   return indices_;
 }
 
-template <typename T, typename I, typename J>
+template<typename T, typename I, typename J>
   requires QMatrixTypes<T, I, J>
 I *qmatrix<T, I, J>::indices_ptr() {
   return indices_.mut_data();
 }
 
-template <typename T, typename I, typename J>
+template<typename T, typename I, typename J>
   requires QMatrixTypes<T, I, J>
 const I *qmatrix<T, I, J>::indices_ptr() const {
   return indices_.data();
 }
 
-template <typename T, typename I, typename J>
+template<typename T, typename I, typename J>
   requires QMatrixTypes<T, I, J>
 const I &qmatrix<T, I, J>::indices_at(const std::size_t &i) const {
   return indices_ptr()[i];
 }
 
-template <typename T, typename I, typename J>
+template<typename T, typename I, typename J>
   requires QMatrixTypes<T, I, J>
 I &qmatrix<T, I, J>::indices_at(const std::size_t &i) {
   return indices_ptr()[i];
 }
 
-template <typename T, typename I, typename J>
+template<typename T, typename I, typename J>
   requires QMatrixTypes<T, I, J>
 array<J> qmatrix<T, I, J>::cindices() const {
   return cindices_;
 }
 
-template <typename T, typename I, typename J>
+template<typename T, typename I, typename J>
   requires QMatrixTypes<T, I, J>
 J *qmatrix<T, I, J>::cindices_ptr() {
   return cindices_.mut_data();
 }
 
-template <typename T, typename I, typename J>
+template<typename T, typename I, typename J>
   requires QMatrixTypes<T, I, J>
 const J *qmatrix<T, I, J>::cindices_ptr() const {
   return cindices_.data();
 }
 
-template <typename T, typename I, typename J>
+template<typename T, typename I, typename J>
   requires QMatrixTypes<T, I, J>
 const J &qmatrix<T, I, J>::cindices_at(const std::size_t &i) const {
   return cindices_ptr()[i];
 }
 
-template <typename T, typename I, typename J>
+template<typename T, typename I, typename J>
   requires QMatrixTypes<T, I, J>
 J &qmatrix<T, I, J>::cindices_at(const std::size_t &i) {
   return cindices_ptr()[i];
 }
 
-template <typename T, typename I, typename J>
+template<typename T, typename I, typename J>
   requires QMatrixTypes<T, I, J>
 std::size_t qmatrix<T, I, J>::dim() const {
   return dim_;
 }
 
-template <typename T, typename I, typename J>
+template<typename T, typename I, typename J>
   requires QMatrixTypes<T, I, J>
 const iterator<T, I, J> qmatrix<T, I, J>::row_begin(
     const std::size_t &row) const {
@@ -258,7 +258,7 @@ const iterator<T, I, J> qmatrix<T, I, J>::row_begin(
   return tmp;
 }
 
-template <typename T, typename I, typename J>
+template<typename T, typename I, typename J>
   requires QMatrixTypes<T, I, J>
 const iterator<T, I, J> qmatrix<T, I, J>::row_end(
     const std::size_t &row) const {
@@ -272,7 +272,7 @@ const iterator<T, I, J> qmatrix<T, I, J>::row_end(
   return tmp;
 }
 
-template <typename T, typename I, typename J>
+template<typename T, typename I, typename J>
   requires QMatrixTypes<T, I, J>
 iterator<T, I, J> qmatrix<T, I, J>::row_begin(const std::size_t &row) {
   const std::size_t offset = indptr_at(row);
@@ -280,7 +280,7 @@ iterator<T, I, J> qmatrix<T, I, J>::row_begin(const std::size_t &row) {
                            cindices_ptr() + offset);
 }
 
-template <typename T, typename I, typename J>
+template<typename T, typename I, typename J>
   requires QMatrixTypes<T, I, J>
 iterator<T, I, J> qmatrix<T, I, J>::row_end(const std::size_t &row) {
   const std::size_t offset = indptr_at(row + 1);
@@ -313,5 +313,4 @@ template struct qmatrix<double, int64_t, uint16_t>;
 template struct qmatrix<cfloat, int64_t, uint16_t>;
 template struct qmatrix<cdouble, int64_t, uint16_t>;
 
-}  // namespace details
-}  // namespace quspin
+}}  // namespace quspin::details

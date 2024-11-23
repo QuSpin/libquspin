@@ -3,10 +3,9 @@
 #include <quspin/dtype/details/dtype.hpp>
 #include <vector>
 
-namespace quspin {
-namespace details {
+namespace quspin { namespace details {
 
-template <PrimativeTypes T>
+template<PrimativeTypes T>
 array_iterator<T>::array_iterator(T *data,
                                   const std::vector<std::size_t> &shape,
                                   const std::vector<std::size_t> &strides,
@@ -27,12 +26,12 @@ array_iterator<T>::array_iterator(T *data,
   }
 }
 
-template <PrimativeTypes T>
+template<PrimativeTypes T>
 bool array_iterator<T>::operator==(const array_iterator<T> &other) const {
   return (data_ == other.data_) && (index_ == other.index_);
 }
 
-template <PrimativeTypes T>
+template<PrimativeTypes T>
 array_iterator<T> &array_iterator<T>::operator++() {
   std::size_t dim = ndim_;
   for (; dim > 1; --dim) {
@@ -61,14 +60,14 @@ array_iterator<T> &array_iterator<T>::operator++() {
   return *this;
 }
 
-template <PrimativeTypes T>
+template<PrimativeTypes T>
 array_iterator<T> array_iterator<T>::operator++(int) {
   array_iterator<T> temp = *this;
   ++(*this);
   return temp;
 }
 
-template <PrimativeTypes T>
+template<PrimativeTypes T>
 T &array_iterator<T>::operator*() const {
   return const_cast<T &>(data_[index_]);
 }
@@ -86,5 +85,4 @@ template struct array_iterator<double>;
 template struct array_iterator<cfloat>;
 template struct array_iterator<cdouble>;
 
-}  // namespace details
-}  // namespace quspin
+}}  // namespace quspin::details

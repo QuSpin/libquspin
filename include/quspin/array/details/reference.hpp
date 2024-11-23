@@ -5,27 +5,31 @@
 #include <quspin/dtype/details/dtype.hpp>
 #include <variant>
 
-namespace quspin {
-namespace details {
+namespace quspin { namespace details {
 
-template <typename T>
+template<typename T>
 class reference : public typed_object<T> {
-  T *ref_;
+    T *ref_;
 
- public:
-  reference() : ref_(nullptr) {}
-  reference(T &ref) : ref_(&ref) {}
-  operator T &() const { return *ref_; }
-  T &operator=(const T &value) {
-    *ref_ = value;
-    return *ref_;
-  }
-  const T &get() const { return *ref_; }
+  public:
+
+    reference() : ref_(nullptr) {}
+
+    reference(T &ref) : ref_(&ref) {}
+
+    operator T &() const { return *ref_; }
+
+    T &operator=(const T &value) {
+      *ref_ = value;
+      return *ref_;
+    }
+
+    const T &get() const { return *ref_; }
 };
 
-template <typename T>
+template<typename T>
 struct value_type<reference<T>> {
-  using type = T;
+    using type = T;
 };
 
 using references =
@@ -34,5 +38,4 @@ using references =
                  reference<uint64_t>, reference<int64_t>, reference<float>,
                  reference<double>, reference<cfloat>, reference<cdouble>>;
 
-}  // namespace details
-}  // namespace quspin
+}}  // namespace quspin::details

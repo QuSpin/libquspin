@@ -19,271 +19,277 @@
 
 namespace quspin {
 
-template <class T, size_t N>
+template<class T, size_t N>
 class N_body_dit_op {
-  //
- private:
-  const basis::dit_integer_t lhss;  // size of local
-  const int dim;
-  std::array<int, N> locs;
-  std::vector<T> data;
-  std::vector<bool> nonzero;
+    //
+  private:
 
- public:
-  static const int length = N;
-  typedef T value_type;
+    const basis::dit_integer_t lhss;  // size of local
+    const int dim;
+    std::array<int, N> locs;
+    std::vector<T> data;
+    std::vector<bool> nonzero;
 
-  static int get_power(const int _lhss) {
-    int _dim = 1;
-    for (size_t i = 0; i < N; i++) {
-      _dim *= _lhss;
+  public:
+
+    static const int length = N;
+    typedef T value_type;
+
+    static int get_power(const int _lhss) {
+      int _dim = 1;
+      for (size_t i = 0; i < N; i++) {
+        _dim *= _lhss;
+      }
+      return _dim;
     }
-    return _dim;
-  }
 
-  N_body_dit_op(const basis::dit_integer_t _lhss, const std::vector<int>& _locs,
-                const std::vector<T>& _data)
-      : lhss(_lhss), dim(get_power(_lhss)) {
-    assert(_data.size() == dim * dim);
-    assert(_locs.size() == N);
-    // copy to contiguous pointers
-    data.insert(data.begin(), _data.begin(), _data.end());
-    std::copy(_locs.begin(), _locs.end(), locs.begin());
+    N_body_dit_op(const basis::dit_integer_t _lhss,
+                  const std::vector<int>& _locs, const std::vector<T>& _data)
+        : lhss(_lhss), dim(get_power(_lhss)) {
+      assert(_data.size() == dim * dim);
+      assert(_locs.size() == N);
+      // copy to contiguous pointers
+      data.insert(data.begin(), _data.begin(), _data.end());
+      std::copy(_locs.begin(), _locs.end(), locs.begin());
 
-    nonzero.resize(data.size());
-    std::transform(data.begin(), data.end(), nonzero.begin(),
-                   [](const T value) -> bool { return value != T(0); });
-  }
+      nonzero.resize(data.size());
+      std::transform(data.begin(), data.end(), nonzero.begin(),
+                     [](const T value) -> bool { return value != T(0); });
+    }
 
-  N_body_dit_op(const basis::dit_integer_t _lhss, int* _locs, T* _data)
-      : lhss(_lhss), dim(get_power(_lhss)) {
-    // copy to contiguous pointers
-    data.insert(data.begin(), _data, _data + dim * dim);
-    std::copy(_locs, _locs + N, locs.begin());
+    N_body_dit_op(const basis::dit_integer_t _lhss, int* _locs, T* _data)
+        : lhss(_lhss), dim(get_power(_lhss)) {
+      // copy to contiguous pointers
+      data.insert(data.begin(), _data, _data + dim * dim);
+      std::copy(_locs, _locs + N, locs.begin());
 
-    nonzero.resize(data.size());
-    std::transform(data.begin(), data.end(), nonzero.begin(),
-                   [](const T value) -> bool { return value != T(0); });
-  }
+      nonzero.resize(data.size());
+      std::transform(data.begin(), data.end(), nonzero.begin(),
+                     [](const T value) -> bool { return value != T(0); });
+    }
 
-  ~N_body_dit_op() {}
+    ~N_body_dit_op() {}
 
-  template <typename bitset_t, typename container_t>
-  void op(const bitset_t& s, container_t& output) const {
-    const int a = basis::get_sub_bitstring(s, locs);
-    for (int b = 0; b < dim; ++b) {  // loop over columns
-      const int i = dim * a + b;
-      if (nonzero[i]) {
-        const bitset_t r = basis::set_sub_bitstring(s, b, locs);
-        output.push_back(std::make_pair(r, data[i]));
+    template<typename bitset_t, typename container_t>
+    void op(const bitset_t& s, container_t& output) const {
+      const int a = basis::get_sub_bitstring(s, locs);
+      for (int b = 0; b < dim; ++b) {  // loop over columns
+        const int i = dim * a + b;
+        if (nonzero[i]) {
+          const bitset_t r = basis::set_sub_bitstring(s, b, locs);
+          output.push_back(std::make_pair(r, data[i]));
+        }
       }
     }
-  }
 
-  template <typename bitset_t, typename container_t>
-  void op_dagger(const bitset_t& s, container_t& output) const {
-    const int a = basis::get_sub_bitstring(s, locs);
-    for (int b = 0; b < dim; ++b) {  // loop over rows
-      const int i = dim * b + a;
-      if (nonzero[i]) {
-        const bitset_t r = basis::set_sub_bitstring(s, b, locs);
-        output.push_back(std::make_pair(r, conj(data[i])));
+    template<typename bitset_t, typename container_t>
+    void op_dagger(const bitset_t& s, container_t& output) const {
+      const int a = basis::get_sub_bitstring(s, locs);
+      for (int b = 0; b < dim; ++b) {  // loop over rows
+        const int i = dim * b + a;
+        if (nonzero[i]) {
+          const bitset_t r = basis::set_sub_bitstring(s, b, locs);
+          output.push_back(std::make_pair(r, conj(data[i])));
+        }
       }
     }
-  }
 };
 
-template <class T, size_t N>
+template<class T, size_t N>
 class N_body_bit_op {
-  //
- private:
-  static const int dim = static_cast<size_t>(integer_pow<2, N>::value);
+    //
+  private:
 
-  std::array<int, N> locs;
-  std::array<T, dim * dim> data;
-  std::array<bool, dim * dim> nonzero;
+    static const int dim = static_cast<size_t>(integer_pow<2, N>::value);
 
- public:
-  static const int length = N;
-  typedef T value_type;
+    std::array<int, N> locs;
+    std::array<T, dim * dim> data;
+    std::array<bool, dim * dim> nonzero;
 
-  N_body_bit_op(const std::vector<int>& _locs, const std::vector<T>& _data) {
-    assert(_data.size() == dim * dim);
-    assert(_locs.size() == N);
-    // copy to contiguous pointers
-    std::copy(_data.begin(), _data.end(), data.begin());
-    std::copy(_locs.begin(), _locs.end(), locs.begin());
+  public:
 
-    std::transform(data.begin(), data.end(), nonzero.begin(),
-                   [](const T& value) -> bool { return value != T(0); });
-  }
+    static const int length = N;
+    typedef T value_type;
 
-  N_body_bit_op(int* _locs, T* _data) {
-    // copy to contiguous pointers (already allocated)
-    std::copy(_data, _data + dim * dim, data.begin());
-    std::copy(_locs, _locs + N, locs.begin());
+    N_body_bit_op(const std::vector<int>& _locs, const std::vector<T>& _data) {
+      assert(_data.size() == dim * dim);
+      assert(_locs.size() == N);
+      // copy to contiguous pointers
+      std::copy(_data.begin(), _data.end(), data.begin());
+      std::copy(_locs.begin(), _locs.end(), locs.begin());
 
-    std::transform(data.begin(), data.end(), nonzero.begin(),
-                   [](const T& value) -> bool { return value != T(0); });
-  }
+      std::transform(data.begin(), data.end(), nonzero.begin(),
+                     [](const T& value) -> bool { return value != T(0); });
+    }
 
-  ~N_body_bit_op() {}
+    N_body_bit_op(int* _locs, T* _data) {
+      // copy to contiguous pointers (already allocated)
+      std::copy(_data, _data + dim * dim, data.begin());
+      std::copy(_locs, _locs + N, locs.begin());
 
-  template <typename bitset_t, typename container_t>
-  void op(const bitset_t& s, container_t& output) const {
-    const int a = basis::get_sub_bitstring(s, locs);
+      std::transform(data.begin(), data.end(), nonzero.begin(),
+                     [](const T& value) -> bool { return value != T(0); });
+    }
 
-    for (int b = 0; b < dim; ++b) {  // loop over columns
-      const int i = dim * a + b;
-      if (nonzero[i]) {
-        bitset_t r = basis::set_sub_bitstring(s, b, locs);
-        output.push_back(std::make_pair(r, data[i]));
+    ~N_body_bit_op() {}
+
+    template<typename bitset_t, typename container_t>
+    void op(const bitset_t& s, container_t& output) const {
+      const int a = basis::get_sub_bitstring(s, locs);
+
+      for (int b = 0; b < dim; ++b) {  // loop over columns
+        const int i = dim * a + b;
+        if (nonzero[i]) {
+          bitset_t r = basis::set_sub_bitstring(s, b, locs);
+          output.push_back(std::make_pair(r, data[i]));
+        }
       }
     }
-  }
 
-  template <typename bitset_t, typename container_t>
-  void op_dagger(const bitset_t& s, container_t& output) const {
-    const int a = basis::get_sub_bitstring(s, locs);
+    template<typename bitset_t, typename container_t>
+    void op_dagger(const bitset_t& s, container_t& output) const {
+      const int a = basis::get_sub_bitstring(s, locs);
 
-    for (int b = 0; b < dim; ++b) {  // loop over rows
-      const int i = dim * b + a;
-      if (nonzero[i]) {
-        bitset_t r = basis::set_sub_bitstring(s, b, locs);
-        output.push_back(std::make_pair(r, conj(data[i])));
+      for (int b = 0; b < dim; ++b) {  // loop over rows
+        const int i = dim * b + a;
+        if (nonzero[i]) {
+          bitset_t r = basis::set_sub_bitstring(s, b, locs);
+          output.push_back(std::make_pair(r, conj(data[i])));
+        }
       }
     }
-  }
 };
 
-template <typename T>
+template<typename T>
 class operator_string  // generic operator
 {
- private:
-  const int lhss;          // local hilbert space size for each term
-  const int nlocs;         // number of local operators
-  std::vector<int> locs;   // number of local operators in
-  std::vector<int> perms;  // non-branching operators stored as permutations
-  std::vector<int>
-      inv_perms;  // non-branching operators dagger stored as permutations
-  std::vector<T> datas;      // matrix elements for non-branching operators.
-  std::vector<T> inv_datas;  // matrix elements for dagger operator.
+  private:
 
- public:
-  static const int length = 0;
-  typedef T value_type;
+    const int lhss;          // local hilbert space size for each term
+    const int nlocs;         // number of local operators
+    std::vector<int> locs;   // number of local operators in
+    std::vector<int> perms;  // non-branching operators stored as permutations
+    std::vector<int>
+        inv_perms;  // non-branching operators dagger stored as permutations
+    std::vector<T> datas;      // matrix elements for non-branching operators.
+    std::vector<T> inv_datas;  // matrix elements for dagger operator.
 
-  operator_string(const std::vector<int>& _locs,
-                  const std::vector<std::vector<int>>& _perms,
-                  const std::vector<std::vector<T>>& _datas)
-      : lhss(_perms.front().size()), nlocs(_locs.size()) {
-    assert(_locs.size() == _perms.size());
-    assert(_locs.size() == _datas.size());
+  public:
 
-    locs.insert(locs.end(), _locs.begin(), _locs.end());
+    static const int length = 0;
+    typedef T value_type;
 
-    for (size_t i = 0; i < _locs.size(); i++) {
-      std::vector<int> perm(_perms[i].begin(), _perms[i].end()),
-          inv_perm(_perms[i].size());
-      std::vector<T> data(_datas[i].begin(), _datas[i].end()),
-          inv_data(_datas[i].size());
+    operator_string(const std::vector<int>& _locs,
+                    const std::vector<std::vector<int>>& _perms,
+                    const std::vector<std::vector<T>>& _datas)
+        : lhss(_perms.front().size()), nlocs(_locs.size()) {
+      assert(_locs.size() == _perms.size());
+      assert(_locs.size() == _datas.size());
 
-      assert(perm.size() == lhss);
-      assert(data.size() == lhss);
+      locs.insert(locs.end(), _locs.begin(), _locs.end());
 
-      int j = 0;
-      for (const int p : perm) {
-        assert((p >= 0) && (p < lhss));
-        inv_perm[p] = j;
-        inv_data[p] = conj(data[j]);
-        j++;
-      }
+      for (size_t i = 0; i < _locs.size(); i++) {
+        std::vector<int> perm(_perms[i].begin(), _perms[i].end()),
+            inv_perm(_perms[i].size());
+        std::vector<T> data(_datas[i].begin(), _datas[i].end()),
+            inv_data(_datas[i].size());
 
-      perms.insert(perms.end(), perm.begin(), perm.end());
-      inv_perms.insert(inv_perms.end(), inv_perm.begin(), inv_perm.end());
+        assert(perm.size() == lhss);
+        assert(data.size() == lhss);
 
-      datas.insert(datas.end(), data.begin(), data.end());
-      inv_datas.insert(inv_datas.end(), inv_data.begin(), inv_data.end());
-    }
-  }
+        int j = 0;
+        for (const int p : perm) {
+          assert((p >= 0) && (p < lhss));
+          inv_perm[p] = j;
+          inv_data[p] = conj(data[j]);
+          j++;
+        }
 
-  operator_string(const int _lhss, const int _nlocs, int* _locs, int* _perms,
-                  T* _datas)
-      : lhss(_lhss), nlocs(_nlocs) {
-    // constructor for raw data.
-    locs.insert(locs.end(), _locs, _locs + _nlocs);
-    perms.insert(perms.end(), _perms, _perms + _lhss * _nlocs);
-    datas.insert(datas.end(), _datas, _datas + _lhss * _nlocs);
-    inv_perms.resize(perms.size());
-    inv_datas.resize(perms.size());
+        perms.insert(perms.end(), perm.begin(), perm.end());
+        inv_perms.insert(inv_perms.end(), inv_perm.begin(), inv_perm.end());
 
-    std::transform(datas.begin(), datas.end(), inv_datas.begin(),
-                   [](const T& val) { return conj(val); });
-
-    int* _inv_perms = inv_perms.data();
-    for (int i = 0; i < _nlocs; ++i) {
-      int* perm = _perms + i * _lhss;
-      int* inv_perm = _inv_perms + i * _lhss;
-      for (int j = 0; j < _lhss; ++j) {
-        inv_perm[perm[j]] = j;
+        datas.insert(datas.end(), data.begin(), data.end());
+        inv_datas.insert(inv_datas.end(), inv_data.begin(), inv_data.end());
       }
     }
-  }
 
-  ~operator_string() {}
+    operator_string(const int _lhss, const int _nlocs, int* _locs, int* _perms,
+                    T* _datas)
+        : lhss(_lhss), nlocs(_nlocs) {
+      // constructor for raw data.
+      locs.insert(locs.end(), _locs, _locs + _nlocs);
+      perms.insert(perms.end(), _perms, _perms + _lhss * _nlocs);
+      datas.insert(datas.end(), _datas, _datas + _lhss * _nlocs);
+      inv_perms.resize(perms.size());
+      inv_datas.resize(perms.size());
 
-  template <typename bitset_t, typename container_t>
-  void op(const bitset_t& s, container_t& output) const {
-    T m = T(1.0);
-    bitset_t r(s);
+      std::transform(datas.begin(), datas.end(), inv_datas.begin(),
+                     [](const T& val) { return conj(val); });
 
-    bool nonzero = true;
-    size_t ptr = 0;
-
-    for (int i = 0; i < nlocs; ++i) {
-      const int s_loc = quspin::basis::get_sub_bitstring(r, locs[i]);
-      const size_t ind = ptr + s_loc;
-
-      m *= datas[ind];
-      r = basis::set_sub_bitstring(r, perms[ind], locs[i]);
-
-      if (m == T(0)) {
-        nonzero = false;
-        break;
+      int* _inv_perms = inv_perms.data();
+      for (int i = 0; i < _nlocs; ++i) {
+        int* perm = _perms + i * _lhss;
+        int* inv_perm = _inv_perms + i * _lhss;
+        for (int j = 0; j < _lhss; ++j) {
+          inv_perm[perm[j]] = j;
+        }
       }
-
-      // shift to next permutation
-      ptr += lhss;
     }
 
-    if (nonzero) output.push_back(std::make_pair(r, m));
-  }
+    ~operator_string() {}
 
-  template <typename bitset_t, typename container_t>
-  void op_dagger(const bitset_t& s, container_t& output) const {
-    T m = T(1.0);
-    bitset_t r(s);
+    template<typename bitset_t, typename container_t>
+    void op(const bitset_t& s, container_t& output) const {
+      T m = T(1.0);
+      bitset_t r(s);
 
-    bool nonzero = true;
-    size_t ptr = inv_perms.size() - lhss;
+      bool nonzero = true;
+      size_t ptr = 0;
 
-    for (int i = nlocs - 1; i > -1; --i) {
-      const int s_loc = basis::get_sub_bitstring(r, locs[i]);
-      const size_t ind = ptr + s_loc;
+      for (int i = 0; i < nlocs; ++i) {
+        const int s_loc = quspin::basis::get_sub_bitstring(r, locs[i]);
+        const size_t ind = ptr + s_loc;
 
-      m *= inv_datas[ind];
-      r = basis::set_sub_bitstring(r, inv_perms[ind], locs[i]);
+        m *= datas[ind];
+        r = basis::set_sub_bitstring(r, perms[ind], locs[i]);
 
-      if (m == T(0)) {
-        nonzero = false;
-        break;
+        if (m == T(0)) {
+          nonzero = false;
+          break;
+        }
+
+        // shift to next permutation
+        ptr += lhss;
       }
 
-      ptr -= lhss;
+      if (nonzero) output.push_back(std::make_pair(r, m));
     }
 
-    if (nonzero) output.push_back(std::make_pair(r, m));
-  }
+    template<typename bitset_t, typename container_t>
+    void op_dagger(const bitset_t& s, container_t& output) const {
+      T m = T(1.0);
+      bitset_t r(s);
+
+      bool nonzero = true;
+      size_t ptr = inv_perms.size() - lhss;
+
+      for (int i = nlocs - 1; i > -1; --i) {
+        const int s_loc = basis::get_sub_bitstring(r, locs[i]);
+        const size_t ind = ptr + s_loc;
+
+        m *= inv_datas[ind];
+        r = basis::set_sub_bitstring(r, inv_perms[ind], locs[i]);
+
+        if (m == T(0)) {
+          nonzero = false;
+          break;
+        }
+
+        ptr -= lhss;
+      }
+
+      if (nonzero) output.push_back(std::make_pair(r, m));
+    }
 };
 
 }  // namespace quspin

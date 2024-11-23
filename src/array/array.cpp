@@ -74,6 +74,7 @@ bool Array::is_contiguous() const {
       [](const auto &internals) { return internals.is_contiguous(); },
       internals_);
 }
+
 std::vector<std::size_t> Array::shape() const {
   return std::visit([](const auto &internals) { return internals.shape(); },
                     internals_);

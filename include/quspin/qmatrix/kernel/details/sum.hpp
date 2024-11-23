@@ -9,10 +9,9 @@
 #include <quspin/qmatrix/details/qmatrix.hpp>
 #include <thread>
 
-namespace quspin {
-namespace details {
+namespace quspin { namespace details {
 
-template <typename Op, PrimativeTypes T, PrimativeTypes I, PrimativeTypes J>
+template<typename Op, PrimativeTypes T, PrimativeTypes I, PrimativeTypes J>
 void elementwise_binop_size(Op &&op, const qmatrix<T, I, J> &lhs,
                             const qmatrix<T, I, J> &rhs, array<I> &out_indptr,
                             const std::size_t num_threads = 0) {
@@ -59,7 +58,7 @@ void elementwise_binop_size(Op &&op, const qmatrix<T, I, J> &lhs,
   }
 }
 
-template <typename Op, PrimativeTypes T, PrimativeTypes I, PrimativeTypes J>
+template<typename Op, PrimativeTypes T, PrimativeTypes I, PrimativeTypes J>
 void elementwise_binary_operation(Op &&op, const qmatrix<T, I, J> &lhs,
                                   const qmatrix<T, I, J> &rhs,
                                   qmatrix<T, I, J> &out,
@@ -114,5 +113,4 @@ void elementwise_binary_operation(Op &&op, const qmatrix<T, I, J> &lhs,
     }
   }
 }
-}  // namespace details
-}  // namespace quspin
+}}  // namespace quspin::details

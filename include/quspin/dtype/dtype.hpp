@@ -10,27 +10,30 @@
 namespace quspin {
 
 class DType : public details::VariantContainer<details::dtypes> {
-  using details::VariantContainer<details::dtypes>::internals_;
+    using details::VariantContainer<details::dtypes>::internals_;
 
-  static details::dtypes default_value() {
-    return details::dtypes(details::dtype<double>());
-  }
+    static details::dtypes default_value() {
+      return details::dtypes(details::dtype<double>());
+    }
 
- public:
-  DType() : details::VariantContainer<details::dtypes>(default_value()) {};
-  template <typename T>
-  DType(const details::dtype<T> &dtype) {
-    internals_ = details::dtypes(dtype);
-  }
-  std::string name() const;
+  public:
 
-  template <typename T>
-  static DType of() {
-    using val_t = details::value_type_t<std::decay_t<T>>;
-    return DType(details::dtype<details::value_type_t<val_t>>());
-  }
+    DType() : details::VariantContainer<details::dtypes>(default_value()) {};
 
-  bool operator==(const DType &dtype) const;
+    template<typename T>
+    DType(const details::dtype<T> &dtype) {
+      internals_ = details::dtypes(dtype);
+    }
+
+    std::string name() const;
+
+    template<typename T>
+    static DType of() {
+      using val_t = details::value_type_t<std::decay_t<T>>;
+      return DType(details::dtype<details::value_type_t<val_t>>());
+    }
+
+    bool operator==(const DType &dtype) const;
 };
 
 DType result_dtype(std::vector<DType> &);
@@ -51,22 +54,27 @@ static const DType Double = DType(details::dtype<double>());
 static const DType CFloat = DType(details::dtype<details::cfloat>());
 static const DType CDouble = DType(details::dtype<details::cdouble>());
 
-template <typename Variant>
+template<typename Variant>
 class DTypeObject : public details::VariantContainer<Variant> {
- protected:
-  using details::VariantContainer<Variant>::internals_;
+  protected:
 
- public:
-  DTypeObject() = default;
-  DTypeObject(const DTypeObject &obj) = default;
-  DTypeObject(DTypeObject &obj) = default;
-  DTypeObject(DTypeObject &&obj) = default;
-  DTypeObject(const Variant &internals)
-      : details::VariantContainer<Variant>(internals) {}
-  DType dtype() const {
-    return std::visit(
-        [](const auto &obj) { return DType::of<decltype(obj)>(); }, internals_);
-  }
+    using details::VariantContainer<Variant>::internals_;
+
+  public:
+
+    DTypeObject() = default;
+    DTypeObject(const DTypeObject &obj) = default;
+    DTypeObject(DTypeObject &obj) = default;
+    DTypeObject(DTypeObject &&obj) = default;
+
+    DTypeObject(const Variant &internals)
+        : details::VariantContainer<Variant>(internals) {}
+
+    DType dtype() const {
+      return std::visit(
+          [](const auto &obj) { return DType::of<decltype(obj)>(); },
+          internals_);
+    }
 };
 
 }  // namespace quspin

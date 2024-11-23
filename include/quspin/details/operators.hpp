@@ -7,10 +7,9 @@
 
 #include <quspin/details/cast.hpp>
 
-namespace quspin {
-namespace details {
+namespace quspin { namespace details {
 
-template <typename T, typename U, typename Op>
+template<typename T, typename U, typename Op>
 upcast_t<T, U> operator_binary(const T &a, const U &b, Op &&op) {
   {
     using arith_result = upcast_t<T, U>;
@@ -25,10 +24,9 @@ upcast_t<T, U> operator_binary(const T &a, const U &b, Op &&op) {
   }
 }
 
-}  // namespace details
-}  // namespace quspin
+}}  // namespace quspin::details
 
-template <typename T, typename U>
+template<typename T, typename U>
 quspin::details::upcast_t<T, U> operator+(const T &a, const U &b) {
   {
     return quspin::details::operator_binary(a, b, [](auto &&a, auto &&b) {
@@ -39,7 +37,7 @@ quspin::details::upcast_t<T, U> operator+(const T &a, const U &b) {
   }
 }
 
-template <typename T, typename U>
+template<typename T, typename U>
 quspin::details::upcast_t<T, U> operator-(const T &a, const U &b) {
   {
     return quspin::details::operator_binary(a, b, [](auto &&a, auto &&b) {
@@ -50,7 +48,7 @@ quspin::details::upcast_t<T, U> operator-(const T &a, const U &b) {
   }
 }
 
-template <typename T, typename U>
+template<typename T, typename U>
 quspin::details::upcast_t<T, U> operator*(const T &a, const U &b) {
   {
     return quspin::details::operator_binary(a, b, [](auto &&a, auto &&b) {
@@ -61,7 +59,7 @@ quspin::details::upcast_t<T, U> operator*(const T &a, const U &b) {
   }
 }
 
-template <typename T, typename U>
+template<typename T, typename U>
 quspin::details::upcast_t<T, U> operator/(const T &a, const U &b) {
   {
     return quspin::details::operator_binary(a, b, [](auto &&a, auto &&b) {

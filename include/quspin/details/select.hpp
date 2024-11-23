@@ -7,16 +7,15 @@
 #include <type_traits>
 #include <variant>
 
-namespace quspin {
-namespace details {
+namespace quspin { namespace details {
 
-template <typename Type, typename... Types>
+template<typename Type, typename... Types>
 struct is_one_of : std::disjunction<std::is_same<Types, Type>...> {};
 
-template <typename Type, typename... Types>
+template<typename Type, typename... Types>
 inline constexpr bool is_one_of_v = is_one_of<Type, Types...>::value;
 
-template <typename... Types, typename Variants>
+template<typename... Types, typename Variants>
 DTypeObject<std::variant<Types...>> select(DTypeObject<Variants> &obj,
                                            std::string name = "") {
   static_assert(sizeof...(Types) > 0, "No types specified for select");
@@ -52,5 +51,4 @@ DTypeObject<std::variant<Types...>> select(DTypeObject<Variants> &obj,
       obj.get_variant_obj());
 }
 
-}  // namespace details
-}  // namespace quspin
+}}  // namespace quspin::details

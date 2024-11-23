@@ -10,51 +10,57 @@
 namespace quspin {
 
 struct MismatchInputIndexTypes {
-  static constexpr bool has_error() { return true; }
-  static details::Error get_error() {
-    return details::Error(details::ErrorType::ValueError,
-                          "mismatch input index dtypes.");
-  }
+    static constexpr bool has_error() { return true; }
+
+    static details::Error get_error() {
+      return details::Error(details::ErrorType::ValueError,
+                            "mismatch input index dtypes.");
+    }
 };
 
 struct MismatchInputCoeffIndexTypes {
-  static constexpr bool has_error() { return true; }
-  static details::Error get_error() {
-    return details::Error(details::ErrorType::ValueError,
-                          "mismatch input coefficient index dtypes.");
-  }
+    static constexpr bool has_error() { return true; }
+
+    static details::Error get_error() {
+      return details::Error(details::ErrorType::ValueError,
+                            "mismatch input coefficient index dtypes.");
+    }
 };
 
 struct MismatchInputDataTypes {
-  static constexpr bool has_error() { return true; }
-  static details::Error get_error() {
-    return details::Error(details::ErrorType::ValueError,
-                          "mismatch in input data dtypes.");
-  }
+    static constexpr bool has_error() { return true; }
+
+    static details::Error get_error() {
+      return details::Error(details::ErrorType::ValueError,
+                            "mismatch in input data dtypes.");
+    }
 };
 
 struct MismatchOutputIndexTypes {
-  static constexpr bool has_error() { return true; }
-  static details::Error get_error() {
-    return details::Error(details::ErrorType::ValueError,
-                          "mismatch in output index dtypes.");
-  }
+    static constexpr bool has_error() { return true; }
+
+    static details::Error get_error() {
+      return details::Error(details::ErrorType::ValueError,
+                            "mismatch in output index dtypes.");
+    }
 };
 
 struct MismatchOutputCoeffIndexTypes {
-  static constexpr bool has_error() { return true; }
-  static details::Error get_error() {
-    return details::Error(details::ErrorType::ValueError,
-                          "mismatch output coefficient index dtypes.");
-  }
+    static constexpr bool has_error() { return true; }
+
+    static details::Error get_error() {
+      return details::Error(details::ErrorType::ValueError,
+                            "mismatch output coefficient index dtypes.");
+    }
 };
 
 struct MismatchOutputDataTypes {
-  static constexpr bool has_error() { return true; }
-  static details::Error get_error() {
-    return details::Error(details::ErrorType::ValueError,
-                          "mismatch in output data dtype.");
-  }
+    static constexpr bool has_error() { return true; }
+
+    static details::Error get_error() {
+      return details::Error(details::ErrorType::ValueError,
+                            "mismatch in output data dtype.");
+    }
 };
 
 QMatrix sum(const QMatrix lhs, const QMatrix rhs,

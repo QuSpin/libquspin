@@ -48,67 +48,68 @@ static const quspin::basis::dit_integer_t mask[256] = {
 }  // namespace constants
 
 // local degrees of freedom stored in contiguous chunks of bits
-template <typename I>
+template<typename I>
 struct dit_set {  // thin wrapper used for convience
-  I content;
-  int lhss;
-  I mask;
-  dit_integer_t bits;
+    I content;
+    int lhss;
+    I mask;
+    dit_integer_t bits;
 
-  typedef I bitset_t;
+    typedef I bitset_t;
 
-  dit_set(I _content, const int _lhss, const I _mask, const dit_integer_t bits)
-      : content(_content), lhss(_lhss), mask(_mask), bits(bits) {}
+    dit_set(I _content, const int _lhss, const I _mask,
+            const dit_integer_t bits)
+        : content(_content), lhss(_lhss), mask(_mask), bits(bits) {}
 
-  dit_set(I _content, const int _lhss)
-      : content(_content),
-        lhss(_lhss),
-        mask(constants::mask[_lhss]),
-        bits(constants::bits[_lhss]) {}
+    dit_set(I _content, const int _lhss)
+        : content(_content),
+          lhss(_lhss),
+          mask(constants::mask[_lhss]),
+          bits(constants::bits[_lhss]) {}
 
-  dit_set(const dit_set<I>& other)
-      : content(other.content),
-        lhss(other.lhss),
-        mask(other.mask),
-        bits(other.bits) {}
+    dit_set(const dit_set<I>& other)
+        : content(other.content),
+          lhss(other.lhss),
+          mask(other.mask),
+          bits(other.bits) {}
 
-  dit_set(const std::vector<dit_integer_t>& dits, const int _lhss)
-      : lhss(_lhss),
-        mask(constants::mask[_lhss]),
-        bits(constants::bits[_lhss]) {
-    content = 0;
-    for (size_t i = 0; i < dits.size(); i++) {
-      content |= (I(dits[i]) << i * bits);
+    dit_set(const std::vector<dit_integer_t>& dits, const int _lhss)
+        : lhss(_lhss),
+          mask(constants::mask[_lhss]),
+          bits(constants::bits[_lhss]) {
+      content = 0;
+      for (size_t i = 0; i < dits.size(); i++) {
+        content |= (I(dits[i]) << i * bits);
+      }
     }
-  }
 
-  std::vector<dit_integer_t> to_vector(const int length = 0) const {
-    const int niter = (length > 0 ? length : bit_info<I>::bits / bits);
+    std::vector<dit_integer_t> to_vector(const int length = 0) const {
+      const int niter = (length > 0 ? length : bit_info<I>::bits / bits);
 
-    std::vector<dit_integer_t> out(niter);
-    for (int i = 0; i < niter; ++i) {
-      int shift = i * bits;
-      out[i] = integer<dit_integer_t, I>::cast((content >> shift) & mask);
+      std::vector<dit_integer_t> out(niter);
+      for (int i = 0; i < niter; ++i) {
+        int shift = i * bits;
+        out[i] = integer<dit_integer_t, I>::cast((content >> shift) & mask);
+      }
+      return out;
     }
-    return out;
-  }
 
-  std::string to_string(const int length = 0) const {
-    auto dit_vec = to_vector(length);
-    std::stringstream out;
-    for (auto ele : dit_vec) {
-      out << (int)ele << " ";
+    std::string to_string(const int length = 0) const {
+      auto dit_vec = to_vector(length);
+      std::stringstream out;
+      for (auto ele : dit_vec) {
+        out << (int)ele << " ";
+      }
+      return out.str();
     }
-    return out.str();
-  }
 };
 
-template <typename I>
+template<typename I>
 int get_sub_bitstring(const dit_set<I>& s, const int i) {
   return integer<int, I>::cast((s.content >> (i * s.bits)) & s.mask);
 }
 
-template <typename I, std::size_t N>
+template<typename I, std::size_t N>
 int get_sub_bitstring(const dit_set<I>& s, const std::array<int, N>& locs) {
   int out = 0;
   for (int i = N - 1; i > 0; --i) {
@@ -124,14 +125,14 @@ int get_sub_bitstring(const dit_set<I>& s, const std::array<int, N>& locs) {
   return out;
 }
 
-template <typename I>
+template<typename I>
 dit_set<I> set_sub_bitstring(const dit_set<I>& s, const int in, const int i) {
   const int shift = i * s.bits;
   const I r = s.content ^ (((I(in) << shift) ^ s.content) & (s.mask << shift));
   return dit_set<I>(r, s.lhss, s.mask, s.bits);
 }
 
-template <typename I, std::size_t N>
+template<typename I, std::size_t N>
 dit_set<I> set_sub_bitstring(const dit_set<I>& s, int in,
                              const std::array<int, N>& locs) {
   I out = s.content;
@@ -145,17 +146,17 @@ dit_set<I> set_sub_bitstring(const dit_set<I>& s, int in,
   return dit_set<I>(out, s.lhss, s.mask, s.bits);
 }
 
-template <typename I>
+template<typename I>
 inline bool operator<(const dit_set<I>& lhs, const dit_set<I>& rhs) {
   return lhs.content < rhs.content;
 }
 
-template <typename I>
+template<typename I>
 inline bool operator>(const dit_set<I>& lhs, const dit_set<I>& rhs) {
   return lhs.content > rhs.content;
 }
 
-template <typename I>
+template<typename I>
 inline bool operator==(const dit_set<I>& lhs, const dit_set<I>& rhs) {
   return lhs.content == rhs.content;
 }

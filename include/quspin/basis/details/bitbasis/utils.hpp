@@ -5,7 +5,7 @@
 
 namespace quspin::basis {
 
-template <class T>
+template<class T>
 typename bit_info<T>::bit_index_type bit_pos(
     T x, typename bit_info<T>::bit_index_type *idx) {
   typename bit_info<T>::bit_index_type *idx0 = idx;
@@ -18,7 +18,7 @@ typename bit_info<T>::bit_index_type bit_pos(
   return (typename bit_info<T>::bit_index_type)(idx - idx0);
 }
 
-template <class T>
+template<class T>
 int inline bit_count(T v, const int l) {
   // v = v & (((~(T)0) >> 1) >> (bit_info<T>::bits - 1 - l));
   const T m = (~T(0));

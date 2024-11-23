@@ -9,10 +9,9 @@
 #include <thread>
 #include <vector>
 
-namespace quspin {
-namespace details {
+namespace quspin { namespace details {
 
-template <typename Type>
+template<typename Type>
 concept WorkTasksInterface = requires(
     Type work_tasks, const std::size_t task_id, const std::size_t thread_id) {
   { work_tasks.size() } -> std::convertible_to<std::size_t>;
@@ -21,80 +20,86 @@ concept WorkTasksInterface = requires(
 
 enum class Schedule { Interleaved, SequentialBlocks };
 
-template <WorkTasksInterface WorkTasks>
+template<WorkTasksInterface WorkTasks>
 class WorkQueue {
-  WorkTasks work_tasks;
+    WorkTasks work_tasks;
 
- public:
-  WorkQueue(WorkTasks work_tasks) : work_tasks(work_tasks) {}
+  public:
 
-  std::tuple<std::size_t, std::size_t, std::size_t> get_schedule(
-      const Schedule schedule, const std::size_t nt,
-      const std::size_t num_threads) {
-    switch (schedule) {
-      case Schedule::Interleaved: {
-        return {nt, work_tasks.size(), num_threads};
-      }
-      case Schedule::SequentialBlocks: {
-        const std::size_t num_jobs = work_tasks.size();
-        const std::size_t chunk_size = (num_jobs + num_threads) / num_threads;
-        const std::size_t start = nt * chunk_size;
-        const std::size_t end = std::min(num_jobs, (nt + 1) * chunk_size);
-        return {start, end, 1};
-      }
-    }
+    WorkQueue(WorkTasks work_tasks) : work_tasks(work_tasks) {}
 
-    throw std::runtime_error("Invalid schedule");
-  }
-
-  void run(const Schedule schedule, const std::size_t num_threads) {
-    if (num_threads <= 0) {
-      for (std::size_t i = 0; i < work_tasks.size(); i++) {
-        this->work_tasks.do_work(i, 0);
-      }
-      return;
-    }
-
-    std::vector<std::thread> workers;
-    for (std::size_t nt = 0; nt < num_threads; nt++) {
-      auto res = this->get_schedule(schedule, nt, num_threads);
-      workers.emplace_back(std::thread([res, this, nt]() {
-        const std::size_t start = std::get<0>(res);
-        const std::size_t end = std::get<1>(res);
-        const std::size_t step = std::get<2>(res);
-        for (std::size_t i = start; i < end; i += step) {
-          this->work_tasks.do_work(i, nt);
+    std::tuple<std::size_t, std::size_t, std::size_t> get_schedule(
+        const Schedule schedule, const std::size_t nt,
+        const std::size_t num_threads) {
+      switch (schedule) {
+        case Schedule::Interleaved: {
+          return {nt, work_tasks.size(), num_threads};
         }
-      }));
+        case Schedule::SequentialBlocks: {
+          const std::size_t num_jobs = work_tasks.size();
+          const std::size_t chunk_size = (num_jobs + num_threads) / num_threads;
+          const std::size_t start = nt * chunk_size;
+          const std::size_t end = std::min(num_jobs, (nt + 1) * chunk_size);
+          return {start, end, 1};
+        }
+      }
+
+      throw std::runtime_error("Invalid schedule");
     }
 
-    for (auto &f : workers) {
-      f.join();
+    void run(const Schedule schedule, const std::size_t num_threads) {
+      if (num_threads <= 0) {
+        for (std::size_t i = 0; i < work_tasks.size(); i++) {
+          this->work_tasks.do_work(i, 0);
+        }
+        return;
+      }
+
+      std::vector<std::thread> workers;
+      for (std::size_t nt = 0; nt < num_threads; nt++) {
+        auto res = this->get_schedule(schedule, nt, num_threads);
+        workers.emplace_back(std::thread([res, this, nt]() {
+          const std::size_t start = std::get<0>(res);
+          const std::size_t end = std::get<1>(res);
+          const std::size_t step = std::get<2>(res);
+          for (std::size_t i = start; i < end; i += step) {
+            this->work_tasks.do_work(i, nt);
+          }
+        }));
+      }
+
+      for (auto &f : workers) {
+        f.join();
+      }
     }
-  }
 };
 
 class atomic_flag {
-  std::atomic_flag flag = ATOMIC_FLAG_INIT;
-  std::memory_order order = std::memory_order::relaxed;
+    std::atomic_flag flag = ATOMIC_FLAG_INIT;
+    std::memory_order order = std::memory_order::relaxed;
 
- public:
-  inline void clear() { std::atomic_flag_clear_explicit(&flag, order); }
-  inline bool test_and_set() {
-    return std::atomic_flag_test_and_set_explicit(&flag, order);
-  }
-  inline bool test() {
-    return std::atomic_flag_test_and_set_explicit(&flag, order);
-  }
-  inline void notify_one() { std::atomic_flag_clear_explicit(&flag, order); }
-  inline void wait() {
-    while (std::atomic_flag_test_and_set_explicit(&flag, order)) {
-      std::this_thread::yield();
+  public:
+
+    inline void clear() { std::atomic_flag_clear_explicit(&flag, order); }
+
+    inline bool test_and_set() {
+      return std::atomic_flag_test_and_set_explicit(&flag, order);
     }
-  }
+
+    inline bool test() {
+      return std::atomic_flag_test_and_set_explicit(&flag, order);
+    }
+
+    inline void notify_one() { std::atomic_flag_clear_explicit(&flag, order); }
+
+    inline void wait() {
+      while (std::atomic_flag_test_and_set_explicit(&flag, order)) {
+        std::this_thread::yield();
+      }
+    }
 };
 
-template <std::size_t batch_size = 100, typename Iterator, typename Function>
+template<std::size_t batch_size = 100, typename Iterator, typename Function>
 void async_for_each(Iterator &&begin, Iterator &&end, Function &&f) {
   using task_t = std::remove_reference_t<decltype(*begin)>;
   using batch_t = std::array<task_t, batch_size>;
@@ -171,5 +176,4 @@ void async_for_each(Iterator &&begin, Iterator &&end, Function &&f) {
     workers.at(id).join();
   }
 }
-}  // namespace details
-}  // namespace quspin
+}}  // namespace quspin::details

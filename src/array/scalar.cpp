@@ -18,12 +18,13 @@ template Scalar::Scalar(const double &);
 template Scalar::Scalar(const details::cfloat &);
 template Scalar::Scalar(const details::cdouble &);
 
-template <PrimativeTypes T>
+template<PrimativeTypes T>
 Scalar::operator T() const {
   return std::visit(
       [](const auto &internals) { return details::cast<T>(internals.get()); },
       internals_);
 }
+
 template Scalar::operator int8_t() const;
 template Scalar::operator uint8_t() const;
 template Scalar::operator int16_t() const;
@@ -37,7 +38,7 @@ template Scalar::operator double() const;
 template Scalar::operator details::cfloat() const;
 template Scalar::operator details::cdouble() const;
 
-template <PrimativeTypes T>
+template<PrimativeTypes T>
 Scalar &Scalar::operator=(const T &value) {
   internals_ = details::scalars(details::scalar<T>(value));
   return *this;
@@ -56,7 +57,7 @@ template Scalar &Scalar::operator=(const double &);
 template Scalar &Scalar::operator=(const details::cfloat &);
 template Scalar &Scalar::operator=(const details::cdouble &);
 
-template <typename Op>
+template<typename Op>
 Scalar Scalar::binary_op(const Scalar &lhs, const Scalar &rhs, Op &&op) {
   return std::visit(
       [&op](auto &&lhs, auto &&rhs) {
@@ -69,11 +70,13 @@ Scalar Scalar::operator+(const Scalar &other) const {
   return Scalar::binary_op(*this, other,
                            [](auto &&lhs, auto &&rhs) { return lhs + rhs; });
 }
-template <PrimativeTypes T>
+
+template<PrimativeTypes T>
 Scalar Scalar::operator+(const T &other) const {
   return Scalar::binary_op(*this, Scalar(other),
                            [](auto &&lhs, auto &&rhs) { return lhs + rhs; });
 }
+
 template Scalar Scalar::operator+(const int8_t &) const;
 template Scalar Scalar::operator+(const uint8_t &) const;
 template Scalar Scalar::operator+(const int16_t &) const;
@@ -91,11 +94,13 @@ Scalar Scalar::operator-(const Scalar &other) const {
   return Scalar::binary_op(*this, other,
                            [](auto &&lhs, auto &&rhs) { return lhs - rhs; });
 }
-template <PrimativeTypes T>
+
+template<PrimativeTypes T>
 Scalar Scalar::operator-(const T &other) const {
   return Scalar::binary_op(*this, Scalar(other),
                            [](auto &&lhs, auto &&rhs) { return lhs - rhs; });
 }
+
 template Scalar Scalar::operator-(const int8_t &) const;
 template Scalar Scalar::operator-(const uint8_t &) const;
 template Scalar Scalar::operator-(const int16_t &) const;
@@ -113,11 +118,13 @@ Scalar Scalar::operator*(const Scalar &other) const {
   return Scalar::binary_op(*this, other,
                            [](auto &&lhs, auto &&rhs) { return lhs * rhs; });
 }
-template <PrimativeTypes T>
+
+template<PrimativeTypes T>
 Scalar Scalar::operator*(const T &other) const {
   return Scalar::binary_op(*this, Scalar(other),
                            [](auto &&lhs, auto &&rhs) { return lhs * rhs; });
 }
+
 template Scalar Scalar::operator*(const int8_t &) const;
 template Scalar Scalar::operator*(const uint8_t &) const;
 template Scalar Scalar::operator*(const int16_t &) const;
@@ -135,11 +142,13 @@ Scalar Scalar::operator/(const Scalar &other) const {
   return Scalar::binary_op(*this, other,
                            [](auto &&lhs, auto &&rhs) { return lhs / rhs; });
 }
-template <PrimativeTypes T>
+
+template<PrimativeTypes T>
 Scalar Scalar::operator/(const T &other) const {
   return Scalar::binary_op(*this, Scalar(other),
                            [](auto &&lhs, auto &&rhs) { return lhs / rhs; });
 }
+
 template Scalar Scalar::operator/(const int8_t &) const;
 template Scalar Scalar::operator/(const uint8_t &) const;
 template Scalar Scalar::operator/(const int16_t &) const;

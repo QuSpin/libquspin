@@ -5,27 +5,31 @@
 #include <quspin/dtype/details/dtype.hpp>
 #include <variant>
 
-namespace quspin {
-namespace details {
+namespace quspin { namespace details {
 
-template <typename T>
+template<typename T>
 class scalar : public typed_object<T> {
-  T value_;
+    T value_;
 
- public:
-  scalar() = default;
-  scalar(T value) : value_(value) {}
-  operator T() const { return value_; }
-  T operator=(const T &value) {
-    value_ = value;
-    return value_;
-  }
-  T get() const { return value_; }
+  public:
+
+    scalar() = default;
+
+    scalar(T value) : value_(value) {}
+
+    operator T() const { return value_; }
+
+    T operator=(const T &value) {
+      value_ = value;
+      return value_;
+    }
+
+    T get() const { return value_; }
 };
 
-template <typename T>
+template<typename T>
 struct value_type<scalar<T>> {
-  using type = T;
+    using type = T;
 };
 
 using scalars =
@@ -34,5 +38,4 @@ using scalars =
                  scalar<uint64_t>, scalar<int64_t>, scalar<float>,
                  scalar<double>, scalar<cfloat>, scalar<cdouble>>;
 
-}  // namespace details
-}  // namespace quspin
+}}  // namespace quspin::details

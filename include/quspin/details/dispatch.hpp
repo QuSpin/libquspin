@@ -13,15 +13,14 @@
 #include <quspin/details/operators.hpp>
 #include <quspin/details/optional.hpp>
 
-namespace quspin {
-namespace details {
+namespace quspin { namespace details {
 
 struct ValidArgs {
-  static constexpr bool has_error() { return false; }
+    static constexpr bool has_error() { return false; }
 };
 
-template <typename Kernel, typename StaticArgsCheck, typename DynamicArgsCheck,
-          typename... Args>
+template<typename Kernel, typename StaticArgsCheck, typename DynamicArgsCheck,
+         typename... Args>
 void dispatch(Kernel &&kernel, StaticArgsCheck &&static_args_check,
               DynamicArgsCheck &&dynamic_args_check, Args... args) {
   visit_or_error<std::monostate>(
@@ -51,8 +50,8 @@ void dispatch(Kernel &&kernel, StaticArgsCheck &&static_args_check,
       args.get_variant_obj()...);
 }
 
-template <typename Kernel, typename ResultShape, typename ResultDType,
-          typename StaticArgsCheck, class DynamicArgsCheck, typename... Args>
+template<typename Kernel, typename ResultShape, typename ResultDType,
+         typename StaticArgsCheck, class DynamicArgsCheck, typename... Args>
 Array dispatch_array(Kernel &&kernel, ResultShape &&result_shape_func,
                      ResultDType &&result_dtype_func,
                      StaticArgsCheck &&static_args_check,
@@ -72,14 +71,15 @@ Array dispatch_array(Kernel &&kernel, ResultShape &&result_shape_func,
   return out;
 }
 
-template <typename Kernel>
+template<typename Kernel>
 Array dispatch_elementwise(Kernel &&kernel, Optional<Array> out,
                            const Array &lhs, const Array &rhs) {
   struct InvalidDtype {
-    static constexpr bool has_error() { return true; }
-    static Error get_error() {
-      return Error(ErrorType::ValueError, "Incompatible out type");
-    }
+      static constexpr bool has_error() { return true; }
+
+      static Error get_error() {
+        return Error(ErrorType::ValueError, "Incompatible out type");
+      }
   };
 
   auto result_shape = [](const Array &lhs, const Array &) {
@@ -116,8 +116,8 @@ Array dispatch_elementwise(Kernel &&kernel, Optional<Array> out,
                         static_args_check, dynamic_args_check, out, lhs, rhs);
 }
 
-template <typename Kernel, typename StaticArgsCheck, typename DynamicArgsCheck,
-          typename... Args>
+template<typename Kernel, typename StaticArgsCheck, typename DynamicArgsCheck,
+         typename... Args>
 Scalar dispatch_scalar(Kernel &&kernel, StaticArgsCheck &&static_args_check,
                        DynamicArgsCheck &&dynamic_args_check,
                        const Args &...args) {
@@ -149,8 +149,7 @@ Scalar dispatch_scalar(Kernel &&kernel, StaticArgsCheck &&static_args_check,
       args.get_variant_obj()...);
 }
 
-}  // namespace details
-}  // namespace quspin
+}}  // namespace quspin::details
 
 #ifdef _MSC_VER
 #pragma warning(pop)

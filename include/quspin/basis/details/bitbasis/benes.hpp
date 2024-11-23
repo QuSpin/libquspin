@@ -7,60 +7,63 @@ namespace quspin::basis::benes {
 
 static const int no_index = -1;
 
-template <typename I>
+template<typename I>
 struct tr_bfly {
-  // This structure is used to hold the configuration of
-  // butterfly-based operations as well as compress and expand.
-  enum { ld_bits = bit_info<I>::ld_bits };
-  I cfg[ld_bits];  // butterfly configuration
-  I mask;          // saved mask, for compress/expand
+    // This structure is used to hold the configuration of
+    // butterfly-based operations as well as compress and expand.
+    enum { ld_bits = bit_info<I>::ld_bits };
 
-  // Here is sketched how to convert this to a class:
-  // Include all the generator and usage functions as private methods
-  // and replace the parameter self by the implicit object pointer this.
-  // Add the many compound routines.
-  // Remove the name suffix  for all methods.
-  // If you want to cache the configuration, add here:
-  //   kind: the generator kind
-  //     enum (initialized, frot, vrot, ce_right, ce_left, cef_right,
-  //     cef_left)
-  //   sw: the used subword size (t_subword)
-  // Add an initializer/constructor which sets kind to initialized.
-  // The generator routines must set the keys (kind, mask, sw).
-  // The compound routines check the cached keys (kind, mask, sw);
-  //   if not equal, call the generator routine and update the configuration;
-  // finally they call the usage routine.
+    I cfg[ld_bits];  // butterfly configuration
+    I mask;          // saved mask, for compress/expand
+
+    // Here is sketched how to convert this to a class:
+    // Include all the generator and usage functions as private methods
+    // and replace the parameter self by the implicit object pointer this.
+    // Add the many compound routines.
+    // Remove the name suffix  for all methods.
+    // If you want to cache the configuration, add here:
+    //   kind: the generator kind
+    //     enum (initialized, frot, vrot, ce_right, ce_left, cef_right,
+    //     cef_left)
+    //   sw: the used subword size (t_subword)
+    // Add an initializer/constructor which sets kind to initialized.
+    // The generator routines must set the keys (kind, mask, sw).
+    // The compound routines check the cached keys (kind, mask, sw);
+    //   if not equal, call the generator routine and update the configuration;
+    // finally they call the usage routine.
 };
 
-template <typename I>
+template<typename I>
 struct tr_benes {
-  tr_bfly<I> b1, b2;
+    tr_bfly<I> b1, b2;
 };
 
-template <typename I>  // primary template
+template<typename I>  // primary template
 struct ta_index {
-  enum { bits = bit_info<I>::bits };
-  int data[bits];
+    enum { bits = bit_info<I>::bits };
 
-  int& operator[](int idx) { return data[idx]; }
+    int data[bits];
 
-  int operator[](int idx) const { return data[idx]; }
+    int& operator[](int idx) { return data[idx]; }
+
+    int operator[](int idx) const { return data[idx]; }
 };
 
-template <typename I>  // primary template
+template<typename I>  // primary template
 struct ta_subword {
-  enum { ld_bits = bit_info<I>::ld_bits };
-  unsigned int data[ld_bits];
+    enum { ld_bits = bit_info<I>::ld_bits };
 
-  unsigned int& operator[](int idx) { return data[idx]; }
+    unsigned int data[ld_bits];
 
-  unsigned int operator[](int idx) const { return data[idx]; }
+    unsigned int& operator[](int idx) { return data[idx]; }
+
+    unsigned int operator[](int idx) const { return data[idx]; }
 };
 
 //////
 // aux functions
 
-template <typename I>
+template<typename I>
 void invert_perm(const ta_index<I>& src, ta_index<I>& tgt) {
   int i;
 
@@ -74,7 +77,7 @@ void invert_perm(const ta_index<I>& src, ta_index<I>& tgt) {
   }
 }
 
-template <typename I>
+template<typename I>
 I bit_permute_step(I x, I m, int shift) {
   // INLINE
   // Can be replaced by bit_permute_step_simple,
@@ -94,7 +97,7 @@ I bit_permute_step(I x, I m, int shift) {
 
 //////
 // Butterfly network
-template <typename I>
+template<typename I>
 I bfly(const tr_bfly<I>* self, I x) {
   // Apply butterfly network on x configured by
   //   - gen_frot
@@ -113,7 +116,7 @@ I bfly(const tr_bfly<I>* self, I x) {
   return x;
 }
 
-template <typename I>
+template<typename I>
 I ibfly(const tr_bfly<I>* self, I x) {
   // Apply inverse butterfly network on x configured by
   //   - gen_frot
@@ -135,7 +138,7 @@ I ibfly(const tr_bfly<I>* self, I x) {
 //////
 // Permutations via benes_perm network
 
-template <typename t_bit_index>
+template<typename t_bit_index>
 void exchange_bit_index(t_bit_index* a, t_bit_index* b) {
   // INLINE
 
@@ -146,7 +149,7 @@ void exchange_bit_index(t_bit_index* a, t_bit_index* b) {
   *b = q;
 }
 
-template <typename I>
+template<typename I>
 void gen_benes_ex(tr_benes<I>* self, const ta_index<I>& c_tgt,
                   const ta_subword<I>& a_stage) {
   // Generate a configuration for the benes_perm network with variable stage
@@ -260,7 +263,7 @@ void gen_benes_ex(tr_benes<I>* self, const ta_index<I>& c_tgt,
   // self->b1.cfg[0] = 0;
 }
 
-template <typename I>
+template<typename I>
 void gen_benes(tr_benes<I>* self, const ta_index<I>& c_tgt) {
   // INLINE
   // Generate a configuration for the standard benes_perm network.
@@ -271,7 +274,7 @@ void gen_benes(tr_benes<I>* self, const ta_index<I>& c_tgt) {
   gen_benes_ex(self, c_tgt, a_stage_bwd);  // standard benes_perm order
 }
 
-template <typename I>
+template<typename I>
 I benes_fwd(const tr_benes<I>* self, I x) {
   // Apply benes_perm network.
   // c_tgt of gen_benes selected source indexes.
@@ -279,7 +282,7 @@ I benes_fwd(const tr_benes<I>* self, I x) {
   return ibfly(&self->b2, bfly(&self->b1, x));
 }
 
-template <typename I>
+template<typename I>
 I benes_bwd(const tr_benes<I>* self, I x) {
   // Apply benes_perm network.
   // c_tgt of gen_benes selected target indexes.
@@ -311,6 +314,7 @@ template uint8_t benes_fwd<uint8_t>(const tr_benes<uint8_t>*, uint8_t);
 template uint8_t benes_bwd<uint8_t>(const tr_benes<uint8_t>*, uint8_t);
 
 }  // namespace quspin::basis::benes
+
 TEST_SUITE("quspin/basis/bitbasis/benes.h") {
   using namespace quspin::basis::benes;
 

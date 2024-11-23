@@ -66,7 +66,7 @@ QMatrix::QMatrix(Array data, Array indptr, Array indices, Array cindices) {
       cindices_select.get_variant_obj());
 }
 
-template <typename J>
+template<typename J>
   requires std::same_as<J, uint8_t> || std::same_as<J, uint16_t>
 QMatrix::QMatrix(Array data, Array indptr, Array indices, const J cindex) {
   using namespace details;
