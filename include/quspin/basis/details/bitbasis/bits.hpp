@@ -1,3 +1,4 @@
+// Copyright 2024 Phillip Weinberg
 #pragma once
 
 #include <array>
@@ -9,97 +10,97 @@
 
 namespace quspin::basis {
 
-  // local degrees of freedom stored in contiguous chunks of bits
-  template <typename I> struct bit_set {  // thin wrapper used for convience
-    // doesn't allocate any data
-    static const int lhss = 2;
-    static constexpr I mask = 1;
-    static const dit_integer_t bits = 1;
+// local degrees of freedom stored in contiguous chunks of bits
+template <typename I>
+struct bit_set {  // thin wrapper used for convience
+  // doesn't allocate any data
+  static const int lhss = 2;
+  static constexpr I mask = 1;
+  static const dit_integer_t bits = 1;
 
-    typedef I bitset_t;
-    I content;
+  typedef I bitset_t;
+  I content;
 
-    bit_set(const I _content) : content(_content) {}
-    bit_set(const bit_set<I>& other) : content(other.content) {}
+  bit_set(const I _content) : content(_content) {}
+  bit_set(const bit_set<I>& other) : content(other.content) {}
 
-    bit_set(const std::vector<dit_integer_t>& bits_vec, const int lhss = 2) {
-      content = 0;
-      for (size_t i = 0; i < bits_vec.size(); i++) {
-        content |= (I(bits_vec[i]) << i * bits);
-      }
+  bit_set(const std::vector<dit_integer_t>& bits_vec, const int lhss = 2) {
+    content = 0;
+    for (size_t i = 0; i < bits_vec.size(); i++) {
+      content |= (I(bits_vec[i]) << i * bits);
     }
-
-    std::vector<dit_integer_t> to_vector(const int length = 0) const {
-      const int niter = (length > 0 ? length : bit_info<I>::bits / bits);
-
-      std::vector<dit_integer_t> out(niter);
-      for (int i = 0; i < niter; ++i) {
-        out[i] = integer<dit_integer_t, I>::cast((content >> i * bits) & mask);
-      }
-      return out;
-    }
-
-    std::string to_string(const int length = 0) const {
-      auto bit_vec = to_vector(length);
-      std::stringstream out;
-      for (auto ele : bit_vec) {
-        out << (int)ele << " ";
-      }
-      return out.str();
-    }
-  };
-
-  template <typename I>
-  int get_sub_bitstring(const bit_set<I>& s, const int i) {
-    return integer<int, I>::cast((s.content >> i) & I(1));
   }
 
-  template <typename I, std::size_t N>
-  int get_sub_bitstring(const bit_set<I>& s, const std::array<int, N>& locs) {
-    int out = 0;
-    for (int i = N - 1; i > 0; --i) {
-      out |= get_sub_bitstring(s, locs.at(i));
-      out <<= 1;
-    }
-    out |= get_sub_bitstring(s, locs.at(0));
+  std::vector<dit_integer_t> to_vector(const int length = 0) const {
+    const int niter = (length > 0 ? length : bit_info<I>::bits / bits);
 
+    std::vector<dit_integer_t> out(niter);
+    for (int i = 0; i < niter; ++i) {
+      out[i] = integer<dit_integer_t, I>::cast((content >> i * bits) & mask);
+    }
     return out;
   }
 
-  template <typename I>
-  bit_set<I> set_sub_bitstring(const bit_set<I>& s, const int in, const int i) {
-    return bit_set<I>(s.content
-                      ^ (((I(in & 1) << i) ^ s.content) & (I(1) << i)));
-  }
-
-  template <typename I, std::size_t N>
-  bit_set<I> set_sub_bitstring(const bit_set<I>& s, const int in,
-                               const std::array<int, N>& locs) {
-    I out = s.content;
-    I in_I = I(in);
-    for (const int loc : locs) {
-      const int shift = loc * s.bits;
-      out ^= (((in_I & s.mask) << shift) ^ s.content) & (s.mask << shift);
-      in_I >>= 1;
+  std::string to_string(const int length = 0) const {
+    auto bit_vec = to_vector(length);
+    std::stringstream out;
+    for (auto ele : bit_vec) {
+      out << (int)ele << " ";
     }
+    return out.str();
+  }
+};
 
-    return bit_set<I>(out);
+template <typename I>
+int get_sub_bitstring(const bit_set<I>& s, const int i) {
+  return integer<int, I>::cast((s.content >> i) & I(1));
+}
+
+template <typename I, std::size_t N>
+int get_sub_bitstring(const bit_set<I>& s, const std::array<int, N>& locs) {
+  int out = 0;
+  for (int i = N - 1; i > 0; --i) {
+    out |= get_sub_bitstring(s, locs.at(i));
+    out <<= 1;
+  }
+  out |= get_sub_bitstring(s, locs.at(0));
+
+  return out;
+}
+
+template <typename I>
+bit_set<I> set_sub_bitstring(const bit_set<I>& s, const int in, const int i) {
+  return bit_set<I>(s.content ^ (((I(in & 1) << i) ^ s.content) & (I(1) << i)));
+}
+
+template <typename I, std::size_t N>
+bit_set<I> set_sub_bitstring(const bit_set<I>& s, const int in,
+                             const std::array<int, N>& locs) {
+  I out = s.content;
+  I in_I = I(in);
+  for (const int loc : locs) {
+    const int shift = loc * s.bits;
+    out ^= (((in_I & s.mask) << shift) ^ s.content) & (s.mask << shift);
+    in_I >>= 1;
   }
 
-  template <typename I>
-  inline bool operator<(const bit_set<I>& lhs, const bit_set<I>& rhs) {
-    return lhs.content < rhs.content;
-  }
+  return bit_set<I>(out);
+}
 
-  template <typename I>
-  inline bool operator>(const bit_set<I>& lhs, const bit_set<I>& rhs) {
-    return lhs.content > rhs.content;
-  }
+template <typename I>
+inline bool operator<(const bit_set<I>& lhs, const bit_set<I>& rhs) {
+  return lhs.content < rhs.content;
+}
 
-  template <typename I>
-  inline bool operator==(const bit_set<I>& lhs, const bit_set<I>& rhs) {
-    return lhs.content == rhs.content;
-  }
+template <typename I>
+inline bool operator>(const bit_set<I>& lhs, const bit_set<I>& rhs) {
+  return lhs.content > rhs.content;
+}
+
+template <typename I>
+inline bool operator==(const bit_set<I>& lhs, const bit_set<I>& rhs) {
+  return lhs.content == rhs.content;
+}
 
 }  // end namespace quspin::basis
 
@@ -107,25 +108,25 @@ namespace quspin::basis {
 
 namespace quspin::basis {  // explicit instantiation for code coverage
 
-  template struct bit_set<uint8_t>;
+template struct bit_set<uint8_t>;
 
-  template int get_sub_bitstring<uint8_t>(const bit_set<uint8_t>&, const int);
-  template int get_sub_bitstring<uint8_t, 2>(const bit_set<uint8_t>&,
-                                             const std::array<int, 2>&);
-  template int get_sub_bitstring<uint8_t, 4>(const bit_set<uint8_t>&,
-                                             const std::array<int, 4>&);
+template int get_sub_bitstring<uint8_t>(const bit_set<uint8_t>&, const int);
+template int get_sub_bitstring<uint8_t, 2>(const bit_set<uint8_t>&,
+                                           const std::array<int, 2>&);
+template int get_sub_bitstring<uint8_t, 4>(const bit_set<uint8_t>&,
+                                           const std::array<int, 4>&);
 
-  template bit_set<uint8_t> set_sub_bitstring<uint8_t>(const bit_set<uint8_t>&,
-                                                       const int, const int);
-  template bit_set<uint8_t> set_sub_bitstring<uint8_t, 3>(
-      const bit_set<uint8_t>& s, const int, const std::array<int, 3>&);
+template bit_set<uint8_t> set_sub_bitstring<uint8_t>(const bit_set<uint8_t>&,
+                                                     const int, const int);
+template bit_set<uint8_t> set_sub_bitstring<uint8_t, 3>(
+    const bit_set<uint8_t>& s, const int, const std::array<int, 3>&);
 
-  template bool operator<< uint8_t>(const bit_set<uint8_t>&,
-                                    const bit_set<uint8_t>&);
-  template bool operator><uint8_t>(const bit_set<uint8_t>&,
-                                   const bit_set<uint8_t>&);
-  template bool operator== <uint8_t>(const bit_set<uint8_t>&,
-                                     const bit_set<uint8_t>&);
+template bool operator<< uint8_t>(const bit_set<uint8_t>&,
+                                  const bit_set<uint8_t>&);
+template bool operator>
+    <uint8_t>(const bit_set<uint8_t>&, const bit_set<uint8_t>&);
+template bool operator==
+    <uint8_t>(const bit_set<uint8_t>&, const bit_set<uint8_t>&);
 
 }  // namespace quspin::basis
 

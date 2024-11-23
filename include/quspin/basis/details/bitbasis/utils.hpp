@@ -1,32 +1,35 @@
+// Copyright 2024 Phillip Weinberg
 #pragma once
 
 #include <quspin/basis/details/bitbasis/info.hpp>
 
 namespace quspin::basis {
 
-  template <class T> typename bit_info<T>::bit_index_type bit_pos(
-      T x, typename bit_info<T>::bit_index_type *idx) {
-    typename bit_info<T>::bit_index_type *idx0 = idx;
-    typename bit_info<T>::bit_index_type n = 0;
-    typename bit_info<T>::bit_index_type p = 0;
-    do {
-      if (x & 1) *(idx++) = n;
-      n++;
-    } while (x >>= 1);
-    return (typename bit_info<T>::bit_index_type)(idx - idx0);
-  }
+template <class T>
+typename bit_info<T>::bit_index_type bit_pos(
+    T x, typename bit_info<T>::bit_index_type *idx) {
+  typename bit_info<T>::bit_index_type *idx0 = idx;
+  typename bit_info<T>::bit_index_type n = 0;
+  typename bit_info<T>::bit_index_type p = 0;
+  do {
+    if (x & 1) *(idx++) = n;
+    n++;
+  } while (x >>= 1);
+  return (typename bit_info<T>::bit_index_type)(idx - idx0);
+}
 
-  template <class T> int inline bit_count(T v, const int l) {
-    // v = v & (((~(T)0) >> 1) >> (bit_info<T>::bits - 1 - l));
-    const T m = (~T(0));
-    v = v & (m >> (bit_info<T>::bits - l));
-    v = v - ((v >> 1) & (T) ~(T)0 / 3);                              // temp
-    v = (v & (T) ~(T)0 / 15 * 3) + ((v >> 2) & (T) ~(T)0 / 15 * 3);  // temp
-    v = (v + (v >> 4)) & (T) ~(T)0 / 255 * 15;                       // temp
-    T res = (T)(v * ((T) ~(T)0 / 255))
-            >> ((bit_info<T>::bytes - 1) * 8);  // count
-    return (int)res;
-  }
+template <class T>
+int inline bit_count(T v, const int l) {
+  // v = v & (((~(T)0) >> 1) >> (bit_info<T>::bits - 1 - l));
+  const T m = (~T(0));
+  v = v & (m >> (bit_info<T>::bits - l));
+  v = v - ((v >> 1) & (T) ~(T)0 / 3);                              // temp
+  v = (v & (T) ~(T)0 / 15 * 3) + ((v >> 2) & (T) ~(T)0 / 15 * 3);  // temp
+  v = (v + (v >> 4)) & (T) ~(T)0 / 255 * 15;                       // temp
+  T res =
+      (T)(v * ((T) ~(T)0 / 255)) >> ((bit_info<T>::bytes - 1) * 8);  // count
+  return (int)res;
+}
 
 }  // namespace quspin::basis
 
@@ -34,8 +37,8 @@ namespace quspin::basis {
 
 namespace quspin::basis {
 
-  template int bit_pos<uint8_t>(uint8_t, int *);
-  template int bit_count<uint8_t>(uint8_t, const int);
+template int bit_pos<uint8_t>(uint8_t, int *);
+template int bit_count<uint8_t>(uint8_t, const int);
 
 }  // namespace quspin::basis
 

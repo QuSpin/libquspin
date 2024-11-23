@@ -1,3 +1,4 @@
+// Copyright 2024 Phillip Weinberg
 
 #include <cassert>
 #include <quspin/array/array.hpp>

@@ -1,3 +1,4 @@
+// Copyright 2024 Phillip Weinberg
 
 #include <quspin/details/type_concepts.hpp>
 

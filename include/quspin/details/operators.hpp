@@ -1,3 +1,4 @@
+// Copyright 2024 Phillip Weinberg
 #pragma once
 
 /*
@@ -7,24 +8,24 @@
 #include <quspin/details/cast.hpp>
 
 namespace quspin {
-  namespace details {
+namespace details {
 
-    template <typename T, typename U, typename Op>
-    upcast_t<T, U> operator_binary(const T &a, const U &b, Op &&op) {
-      {
-        using arith_result = upcast_t<T, U>;
+template <typename T, typename U, typename Op>
+upcast_t<T, U> operator_binary(const T &a, const U &b, Op &&op) {
+  {
+    using arith_result = upcast_t<T, U>;
 #ifdef _MSC_VER
-#  pragma warning(push)
-#  pragma warning(disable : 4244)  // disable warning for implicit conversion
+#pragma warning(push)
+#pragma warning(disable : 4244)  // disable warning for implicit conversion
 #endif
-        return op(static_cast<arith_result>(a), static_cast<arith_result>(b));
+    return op(static_cast<arith_result>(a), static_cast<arith_result>(b));
 #ifdef _MSC_VER
-#  pragma warning(pop)
+#pragma warning(pop)
 #endif
-      }
-    }
+  }
+}
 
-  }  // namespace details
+}  // namespace details
 }  // namespace quspin
 
 template <typename T, typename U>
