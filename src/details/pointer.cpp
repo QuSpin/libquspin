@@ -1,5 +1,5 @@
 // Copyright 2024 Phillip Weinberg
-#include <quspin/array/details/pointer.hpp>
+#include <quspin/details/pointer.hpp>
 
 namespace quspin { namespace details {
 

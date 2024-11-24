@@ -2,7 +2,7 @@
 #pragma once
 
 #include <quspin/array/details/iterator.hpp>
-#include <quspin/array/details/pointer.hpp>
+#include <quspin/details/pointer.hpp>
 #include <quspin/details/type_concepts.hpp>
 #include <quspin/dtype/details/dtype.hpp>
 #include <vector>
