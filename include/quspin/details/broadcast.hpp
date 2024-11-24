@@ -3,8 +3,8 @@
 #pragma once
 
 #include <quspin/array/details/array.hpp>
-#include <quspin/array/details/reference.hpp>
-#include <quspin/array/details/scalar.hpp>
+#include <quspin/scalar/details/reference.hpp>
+#include <quspin/scalar/details/scalar.hpp>
 
 namespace quspin { namespace details {
 

@@ -5,11 +5,11 @@
 #include <numeric>
 #include <quspin/array/array.hpp>
 #include <quspin/array/details/array.hpp>
-#include <quspin/array/reference.hpp>
-#include <quspin/array/scalar.hpp>
 #include <quspin/details/error.hpp>
 #include <quspin/details/operators.hpp>
 #include <quspin/dtype/dtype.hpp>
+#include <quspin/scalar/reference.hpp>
+#include <quspin/scalar/scalar.hpp>
 #include <stdexcept>
 #include <string>
 #include <type_traits>

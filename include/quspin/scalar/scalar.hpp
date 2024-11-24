@@ -2,12 +2,12 @@
 #pragma once
 
 #include <functional>
-#include <quspin/array/details/scalar.hpp>
 #include <quspin/details/cast.hpp>
 #include <quspin/details/operators.hpp>
 #include <quspin/details/type_concepts.hpp>
 #include <quspin/dtype/details/dtype.hpp>
 #include <quspin/dtype/dtype.hpp>
+#include <quspin/scalar/details/scalar.hpp>
 #include <variant>
 
 namespace quspin {

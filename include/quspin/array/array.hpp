@@ -3,12 +3,12 @@
 
 #include <cstddef>
 #include <quspin/array/details/array.hpp>
-#include <quspin/array/details/scalar.hpp>
-#include <quspin/array/reference.hpp>
-#include <quspin/array/scalar.hpp>
 #include <quspin/details/operators.hpp>
 #include <quspin/dtype/details/dtype.hpp>
 #include <quspin/dtype/dtype.hpp>
+#include <quspin/scalar/details/scalar.hpp>
+#include <quspin/scalar/reference.hpp>
+#include <quspin/scalar/scalar.hpp>
 #include <string>
 #include <vector>
 

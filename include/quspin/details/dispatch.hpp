@@ -8,10 +8,10 @@
 #include <any>
 #include <quspin/array/array.hpp>
 #include <quspin/array/details/array.hpp>
-#include <quspin/array/scalar.hpp>
 #include <quspin/details/error.hpp>
 #include <quspin/details/operators.hpp>
 #include <quspin/details/optional.hpp>
+#include <quspin/scalar/scalar.hpp>
 
 namespace quspin { namespace details {
 

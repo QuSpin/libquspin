@@ -1,7 +1,7 @@
 // Copyright 2024 Phillip Weinberg
 
-#include <quspin/array/scalar.hpp>
 #include <quspin/details/type_concepts.hpp>
+#include <quspin/scalar/scalar.hpp>
 
 namespace quspin {
 

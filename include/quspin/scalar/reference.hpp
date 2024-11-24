@@ -1,11 +1,11 @@
 // Copyright 2024 Phillip Weinberg
 #pragma once
 
-#include <quspin/array/details/reference.hpp>
-#include <quspin/array/scalar.hpp>
 #include <quspin/details/cast.hpp>
 #include <quspin/dtype/details/dtype.hpp>
 #include <quspin/dtype/dtype.hpp>
+#include <quspin/scalar/details/reference.hpp>
+#include <quspin/scalar/scalar.hpp>
 #include <variant>
 
 namespace quspin {

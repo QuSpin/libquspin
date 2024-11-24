@@ -1,7 +1,7 @@
 // Copyright 2024 Phillip Weinberg
 
-#include <quspin/array/reference.hpp>
-#include <quspin/array/scalar.hpp>
+#include <quspin/scalar/reference.hpp>
+#include <quspin/scalar/scalar.hpp>
 
 namespace quspin {
 template Reference::Reference(int8_t &);
