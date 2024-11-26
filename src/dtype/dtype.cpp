@@ -1,8 +1,8 @@
 // Copyright 2024 Phillip Weinberg
 
 #include <cstdint>
-#include <quspin/details/operators.hpp>
-#include <quspin/dtype/details/dtype.hpp>
+#include <quspin/detail/operators.hpp>
+#include <quspin/dtype/detail/dtype.hpp>
 #include <quspin/dtype/dtype.hpp>
 #include <stdexcept>
 #include <string>
@@ -11,18 +11,18 @@
 
 namespace quspin {
 
-template DType::DType(const details::dtype<int8_t> &);
-template DType::DType(const details::dtype<uint8_t> &);
-template DType::DType(const details::dtype<int16_t> &);
-template DType::DType(const details::dtype<uint16_t> &);
-template DType::DType(const details::dtype<int32_t> &);
-template DType::DType(const details::dtype<uint32_t> &);
-template DType::DType(const details::dtype<int64_t> &);
-template DType::DType(const details::dtype<uint64_t> &);
-template DType::DType(const details::dtype<float> &);
-template DType::DType(const details::dtype<double> &);
-template DType::DType(const details::dtype<details::cfloat> &);
-template DType::DType(const details::dtype<details::cdouble> &);
+template DType::DType(const detail::dtype<int8_t> &);
+template DType::DType(const detail::dtype<uint8_t> &);
+template DType::DType(const detail::dtype<int16_t> &);
+template DType::DType(const detail::dtype<uint16_t> &);
+template DType::DType(const detail::dtype<int32_t> &);
+template DType::DType(const detail::dtype<uint32_t> &);
+template DType::DType(const detail::dtype<int64_t> &);
+template DType::DType(const detail::dtype<uint64_t> &);
+template DType::DType(const detail::dtype<float> &);
+template DType::DType(const detail::dtype<double> &);
+template DType::DType(const detail::dtype<detail::cfloat> &);
+template DType::DType(const detail::dtype<detail::cdouble> &);
 
 bool DType::operator==(const DType &dtype) const {
   return std::visit(
@@ -58,7 +58,7 @@ std::string DType::name() const {
           return std::string("float");
         } else if constexpr (std::is_same_v<T, double>) {
           return std::string("double");
-        } else if constexpr (std::is_same_v<T, details::cfloat>) {
+        } else if constexpr (std::is_same_v<T, detail::cfloat>) {
           return std::string("cfloat");
         } else {
           return std::string("cdouble");
@@ -76,7 +76,7 @@ DType result_dtype(std::vector<DType> &args) {
     case 2:
       return std::visit(
           [](const auto &dtype1, const auto &dtype2) {
-            return DType(details::result_dtype(dtype1, dtype2));
+            return DType(detail::result_dtype(dtype1, dtype2));
           },
           args[0].get_variant_obj(), args[1].get_variant_obj());
     default:
@@ -110,8 +110,8 @@ bool complex_dtype(const DType &dtype) {
   return std::visit(
       [](const auto &dtype) {
         using T = typename std::decay_t<decltype(dtype)>::value_type;
-        return std::is_same_v<T, details::cfloat> ||
-               std::is_same_v<T, details::cdouble>;
+        return std::is_same_v<T, detail::cfloat> ||
+               std::is_same_v<T, detail::cdouble>;
       },
       dtype.get_variant_obj());
 }

@@ -2,10 +2,10 @@
 #pragma once
 
 #include <quspin/array/array.hpp>
-#include <quspin/details/optional.hpp>
+#include <quspin/detail/optional.hpp>
 #include <quspin/qmatrix/qmatrix.hpp>
 
 namespace quspin {
 Array dot(const bool overwrite_out, QMatrix op, Array coeff, Array input,
-          details::Optional<Array> output = details::Optional<Array>());
+          detail::Optional<Array> output = detail::Optional<Array>());
 }  // namespace quspin

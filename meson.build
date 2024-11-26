@@ -37,7 +37,18 @@ add_global_arguments(
 
 include = include_directories('include')
 
-boost = dependency('boost')
+boost = dependency('boost', required: false)
+
+dependencies = []
+
+if boost.found()
+    if host_machine.system() == 'windows'
+        add_project_arguments('/DUSE_BOOST', language: 'cpp')
+    else
+        add_project_arguments('-DUSE_BOOST', language: 'cpp')
+    endif
+    dependencies += boost
+endif
 
 src_files = files(
     'src' / 'array' / 'array.cpp',
@@ -48,8 +59,8 @@ src_files = files(
     'src' / 'qmatrix' / 'kernel' / 'dot.cpp',
     'src' / 'qmatrix' / 'kernel' / 'sum.cpp',
     'src' / 'qmatrix' / 'qmatrix.cpp',
-    'src' / 'qmatrix' / 'details' / 'qmatrix.cpp',
-    'src' / 'qmatrix' / 'details' / 'iterator.cpp',
+    'src' / 'qmatrix' / 'detail' / 'qmatrix.cpp',
+    'src' / 'qmatrix' / 'detail' / 'iterator.cpp',
 )
 
 if host_machine.system() == 'windows'
@@ -58,7 +69,7 @@ if host_machine.system() == 'windows'
         src_files,
         include_directories: include,
         name_suffix: 'lib',
-        dependencies: boost,
+        dependencies: dependencies,
     )
 elif host_machine.system() == 'darwin'
 
@@ -66,14 +77,15 @@ elif host_machine.system() == 'darwin'
         'quspin',
         src_files,
         include_directories: include,
-        dependencies: boost,
+        dependencies: dependencies,
     )
 else # linux
     libquspin = shared_library(
         'quspin',
         src_files,
         include_directories: include,
-        dependencies: [boost],
+        dependencies: dependenciesxs,
+
     )
 endif
 
@@ -81,6 +93,8 @@ libquspin_dep = declare_dependency(
     include_directories: include,
     link_with: libquspin,
 )
+
+dependencies += libquspin_dep
 
 
 test_files = [
@@ -90,11 +104,12 @@ test_files = [
     ('test' / 'dtype.cpp'),
     ('test' / 'qmatrix' / 'constructor.cpp'),
     ('test' / 'qmatrix' / 'sum.cpp'),
-    ('test' / 'details' / 'select.cpp'),
+    ('test' / 'detail' / 'select.cpp'),
+    ('test' / 'scratch.cpp')
 ]
 
 foreach test_file : test_files
     test_name = test_file.strip('.cpp').replace('/', '_').replace('\\', '_')
-    exe = executable(test_name, test_file, dependencies: libquspin_dep)
+    exe = executable(test_name, test_file, dependencies: dependencies)
     test(test_name, exe)
 endforeach

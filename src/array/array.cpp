@@ -4,9 +4,9 @@
 #include <iostream>
 #include <numeric>
 #include <quspin/array/array.hpp>
-#include <quspin/array/details/array.hpp>
-#include <quspin/details/error.hpp>
-#include <quspin/details/operators.hpp>
+#include <quspin/array/detail/array.hpp>
+#include <quspin/detail/error.hpp>
+#include <quspin/detail/operators.hpp>
 #include <quspin/dtype/dtype.hpp>
 #include <quspin/scalar/reference.hpp>
 #include <quspin/scalar/scalar.hpp>
@@ -21,25 +21,25 @@ namespace quspin {
 
 // implementation of Array
 
-template Array::Array(const details::array<int8_t> &);
-template Array::Array(const details::array<uint8_t> &);
-template Array::Array(const details::array<int16_t> &);
-template Array::Array(const details::array<uint16_t> &);
-template Array::Array(const details::array<uint32_t> &);
-template Array::Array(const details::array<int32_t> &);
-template Array::Array(const details::array<uint64_t> &);
-template Array::Array(const details::array<int64_t> &);
-template Array::Array(const details::array<float> &);
-template Array::Array(const details::array<double> &);
-template Array::Array(const details::array<details::cfloat> &);
-template Array::Array(const details::array<details::cdouble> &);
+template Array::Array(const detail::array<int8_t> &);
+template Array::Array(const detail::array<uint8_t> &);
+template Array::Array(const detail::array<int16_t> &);
+template Array::Array(const detail::array<uint16_t> &);
+template Array::Array(const detail::array<uint32_t> &);
+template Array::Array(const detail::array<int32_t> &);
+template Array::Array(const detail::array<uint64_t> &);
+template Array::Array(const detail::array<int64_t> &);
+template Array::Array(const detail::array<float> &);
+template Array::Array(const detail::array<double> &);
+template Array::Array(const detail::array<detail::cfloat> &);
+template Array::Array(const detail::array<detail::cdouble> &);
 
 Array::Array(const std::vector<std::size_t> &shape, const DType &dtype) {
-  DTypeObject<details::arrays>::internals_ = std::visit(
+  DTypeObject<detail::arrays>::internals_ = std::visit(
       [&shape](const auto &dtype) {
         using T = typename std::decay_t<decltype(dtype)>::value_type;
-        details::array<T> arr(shape);
-        return details::arrays(arr);
+        detail::array<T> arr(shape);
+        return detail::arrays(arr);
       },
       dtype.get_variant_obj());
 }
@@ -47,11 +47,11 @@ Array::Array(const std::vector<std::size_t> &shape, const DType &dtype) {
 Array::Array(const std::vector<std::size_t> &shape,
              const std::vector<std::size_t> &stride, const DType &dtype,
              void *data) {
-  DTypeObject<details::arrays>::internals_ = std::visit(
+  DTypeObject<detail::arrays>::internals_ = std::visit(
       [&shape, &stride, &data](const auto &dtype) {
         using T = typename std::decay_t<decltype(dtype)>::value_type;
-        details::array<T> arr(shape, stride, static_cast<T *>(data));
-        return details::arrays(arr);
+        detail::array<T> arr(shape, stride, static_cast<T *>(data));
+        return detail::arrays(arr);
       },
       dtype.get_variant_obj());
 }
@@ -66,8 +66,8 @@ template Array::Array(std::initializer_list<int64_t>);
 template Array::Array(std::initializer_list<uint64_t>);
 template Array::Array(std::initializer_list<float>);
 template Array::Array(std::initializer_list<double>);
-template Array::Array(std::initializer_list<details::cfloat>);
-template Array::Array(std::initializer_list<details::cdouble>);
+template Array::Array(std::initializer_list<detail::cfloat>);
+template Array::Array(std::initializer_list<detail::cdouble>);
 
 bool Array::is_contiguous() const {
   return std::visit(
@@ -148,7 +148,7 @@ Array Array::astype(const DType &dtype) const {
       [](auto &&from, auto &&to) -> void {
         using to_t = std::decay_t<decltype(to)>::value_type;
 
-        auto func = [](auto &&value) { return details::cast<to_t>(value); };
+        auto func = [](auto &&value) { return detail::cast<to_t>(value); };
         std::transform(from.begin(), from.end(), to.begin(), func);
 
         return;

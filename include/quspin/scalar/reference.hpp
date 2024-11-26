@@ -1,33 +1,33 @@
 // Copyright 2024 Phillip Weinberg
 #pragma once
 
-#include <quspin/details/cast.hpp>
-#include <quspin/dtype/details/dtype.hpp>
+#include <quspin/detail/cast.hpp>
+#include <quspin/dtype/detail/dtype.hpp>
 #include <quspin/dtype/dtype.hpp>
-#include <quspin/scalar/details/reference.hpp>
+#include <quspin/scalar/detail/reference.hpp>
 #include <quspin/scalar/scalar.hpp>
 #include <variant>
 
 namespace quspin {
 
-class Reference : public DTypeObject<details::references> {
-    using DTypeObject<details::references>::internals_;
+class Reference : public DTypeObject<detail::references> {
+    using DTypeObject<detail::references>::internals_;
 
-    details::references default_value() {
-      return details::references(details::reference<double>());
+    detail::references default_value() {
+      return detail::references(detail::reference<double>());
     }
 
   public:
 
-    Reference() : DTypeObject<details::references>(default_value()) {}
+    Reference() : DTypeObject<detail::references>(default_value()) {}
 
-    Reference(details::references &reference)
-        : DTypeObject<details::references>(reference) {}
+    Reference(detail::references &reference)
+        : DTypeObject<detail::references>(reference) {}
 
     template<PrimativeTypes T>
     Reference(T &ref)
-        : DTypeObject<details::references>(
-              details::references(details::reference<T>(ref))) {}
+        : DTypeObject<detail::references>(
+              detail::references(detail::reference<T>(ref))) {}
 
     template<ScalarTypes T>
     operator T() const {
@@ -37,7 +37,7 @@ class Reference : public DTypeObject<details::references> {
             internals_);
       } else {
         return std::visit(
-            [](auto &&internals) { return details::cast<T>(internals.get()); },
+            [](auto &&internals) { return detail::cast<T>(internals.get()); },
             internals_);
       }
     }
@@ -49,7 +49,7 @@ class Reference : public DTypeObject<details::references> {
             [](auto &&internals, auto &&scalar) {
               using ref_t =
                   typename std::decay_t<decltype(internals)>::value_type;
-              internals = details::cast<ref_t>(scalar.get());
+              internals = detail::cast<ref_t>(scalar.get());
             },
             internals_, scalar.get_variant_obj());
       } else {
@@ -57,7 +57,7 @@ class Reference : public DTypeObject<details::references> {
             [&scalar](auto &&internals) {
               using ref_t =
                   typename std::decay_t<decltype(internals)>::value_type;
-              internals = details::cast<ref_t>(scalar);
+              internals = detail::cast<ref_t>(scalar);
             },
             internals_);
       }

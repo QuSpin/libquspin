@@ -2,12 +2,12 @@
 #pragma once
 
 #include <quspin/array/array.hpp>
-#include <quspin/details/optional.hpp>
+#include <quspin/detail/optional.hpp>
 
 namespace quspin {
 
 Array add(const Array &lhs, const Array &rhs,
-          details::Optional<Array> out = details::Optional<Array>());
+          detail::Optional<Array> out = detail::Optional<Array>());
 
 Scalar norm(const Array &array);
 

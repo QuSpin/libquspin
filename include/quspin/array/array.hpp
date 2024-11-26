@@ -2,11 +2,11 @@
 #pragma once
 
 #include <cstddef>
-#include <quspin/array/details/array.hpp>
-#include <quspin/details/operators.hpp>
-#include <quspin/dtype/details/dtype.hpp>
+#include <quspin/array/detail/array.hpp>
+#include <quspin/detail/operators.hpp>
+#include <quspin/dtype/detail/dtype.hpp>
 #include <quspin/dtype/dtype.hpp>
-#include <quspin/scalar/details/scalar.hpp>
+#include <quspin/scalar/detail/scalar.hpp>
 #include <quspin/scalar/reference.hpp>
 #include <quspin/scalar/scalar.hpp>
 #include <string>
@@ -14,16 +14,16 @@
 
 namespace quspin {
 
-class Array : public DTypeObject<details::arrays> {
-    using DTypeObject<details::arrays>::internals_;
+class Array : public DTypeObject<detail::arrays> {
+    using DTypeObject<detail::arrays>::internals_;
 
-    static details::arrays default_value() {
-      return details::arrays(details::array<double>());
+    static detail::arrays default_value() {
+      return detail::arrays(detail::array<double>());
     }
 
   public:
 
-    Array() : DTypeObject<details::arrays>(default_value()) {}
+    Array() : DTypeObject<detail::arrays>(default_value()) {}
 
     Array(const std::vector<std::size_t> &shape,
           const std::vector<std::size_t> &stride, const DType &dtype,
@@ -41,13 +41,13 @@ class Array : public DTypeObject<details::arrays> {
         : Array(std::vector<std::size_t>(shape), dtype) {}
 
     template<PrimativeTypes T>
-    Array(const details::array<T> &array)
-        : DTypeObject<details::arrays>(details::arrays(array)) {}
+    Array(const detail::array<T> &array)
+        : DTypeObject<detail::arrays>(detail::arrays(array)) {}
 
     template<PrimativeTypes T>
     Array(std::initializer_list<T> values)
-        : DTypeObject<details::arrays>(
-              details::arrays(details::array<T>(values))) {}
+        : DTypeObject<detail::arrays>(
+              detail::arrays(detail::array<T>(values))) {}
 
     bool is_contiguous() const;
     std::vector<std::size_t> shape() const;

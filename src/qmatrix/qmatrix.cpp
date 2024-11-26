@@ -1,9 +1,9 @@
 // Copyright 2024 Phillip Weinberg
 
 #include <quspin/array/array.hpp>
-#include <quspin/array/details/array.hpp>
-#include <quspin/details/select.hpp>
-#include <quspin/qmatrix/details/qmatrix.hpp>
+#include <quspin/array/detail/array.hpp>
+#include <quspin/detail/select.hpp>
+#include <quspin/qmatrix/detail/qmatrix.hpp>
 #include <quspin/qmatrix/qmatrix.hpp>
 #include <type_traits>
 #include <variant>
@@ -11,28 +11,28 @@
 namespace quspin {
 
 decltype(auto) select_data_variants(Array &data) {
-  using namespace details;
+  using namespace detail;
   return select<array<int8_t>, array<int16_t>, array<float>, array<double>,
                 array<cfloat>, array<cdouble>>(data, "data");
 }
 
 decltype(auto) select_indptr_variants(Array &indptr) {
-  using namespace details;
+  using namespace detail;
   return select<array<int32_t>, array<int64_t>>(indptr, "indptr");
 }
 
 decltype(auto) select_indices_variants(Array &indptr) {
-  using namespace details;
+  using namespace detail;
   return select<array<int32_t>, array<int64_t>>(indptr, "indices");
 }
 
 decltype(auto) select_cindex_variants(Array &cindices) {
-  using namespace details;
+  using namespace detail;
   return select<array<uint8_t>, array<uint16_t>>(cindices, "cindices");
 }
 
 QMatrix::QMatrix(Array data, Array indptr, Array indices, Array cindices) {
-  using namespace details;
+  using namespace detail;
 
   const std::size_t dim = indptr.size() - 1;
 
@@ -60,7 +60,7 @@ QMatrix::QMatrix(Array data, Array indptr, Array indices, Array cindices) {
     }
   };
 
-  DTypeObject<details::qmatrices>::internals_ = visit_or_error<qmatrices>(
+  DTypeObject<detail::qmatrices>::internals_ = visit_or_error<qmatrices>(
       constructor, data_select.get_variant_obj(),
       indptr_select.get_variant_obj(), indices_select.get_variant_obj(),
       cindices_select.get_variant_obj());
@@ -69,7 +69,7 @@ QMatrix::QMatrix(Array data, Array indptr, Array indices, Array cindices) {
 template<typename J>
   requires std::same_as<J, uint8_t> || std::same_as<J, uint16_t>
 QMatrix::QMatrix(Array data, Array indptr, Array indices, const J cindex) {
-  using namespace details;
+  using namespace detail;
 
   const std::size_t dim = indptr.size() - 1;
 
@@ -96,7 +96,7 @@ QMatrix::QMatrix(Array data, Array indptr, Array indices, const J cindex) {
     }
   };
 
-  DTypeObject<details::qmatrices>::internals_ = visit_or_error<qmatrices>(
+  DTypeObject<detail::qmatrices>::internals_ = visit_or_error<qmatrices>(
       constructor, data_select.get_variant_obj(),
       indptr_select.get_variant_obj(), indices_select.get_variant_obj());
 }
@@ -108,27 +108,27 @@ template QMatrix::QMatrix(Array data, Array indptr, Array indices,
 
 std::size_t QMatrix::dim() const {
   return std::visit([](auto &&arg) { return arg.dim(); },
-                    DTypeObject<details::qmatrices>::internals_);
+                    DTypeObject<detail::qmatrices>::internals_);
 }
 
 Array QMatrix::indptr() const {
   return std::visit([](auto &&arg) { return Array(arg.indptr()); },
-                    DTypeObject<details::qmatrices>::internals_);
+                    DTypeObject<detail::qmatrices>::internals_);
 }
 
 Array QMatrix::indices() const {
   return std::visit([](auto &&arg) { return Array(arg.indices()); },
-                    DTypeObject<details::qmatrices>::internals_);
+                    DTypeObject<detail::qmatrices>::internals_);
 }
 
 Array QMatrix::data() const {
   return std::visit([](auto &&arg) { return Array(arg.data()); },
-                    DTypeObject<details::qmatrices>::internals_);
+                    DTypeObject<detail::qmatrices>::internals_);
 }
 
 Array QMatrix::cindices() const {
   return std::visit([](auto &&arg) { return Array(arg.cindices()); },
-                    DTypeObject<details::qmatrices>::internals_);
+                    DTypeObject<detail::qmatrices>::internals_);
 }
 
 }  // namespace quspin

@@ -1,11 +1,11 @@
 
 #include <quspin/array/array.hpp>
-#include <quspin/details/error.hpp>
-#include <quspin/details/optional.hpp>
-#include <quspin/details/select.hpp>
-#include <quspin/dtype/details/dtype.hpp>
-#include <quspin/qmatrix/details/qmatrix.hpp>
-#include <quspin/qmatrix/kernel/details/dot.hpp>
+#include <quspin/detail/error.hpp>
+#include <quspin/detail/optional.hpp>
+#include <quspin/detail/select.hpp>
+#include <quspin/dtype/detail/dtype.hpp>
+#include <quspin/qmatrix/detail/qmatrix.hpp>
+#include <quspin/qmatrix/kernel/detail/dot.hpp>
 #include <quspin/qmatrix/kernel/dot.hpp>
 #include <quspin/qmatrix/qmatrix.hpp>
 #include <stdexcept>
@@ -13,8 +13,8 @@
 namespace quspin {
 
 Array dot(const bool overwrite_out, QMatrix op, Array coeff, Array input,
-          details::Optional<Array> output) {
-  using namespace details;
+          detail::Optional<Array> output) {
+  using namespace detail;
 
   Array output_value = output.get(
       [&input]() -> Array { return Array(input.shape(), input.dtype()); });

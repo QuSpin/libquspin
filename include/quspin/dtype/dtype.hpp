@@ -1,36 +1,36 @@
 // Copyright 2024 Phillip Weinberg
 #pragma once
 
-#include <quspin/details/operators.hpp>
-#include <quspin/details/variant_container.hpp>
-#include <quspin/dtype/details/dtype.hpp>
+#include <quspin/detail/operators.hpp>
+#include <quspin/detail/variant_container.hpp>
+#include <quspin/dtype/detail/dtype.hpp>
 #include <string>
 #include <vector>
 
 namespace quspin {
 
-class DType : public details::VariantContainer<details::dtypes> {
-    using details::VariantContainer<details::dtypes>::internals_;
+class DType : public detail::VariantContainer<detail::dtypes> {
+    using detail::VariantContainer<detail::dtypes>::internals_;
 
-    static details::dtypes default_value() {
-      return details::dtypes(details::dtype<double>());
+    static detail::dtypes default_value() {
+      return detail::dtypes(detail::dtype<double>());
     }
 
   public:
 
-    DType() : details::VariantContainer<details::dtypes>(default_value()) {};
+    DType() : detail::VariantContainer<detail::dtypes>(default_value()) {};
 
     template<typename T>
-    DType(const details::dtype<T> &dtype) {
-      internals_ = details::dtypes(dtype);
+    DType(const detail::dtype<T> &dtype) {
+      internals_ = detail::dtypes(dtype);
     }
 
     std::string name() const;
 
     template<typename T>
     static DType of() {
-      using val_t = details::value_type_t<std::decay_t<T>>;
-      return DType(details::dtype<details::value_type_t<val_t>>());
+      using val_t = detail::value_type_t<std::decay_t<T>>;
+      return DType(detail::dtype<detail::value_type_t<val_t>>());
     }
 
     bool operator==(const DType &dtype) const;
@@ -41,24 +41,24 @@ bool int_dtype(const DType &);
 bool float_dtype(const DType &);
 bool complex_dtype(const DType &);
 
-static const DType Int8 = DType(details::dtype<int8_t>());
-static const DType UInt8 = DType(details::dtype<uint8_t>());
-static const DType Int16 = DType(details::dtype<int16_t>());
-static const DType UInt16 = DType(details::dtype<uint16_t>());
-static const DType Int32 = DType(details::dtype<int32_t>());
-static const DType UInt32 = DType(details::dtype<uint32_t>());
-static const DType Int64 = DType(details::dtype<int64_t>());
-static const DType UInt64 = DType(details::dtype<uint64_t>());
-static const DType Float = DType(details::dtype<float>());
-static const DType Double = DType(details::dtype<double>());
-static const DType CFloat = DType(details::dtype<details::cfloat>());
-static const DType CDouble = DType(details::dtype<details::cdouble>());
+static const DType Int8 = DType(detail::dtype<int8_t>());
+static const DType UInt8 = DType(detail::dtype<uint8_t>());
+static const DType Int16 = DType(detail::dtype<int16_t>());
+static const DType UInt16 = DType(detail::dtype<uint16_t>());
+static const DType Int32 = DType(detail::dtype<int32_t>());
+static const DType UInt32 = DType(detail::dtype<uint32_t>());
+static const DType Int64 = DType(detail::dtype<int64_t>());
+static const DType UInt64 = DType(detail::dtype<uint64_t>());
+static const DType Float = DType(detail::dtype<float>());
+static const DType Double = DType(detail::dtype<double>());
+static const DType CFloat = DType(detail::dtype<detail::cfloat>());
+static const DType CDouble = DType(detail::dtype<detail::cdouble>());
 
 template<typename Variant>
-class DTypeObject : public details::VariantContainer<Variant> {
+class DTypeObject : public detail::VariantContainer<Variant> {
   protected:
 
-    using details::VariantContainer<Variant>::internals_;
+    using detail::VariantContainer<Variant>::internals_;
 
   public:
 
@@ -68,7 +68,7 @@ class DTypeObject : public details::VariantContainer<Variant> {
     DTypeObject(DTypeObject &&obj) = default;
 
     DTypeObject(const Variant &internals)
-        : details::VariantContainer<Variant>(internals) {}
+        : detail::VariantContainer<Variant>(internals) {}
 
     DType dtype() const {
       return std::visit(

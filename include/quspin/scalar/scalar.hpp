@@ -2,33 +2,33 @@
 #pragma once
 
 #include <functional>
-#include <quspin/details/cast.hpp>
-#include <quspin/details/operators.hpp>
-#include <quspin/details/type_concepts.hpp>
-#include <quspin/dtype/details/dtype.hpp>
+#include <quspin/detail/cast.hpp>
+#include <quspin/detail/operators.hpp>
+#include <quspin/detail/type_concepts.hpp>
+#include <quspin/dtype/detail/dtype.hpp>
 #include <quspin/dtype/dtype.hpp>
-#include <quspin/scalar/details/scalar.hpp>
+#include <quspin/scalar/detail/scalar.hpp>
 #include <variant>
 
 namespace quspin {
 
-class Scalar : public DTypeObject<details::scalars> {
-    using DTypeObject<details::scalars>::internals_;
+class Scalar : public DTypeObject<detail::scalars> {
+    using DTypeObject<detail::scalars>::internals_;
 
-    details::scalars default_value() {
-      return details::scalars(details::scalar<double>());
+    detail::scalars default_value() {
+      return detail::scalars(detail::scalar<double>());
     }
 
   public:
 
-    Scalar() : DTypeObject<details::scalars>(default_value()) {}
+    Scalar() : DTypeObject<detail::scalars>(default_value()) {}
 
     Scalar(const Scalar &scalar) = default;
 
     template<PrimativeTypes T>
     Scalar(const T &value)
-        : DTypeObject<details::scalars>(
-              details::scalars(details::scalar(value))) {}
+        : DTypeObject<detail::scalars>(detail::scalars(detail::scalar(value))) {
+    }
 
     template<PrimativeTypes T>
     operator T() const;

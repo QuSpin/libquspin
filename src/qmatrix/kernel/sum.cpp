@@ -1,9 +1,9 @@
 // Copyright 2024 Phillip Weinberg
 #include <cassert>
 #include <quspin/array/array.hpp>
-#include <quspin/details/dispatch.hpp>
-#include <quspin/details/select.hpp>
-#include <quspin/qmatrix/kernel/details/sum.hpp>
+#include <quspin/detail/dispatch.hpp>
+#include <quspin/detail/select.hpp>
+#include <quspin/qmatrix/kernel/detail/sum.hpp>
 #include <quspin/qmatrix/qmatrix.hpp>
 #include <string>
 
@@ -12,60 +12,60 @@ namespace quspin {
 struct MismatchInputIndexTypes {
     static constexpr bool has_error() { return true; }
 
-    static details::Error get_error() {
-      return details::Error(details::ErrorType::ValueError,
-                            "mismatch input index dtypes.");
+    static detail::Error get_error() {
+      return detail::Error(detail::ErrorType::ValueError,
+                           "mismatch input index dtypes.");
     }
 };
 
 struct MismatchInputCoeffIndexTypes {
     static constexpr bool has_error() { return true; }
 
-    static details::Error get_error() {
-      return details::Error(details::ErrorType::ValueError,
-                            "mismatch input coefficient index dtypes.");
+    static detail::Error get_error() {
+      return detail::Error(detail::ErrorType::ValueError,
+                           "mismatch input coefficient index dtypes.");
     }
 };
 
 struct MismatchInputDataTypes {
     static constexpr bool has_error() { return true; }
 
-    static details::Error get_error() {
-      return details::Error(details::ErrorType::ValueError,
-                            "mismatch in input data dtypes.");
+    static detail::Error get_error() {
+      return detail::Error(detail::ErrorType::ValueError,
+                           "mismatch in input data dtypes.");
     }
 };
 
 struct MismatchOutputIndexTypes {
     static constexpr bool has_error() { return true; }
 
-    static details::Error get_error() {
-      return details::Error(details::ErrorType::ValueError,
-                            "mismatch in output index dtypes.");
+    static detail::Error get_error() {
+      return detail::Error(detail::ErrorType::ValueError,
+                           "mismatch in output index dtypes.");
     }
 };
 
 struct MismatchOutputCoeffIndexTypes {
     static constexpr bool has_error() { return true; }
 
-    static details::Error get_error() {
-      return details::Error(details::ErrorType::ValueError,
-                            "mismatch output coefficient index dtypes.");
+    static detail::Error get_error() {
+      return detail::Error(detail::ErrorType::ValueError,
+                           "mismatch output coefficient index dtypes.");
     }
 };
 
 struct MismatchOutputDataTypes {
     static constexpr bool has_error() { return true; }
 
-    static details::Error get_error() {
-      return details::Error(details::ErrorType::ValueError,
-                            "mismatch in output data dtype.");
+    static detail::Error get_error() {
+      return detail::Error(detail::ErrorType::ValueError,
+                           "mismatch in output data dtype.");
     }
 };
 
 QMatrix sum(const QMatrix lhs, const QMatrix rhs,
             const std::size_t num_threads /* = 0 */) {
-  using namespace details;
+  using namespace detail;
 
   auto static_check_inputs = [](const auto &lhs, const auto &rhs) {
     using lhs_index_t = typename std::decay_t<decltype(lhs)>::index_type;
@@ -84,7 +84,7 @@ QMatrix sum(const QMatrix lhs, const QMatrix rhs,
     } else if constexpr (!std::is_same_v<lhs_data_t, rhs_data_t>) {
       return MismatchInputDataTypes();
     } else {
-      return details::ValidArgs();
+      return detail::ValidArgs();
     }
   };
 
@@ -103,15 +103,15 @@ QMatrix sum(const QMatrix lhs, const QMatrix rhs,
   auto dynamic_checks_nonzero = [](const auto &lhs, const auto &rhs,
                                    auto &out) {
     if (lhs.dim() != rhs.dim() || lhs.indptr().shape(0) != out.shape(0)) {
-      return details::ReturnVoidError(details::Error(
-          details::ErrorType::ValueError, "Incompatible shapes"));
+      return detail::ReturnVoidError(
+          detail::Error(detail::ErrorType::ValueError, "Incompatible shapes"));
     }
-    return details::ReturnVoidError();
+    return detail::ReturnVoidError();
   };
 
   Array indptr = lhs.indptr().copy();
 
-  auto out = details::select<array<int32_t>, array<int64_t>>(indptr);
+  auto out = detail::select<array<int32_t>, array<int64_t>>(indptr);
 
   auto op = [](auto &&lhs, auto &&rhs) {
     using lhs_t = std::decay_t<decltype(lhs)>;
@@ -123,11 +123,11 @@ QMatrix sum(const QMatrix lhs, const QMatrix rhs,
   auto calc_nonzeros = [&op, &num_threads](const auto &lhs, const auto &rhs,
                                            auto &out) {
     elementwise_binop_size(op, lhs, rhs, out, num_threads);
-    return details::ReturnVoidError();
+    return detail::ReturnVoidError();
   };
 
-  details::dispatch(calc_nonzeros, static_checks_nonzero,
-                    dynamic_checks_nonzero, lhs, rhs, out);
+  detail::dispatch(calc_nonzeros, static_checks_nonzero, dynamic_checks_nonzero,
+                   lhs, rhs, out);
 
   auto static_checks_operator =
       [&static_check_inputs](const auto &lhs, const auto &rhs, auto &res) {
@@ -154,16 +154,16 @@ QMatrix sum(const QMatrix lhs, const QMatrix rhs,
   auto dynamic_checks_operator = [](const auto &lhs, const auto &rhs,
                                     auto &res) {
     if (lhs.dim() != rhs.dim() || lhs.dim() != res.dim()) {
-      return details::ReturnVoidError(details::Error(
-          details::ErrorType::ValueError, "Incompatible shapes"));
+      return detail::ReturnVoidError(
+          detail::Error(detail::ErrorType::ValueError, "Incompatible shapes"));
     }
-    return details::ReturnVoidError();
+    return detail::ReturnVoidError();
   };
 
   auto calc_qmatrix = [&op, &num_threads](const auto &lhs, const auto &rhs,
                                           auto &result) {
     elementwise_binary_operation(op, lhs, rhs, result, num_threads);
-    return details::ReturnVoidError();
+    return detail::ReturnVoidError();
   };
 
   const std::size_t nnz = indptr[{indptr.size() - 1}];
@@ -173,8 +173,8 @@ QMatrix sum(const QMatrix lhs, const QMatrix rhs,
 
   QMatrix result(data, indptr, indices, cindices);
 
-  details::dispatch(calc_qmatrix, static_checks_operator,
-                    dynamic_checks_operator, lhs, rhs, result);
+  detail::dispatch(calc_qmatrix, static_checks_operator,
+                   dynamic_checks_operator, lhs, rhs, result);
 
   return result;
 }

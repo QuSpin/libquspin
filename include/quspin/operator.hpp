@@ -10,8 +10,8 @@
 #include <limits>
 #include <list>
 #include <memory>
-#include <quspin/basis/details/bitbasis/bits.hpp>
-#include <quspin/basis/details/bitbasis/dits.hpp>
+#include <quspin/basis/detail/bitbasis/bits.hpp>
+#include <quspin/basis/detail/bitbasis/dits.hpp>
 #include <quspin/utils/functions.hpp>
 #include <unordered_map>
 #include <utility>
@@ -247,7 +247,7 @@ class operator_string  // generic operator
       size_t ptr = 0;
 
       for (int i = 0; i < nlocs; ++i) {
-        const int s_loc = quspin::basis::get_sub_bitstring(r, locs[i]);
+        const int s_loc = quspin::details::basis::get_sub_bitstring(r, locs[i]);
         const size_t ind = ptr + s_loc;
 
         m *= datas[ind];
