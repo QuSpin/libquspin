@@ -19,14 +19,15 @@ struct qmatrix : public typed_object<T> {
   private:
 
     std::size_t dim_;
+    std::size_t num_coeff_;
     array<T> data_;
     array<I> indptr_;
     array<I> indices_;
     array<J> cindices_;
-    static constexpr J max_coeff = std::numeric_limits<J>::max();
 
   public:
 
+    static constexpr J max_coeff = std::numeric_limits<J>::max();
     using value_type = T;
     using index_type = I;
     using cindex_type = J;
@@ -39,6 +40,8 @@ struct qmatrix : public typed_object<T> {
 
     void sort_indices();
     bool has_sorted_indices() const;
+
+    std::size_t num_coeff() const;
 
     array<T> data() const;
     T *data_ptr();

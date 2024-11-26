@@ -121,9 +121,10 @@ Reference Array::operator[](std::vector<std::size_t> &index) {
 
 const Scalar Array::operator[](
     std::initializer_list<std::size_t> indices) const {
-  auto index = std::vector<std::size_t>(indices);
   return std::visit(
-      [&index](const auto &internals) { return Scalar(internals.at(index)); },
+      [&indices](const auto &internals) {
+        return Scalar(internals.at(indices));
+      },
       internals_);
 }
 

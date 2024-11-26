@@ -15,7 +15,11 @@ template<typename T, typename I, typename J>
   requires QMatrixTypes<T, I, J>
 void check_fields(const std::size_t dim, const array<T> &data,
                   const array<I> &indptr, const array<I> &indices,
-                  const array<J> &cindices) {
+                  const array<J> &cindices, const std::size_t num_coeff) {
+  if (num_coeff > std::numeric_limits<J>::max()) {
+    throw std::invalid_argument("cindex value exceeds maximum value");
+  }
+
   if (dim + 1 != indptr.size()) {
     throw std::invalid_argument("Invalid number of rows");
   }
@@ -48,7 +52,7 @@ void check_fields(const std::size_t dim, const array<T> &data,
     throw std::invalid_argument("indptr must be sorted");
   }
 
-  const auto nnz_ = indptr.at({indptr.size() - 1});
+  const auto nnz_ = indptr.at(std::array<std::size_t, 1>{indptr.size() - 1});
 
   if (nnz_ < 0) {
     throw std::invalid_argument("indptr must be positive");
@@ -77,7 +81,9 @@ qmatrix<T, I, J>::qmatrix(const std::size_t dim, array<T> &data,
       indptr_(indptr),
       indices_(indices),
       cindices_(cindices) {
-  check_fields(dim, data, indptr, indices, cindices);
+  num_coeff_ = static_cast<std::size_t>(
+      *std::max_element(cindices.begin(), cindices.end()));
+  check_fields(dim, data, indptr, indices, cindices, num_coeff_);
   if (!has_sorted_indices()) {
     sort_indices();
   }
@@ -89,9 +95,12 @@ qmatrix<T, I, J>::qmatrix(const std::size_t dim, array<T> &data,
                           array<I> &indptr, array<I> &indices, const J &cindex)
     : dim_(dim), data_(data), indptr_(indptr), indices_(indices) {
   cindices_ = array<J>(indices.shape());
+  num_coeff_ = static_cast<std::size_t>(cindex);
+
   std::fill(cindices_.begin(), cindices_.end(), cindex);
 
-  check_fields(dim, data, indptr, indices, cindices_);
+  check_fields(dim, data, indptr, indices, cindices_,
+               static_cast<std::size_t>(cindex));
   if (!has_sorted_indices()) {
     sort_indices();
   }
@@ -100,8 +109,7 @@ qmatrix<T, I, J>::qmatrix(const std::size_t dim, array<T> &data,
 template<typename T, typename I, typename J>
   requires QMatrixTypes<T, I, J>
 void qmatrix<T, I, J>::sort_indices() {
-  auto range_iter = std::ranges::iota_view{std::size_t(0), dim_};
-  for (auto &&i : range_iter) {
+  for (auto &&i : std::ranges::iota_view{std::size_t(0), dim_}) {
     std::sort(row_begin(i), row_end(i));
   }
 }
@@ -109,13 +117,18 @@ void qmatrix<T, I, J>::sort_indices() {
 template<typename T, typename I, typename J>
   requires QMatrixTypes<T, I, J>
 bool qmatrix<T, I, J>::has_sorted_indices() const {
-  auto range_iter = std::ranges::iota_view{std::size_t(0), dim_};
-  for (auto &&i : range_iter) {
+  for (auto &&i : std::ranges::iota_view{std::size_t(0), dim_}) {
     if (!std::is_sorted(row_begin(i), row_end(i))) {
       return false;
     }
   }
   return true;
+}
+
+template<typename T, typename I, typename J>
+  requires QMatrixTypes<T, I, J>
+std::size_t qmatrix<T, I, J>::num_coeff() const {
+  return num_coeff_;
 }
 
 template<typename T, typename I, typename J>

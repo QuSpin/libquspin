@@ -6,6 +6,6 @@
 #include <quspin/qmatrix/qmatrix.hpp>
 
 namespace quspin {
-Array dot(const QMatrix op, const Array coeff, const Array input,
+Array dot(const bool overwrite_out, QMatrix op, Array coeff, Array input,
           details::Optional<Array> output = details::Optional<Array>());
 }  // namespace quspin

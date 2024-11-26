@@ -41,13 +41,10 @@ boost = dependency('boost')
 
 src_files = files(
     'src' / 'array' / 'array.cpp',
-    'src' / 'array' / 'details' / 'array.cpp',
-    'src' / 'array' / 'details' / 'iterator.cpp',
+    'src' / 'array' / 'kernels.cpp',
     'src' / 'scalar' / 'scalar.cpp',
     'src' / 'scalar' / 'reference.cpp',
-    'src' / 'array' / 'kernels.cpp',
     'src' / 'dtype' / 'dtype.cpp',
-    'src' / 'details' / 'pointer.cpp',
     'src' / 'qmatrix' / 'kernel' / 'dot.cpp',
     'src' / 'qmatrix' / 'kernel' / 'sum.cpp',
     'src' / 'qmatrix' / 'qmatrix.cpp',
