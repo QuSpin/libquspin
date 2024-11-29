@@ -1,3 +1,4 @@
+// Copyright 2024 Phillip Weinberg
 #pragma once
 
 #include <algorithm>
@@ -9,8 +10,8 @@
 #include <limits>
 #include <list>
 #include <memory>
-#include <quspin/basis/details/bitbasis/bits.hpp>
-#include <quspin/basis/details/bitbasis/dits.hpp>
+#include <quspin/basis/detail/bitbasis/bits.hpp>
+#include <quspin/basis/detail/bitbasis/dits.hpp>
 #include <quspin/utils/functions.hpp>
 #include <unordered_map>
 #include <utility>
@@ -18,9 +19,11 @@
 
 namespace quspin {
 
-  template <class T, size_t N> class N_body_dit_op {
+template<class T, size_t N>
+class N_body_dit_op {
     //
   private:
+
     const basis::dit_integer_t lhss;  // size of local
     const int dim;
     std::array<int, N> locs;
@@ -28,6 +31,7 @@ namespace quspin {
     std::vector<bool> nonzero;
 
   public:
+
     static const int length = N;
     typedef T value_type;
 
@@ -39,8 +43,8 @@ namespace quspin {
       return _dim;
     }
 
-    N_body_dit_op(const basis::dit_integer_t _lhss, const std::vector<int>& _locs,
-                  const std::vector<T>& _data)
+    N_body_dit_op(const basis::dit_integer_t _lhss,
+                  const std::vector<int>& _locs, const std::vector<T>& _data)
         : lhss(_lhss), dim(get_power(_lhss)) {
       assert(_data.size() == dim * dim);
       assert(_locs.size() == N);
@@ -66,7 +70,7 @@ namespace quspin {
 
     ~N_body_dit_op() {}
 
-    template <typename bitset_t, typename container_t>
+    template<typename bitset_t, typename container_t>
     void op(const bitset_t& s, container_t& output) const {
       const int a = basis::get_sub_bitstring(s, locs);
       for (int b = 0; b < dim; ++b) {  // loop over columns
@@ -78,7 +82,7 @@ namespace quspin {
       }
     }
 
-    template <typename bitset_t, typename container_t>
+    template<typename bitset_t, typename container_t>
     void op_dagger(const bitset_t& s, container_t& output) const {
       const int a = basis::get_sub_bitstring(s, locs);
       for (int b = 0; b < dim; ++b) {  // loop over rows
@@ -89,11 +93,13 @@ namespace quspin {
         }
       }
     }
-  };
+};
 
-  template <class T, size_t N> class N_body_bit_op {
+template<class T, size_t N>
+class N_body_bit_op {
     //
   private:
+
     static const int dim = static_cast<size_t>(integer_pow<2, N>::value);
 
     std::array<int, N> locs;
@@ -101,6 +107,7 @@ namespace quspin {
     std::array<bool, dim * dim> nonzero;
 
   public:
+
     static const int length = N;
     typedef T value_type;
 
@@ -126,7 +133,7 @@ namespace quspin {
 
     ~N_body_bit_op() {}
 
-    template <typename bitset_t, typename container_t>
+    template<typename bitset_t, typename container_t>
     void op(const bitset_t& s, container_t& output) const {
       const int a = basis::get_sub_bitstring(s, locs);
 
@@ -139,7 +146,7 @@ namespace quspin {
       }
     }
 
-    template <typename bitset_t, typename container_t>
+    template<typename bitset_t, typename container_t>
     void op_dagger(const bitset_t& s, container_t& output) const {
       const int a = basis::get_sub_bitstring(s, locs);
 
@@ -151,24 +158,29 @@ namespace quspin {
         }
       }
     }
-  };
+};
 
-  template <typename T> class operator_string  // generic operator
-  {
+template<typename T>
+class operator_string  // generic operator
+{
   private:
-    const int lhss;              // local hilbert space size for each term
-    const int nlocs;             // number of local operators
-    std::vector<int> locs;       // number of local operators in
-    std::vector<int> perms;      // non-branching operators stored as permutations
-    std::vector<int> inv_perms;  // non-branching operators dagger stored as permutations
-    std::vector<T> datas;        // matrix elements for non-branching operators.
-    std::vector<T> inv_datas;    // matrix elements for dagger operator.
+
+    const int lhss;          // local hilbert space size for each term
+    const int nlocs;         // number of local operators
+    std::vector<int> locs;   // number of local operators in
+    std::vector<int> perms;  // non-branching operators stored as permutations
+    std::vector<int>
+        inv_perms;  // non-branching operators dagger stored as permutations
+    std::vector<T> datas;      // matrix elements for non-branching operators.
+    std::vector<T> inv_datas;  // matrix elements for dagger operator.
 
   public:
+
     static const int length = 0;
     typedef T value_type;
 
-    operator_string(const std::vector<int>& _locs, const std::vector<std::vector<int>>& _perms,
+    operator_string(const std::vector<int>& _locs,
+                    const std::vector<std::vector<int>>& _perms,
                     const std::vector<std::vector<T>>& _datas)
         : lhss(_perms.front().size()), nlocs(_locs.size()) {
       assert(_locs.size() == _perms.size());
@@ -177,8 +189,10 @@ namespace quspin {
       locs.insert(locs.end(), _locs.begin(), _locs.end());
 
       for (size_t i = 0; i < _locs.size(); i++) {
-        std::vector<int> perm(_perms[i].begin(), _perms[i].end()), inv_perm(_perms[i].size());
-        std::vector<T> data(_datas[i].begin(), _datas[i].end()), inv_data(_datas[i].size());
+        std::vector<int> perm(_perms[i].begin(), _perms[i].end()),
+            inv_perm(_perms[i].size());
+        std::vector<T> data(_datas[i].begin(), _datas[i].end()),
+            inv_data(_datas[i].size());
 
         assert(perm.size() == lhss);
         assert(data.size() == lhss);
@@ -199,7 +213,8 @@ namespace quspin {
       }
     }
 
-    operator_string(const int _lhss, const int _nlocs, int* _locs, int* _perms, T* _datas)
+    operator_string(const int _lhss, const int _nlocs, int* _locs, int* _perms,
+                    T* _datas)
         : lhss(_lhss), nlocs(_nlocs) {
       // constructor for raw data.
       locs.insert(locs.end(), _locs, _locs + _nlocs);
@@ -223,7 +238,7 @@ namespace quspin {
 
     ~operator_string() {}
 
-    template <typename bitset_t, typename container_t>
+    template<typename bitset_t, typename container_t>
     void op(const bitset_t& s, container_t& output) const {
       T m = T(1.0);
       bitset_t r(s);
@@ -232,7 +247,7 @@ namespace quspin {
       size_t ptr = 0;
 
       for (int i = 0; i < nlocs; ++i) {
-        const int s_loc = quspin::basis::get_sub_bitstring(r, locs[i]);
+        const int s_loc = quspin::details::basis::get_sub_bitstring(r, locs[i]);
         const size_t ind = ptr + s_loc;
 
         m *= datas[ind];
@@ -250,7 +265,7 @@ namespace quspin {
       if (nonzero) output.push_back(std::make_pair(r, m));
     }
 
-    template <typename bitset_t, typename container_t>
+    template<typename bitset_t, typename container_t>
     void op_dagger(const bitset_t& s, container_t& output) const {
       T m = T(1.0);
       bitset_t r(s);
@@ -275,7 +290,7 @@ namespace quspin {
 
       if (nonzero) output.push_back(std::make_pair(r, m));
     }
-  };
+};
 
 }  // namespace quspin
 
@@ -283,30 +298,30 @@ namespace quspin {
 
 namespace quspin {  // test cases
 
-  typedef basis::bit_set<uint8_t> bs;
-  typedef basis::dit_set<uint8_t> ds;
+typedef basis::bit_set<uint8_t> bs;
+typedef basis::dit_set<uint8_t> ds;
 
-  // qubits
+// qubits
 
-  template class operator_string<double>;
-  template void operator_string<double>::op<bs>(const bs&,
-                                                std::vector<std::pair<bs, double>>&) const;
-  template void operator_string<double>::op_dagger<bs>(const bs&,
-                                                       std::vector<std::pair<bs, double>>&) const;
+template class operator_string<double>;
+template void operator_string<double>::op<bs>(
+    const bs&, std::vector<std::pair<bs, double>>&) const;
+template void operator_string<double>::op_dagger<bs>(
+    const bs&, std::vector<std::pair<bs, double>>&) const;
 
-  template class N_body_bit_op<double, 2>;
-  template void N_body_bit_op<double, 2>::op<bs>(const bs&,
-                                                 std::vector<std::pair<bs, double>>&) const;
-  template void N_body_bit_op<double, 2>::op_dagger<bs>(const bs&,
-                                                        std::vector<std::pair<bs, double>>&) const;
+template class N_body_bit_op<double, 2>;
+template void N_body_bit_op<double, 2>::op<bs>(
+    const bs&, std::vector<std::pair<bs, double>>&) const;
+template void N_body_bit_op<double, 2>::op_dagger<bs>(
+    const bs&, std::vector<std::pair<bs, double>>&) const;
 
-  // qudits
+// qudits
 
-  template class N_body_dit_op<double, 2>;
-  template void N_body_dit_op<double, 2>::op<ds>(const ds&,
-                                                 std::vector<std::pair<ds, double>>&) const;
-  template void N_body_dit_op<double, 2>::op_dagger<ds>(const ds&,
-                                                        std::vector<std::pair<ds, double>>&) const;
+template class N_body_dit_op<double, 2>;
+template void N_body_dit_op<double, 2>::op<ds>(
+    const ds&, std::vector<std::pair<ds, double>>&) const;
+template void N_body_dit_op<double, 2>::op_dagger<ds>(
+    const ds&, std::vector<std::pair<ds, double>>&) const;
 
 }  // namespace quspin
 
@@ -339,8 +354,9 @@ TEST_SUITE("quspin/operators.h") {
 
     delete H;
 
-    H = new operator_string<double>({0, 2, 3}, {{0, 1, 2}, {1, 2, 0}, {2, 0, 1}},
-                                    {{1.0, 2.0, 3.0}, {1.0, 2.0, 3.0}, {1.0, 2.0, 3.0}});
+    H = new operator_string<double>(
+        {0, 2, 3}, {{0, 1, 2}, {1, 2, 0}, {2, 0, 1}},
+        {{1.0, 2.0, 3.0}, {1.0, 2.0, 3.0}, {1.0, 2.0, 3.0}});
 
     dit_output.clear();
     H->op(dit_state, dit_output);
@@ -356,7 +372,8 @@ TEST_SUITE("quspin/operators.h") {
     basis::bit_set<uint8_t> bit_state({0, 1, 1, 0, 1, 0, 0, 1});
 
     // \sigma_z \sigma_z
-    H = new operator_string<double>({0, 1}, {{0, 1}, {0, 1}}, {{-1.0, 1.0}, {-1.0, 1.0}});
+    H = new operator_string<double>({0, 1}, {{0, 1}, {0, 1}},
+                                    {{-1.0, 1.0}, {-1.0, 1.0}});
     H->op(bit_state, bit_output);
 
     CHECK(bit_output.size() == 1);
@@ -365,7 +382,8 @@ TEST_SUITE("quspin/operators.h") {
 
     delete H;
 
-    H = new operator_string<double>({0, 3}, {{0, 1}, {0, 1}}, {{-1.0, 1.0}, {-1.0, 1.0}});
+    H = new operator_string<double>({0, 3}, {{0, 1}, {0, 1}},
+                                    {{-1.0, 1.0}, {-1.0, 1.0}});
     H->op(bit_state, bit_output);
 
     CHECK(bit_output.size() == 2);
@@ -423,8 +441,8 @@ TEST_SUITE("quspin/operators.h") {
     std::vector<std::pair<bs, double>> output;
     basis::bit_set<uint8_t> state({0, 1, 1, 0, 1, 0, 0, 1});
 
-    std::vector<double> H_loc
-        = {0.25, 0.0, 0.0, 0.0, 0.0, -0.25, 0.5, 0.0, 0.0, 0.5, -0.25, 0.0, 0.0, 0.0, 0.0, 0.25};
+    std::vector<double> H_loc = {0.25, 0.0, 0.0,   0.0, 0.0, -0.25, 0.5, 0.0,
+                                 0.0,  0.5, -0.25, 0.0, 0.0, 0.0,   0.0, 0.25};
 
     H = new N_body_bit_op<double, 2>({0, 1}, H_loc);
 
@@ -463,11 +481,12 @@ TEST_SUITE("quspin/operators.h") {
   }
 
   TEST_CASE("N_body_dit_op<double,2>") {
-    std::vector<double> H_loc
-        = {1., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 1., 0., 0., 0., 0., 0., 0.,  0., -1.,
-           0., 1., 0., 0., 0., 0., 0., 1., 0., 0., 0., 0., 0., 0., 0., 0., 0., 1., 0.,  0., 0.,
-           1., 0., 0., 0., 0., 0., 0., 0., 0., 0., 1., 0., 0., 0., 0., 0., 1., 0., -1., 0., 0.,
-           0., 0., 0., 0., 0., 1., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 1.};
+    std::vector<double> H_loc = {
+        1., 0., 0., 0.,  0., 0., 0., 0., 0., 0.,  0., 0., 1., 0., 0., 0., 0.,
+        0., 0., 0., -1., 0., 1., 0., 0., 0., 0.,  0., 1., 0., 0., 0., 0., 0.,
+        0., 0., 0., 0.,  1., 0., 0., 0., 1., 0.,  0., 0., 0., 0., 0., 0., 0.,
+        0., 1., 0., 0.,  0., 0., 0., 1., 0., -1., 0., 0., 0., 0., 0., 0., 0.,
+        1., 0., 0., 0.,  0., 0., 0., 0., 0., 0.,  0., 0., 1.};
     using namespace quspin;
     N_body_dit_op<double, 2>* H;
 

@@ -1,3 +1,4 @@
+// Copyright 2024 Phillip Weinberg
 #pragma once
 
 #include <complex>
@@ -5,43 +6,28 @@
 
 namespace quspin {
 
-  template <size_t base, size_t N> struct integer_pow {
-    enum pow : size_t { value = base * static_cast<size_t>(integer_pow<base, N - 1>::value) };
-  };
+template<size_t base, size_t N>
+struct integer_pow {
+    enum pow : size_t {
+      value = base * static_cast<size_t>(integer_pow<base, N - 1>::value)
+    };
+};
 
-  template <size_t base> struct integer_pow<base, 0u> {
+template<size_t base>
+struct integer_pow<base, 0u> {
     enum pow : size_t { value = 1 };
-  };
+};
+
+static_assert(integer_pow<2, 0>::value == 1);
+static_assert(integer_pow<2, 1>::value == 2);
+static_assert(integer_pow<2, 2>::value == 4);
+static_assert(integer_pow<2, 3>::value == 8);
+static_assert(integer_pow<2, 4>::value == 16);
+
+static_assert(integer_pow<3, 0>::value == 1);
+static_assert(integer_pow<3, 1>::value == 3);
+static_assert(integer_pow<3, 2>::value == 9);
+static_assert(integer_pow<3, 3>::value == 27);
+static_assert(integer_pow<3, 4>::value == 81);
 
 }  // namespace quspin
-
-#ifdef USE_STD_COMPLEX
-
-#  include <complex>
-
-namespace quspin {
-  template <class T> std::complex<T> conj(const std::complex<T>& A) { return std::conj(A); }
-
-  template <class T> T conj(const T& A) { return A; }
-
-  template <class T> T real(const std::complex<T>& A) { return A.real(); }
-
-  template <class T> T real(const T& A) { return A; }
-
-}  // namespace quspin
-#endif
-
-#ifdef QUSPIN_UNIT_TESTS
-
-TEST_SUITE("quspin/utils/functions.h") {
-  using namespace quspin;
-
-  TEST_CASE("integer_pow") {
-    CHECK(integer_pow<2, 4>::value == 16);
-    CHECK(integer_pow<3, 3>::value == 27);
-    CHECK(integer_pow<10, 3>::value == 1000);
-    CHECK(integer_pow<5, 5>::value == 3125);
-  }
-}
-
-#endif

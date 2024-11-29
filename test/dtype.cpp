@@ -1,3 +1,4 @@
+// Copyright 2024 Phillip Weinberg
 #include <cassert>
 #include <quspin/dtype/dtype.hpp>
 
@@ -14,6 +15,6 @@ int main() {
   assert(UInt64 == DType::of<uint64_t>());
   assert(Float == DType::of<float>());
   assert(Double == DType::of<double>());
-  assert(CFloat == DType::of<details::cfloat>());
-  assert(CDouble == DType::of<details::cdouble>());
+  assert(CFloat == DType::of<detail::cfloat>());
+  assert(CDouble == DType::of<detail::cdouble>());
 }
