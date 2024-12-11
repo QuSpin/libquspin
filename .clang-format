@@ -1,16 +1,13 @@
 ---
   BasedOnStyle: Google
-  AccessModifierOffset: '-2'
-  AlignTrailingComments: 'true'
-  AllowAllParametersOfDeclarationOnNextLine: 'false'
-  AlwaysBreakTemplateDeclarations: 'No'
-  BreakBeforeBraces: Attach
-  ColumnLimit: '100'
-  ConstructorInitializerAllOnOneLineOrOnePerLine: 'true'
-  IncludeBlocks: Regroup
-  IndentPPDirectives: AfterHash
-  IndentWidth: '2'
-  NamespaceIndentation: All
-  BreakBeforeBinaryOperators: All
-  BreakBeforeTernaryOperators: 'true'
+  AccessModifierOffset: 0
+  IndentAccessModifiers: true
+  IndentRequiresClause: true
+  CompactNamespaces: true
+  EmptyLineAfterAccessModifier: Always
+  FixNamespaceComments: true
+  SeparateDefinitionBlocks: Always
+  SortIncludes: CaseInsensitive
+  SpaceAfterLogicalNot: false
+  SpaceAfterTemplateKeyword: false
 ...

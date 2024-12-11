@@ -1,13 +1,15 @@
+// Copyright 2024 Phillip Weinberg
 
 #include <chrono>
 #include <iostream>
-#include <quspin/array/details/array.hpp>
+#include <quspin/array/detail/array.hpp>
 #include <tuple>
 #include <vector>
 
-using namespace quspin::details;
+using namespace quspin::detail;
 
-template <typename Func, typename... Args> decltype(auto) time_func(Func func, Args... args) {
+template<typename Func, typename... Args>
+decltype(auto) time_func(Func func, Args... args) {
   auto start = std::chrono::high_resolution_clock::now();
   auto res = func(args...);
   auto stop = std::chrono::high_resolution_clock::now();
